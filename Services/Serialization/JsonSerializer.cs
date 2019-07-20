@@ -1,8 +1,8 @@
-﻿using MyLib.Services.Serialization.Extensions;
+﻿using MyCSharpLib.Services.Serialization.Extensions;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MyLib.Services.Serialization
+namespace MyCSharpLib.Services.Serialization
 {
     public class JsonSerializer : ISerializer, IDeserializer
     {

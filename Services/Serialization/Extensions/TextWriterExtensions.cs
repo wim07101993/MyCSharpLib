@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace MyLib.Services.Serialization.Extensions
+namespace MyCSharpLib.Services.Serialization.Extensions
 {
     public static class TextWriterExtensions
     {

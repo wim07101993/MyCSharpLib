@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace MyLib.Services.Serialization.Extensions
+namespace MyCSharpLib.Services.Serialization.Extensions
 {
     public static class XmlSerializerExtensions
     {

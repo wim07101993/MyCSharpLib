@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MyLib.Services.Serialization.Extensions
+namespace MyCSharpLib.Services.Serialization.Extensions
 {
     public static class TextReaderExtensions
     {

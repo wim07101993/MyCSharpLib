@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace MyLib.Services.Serialization
+namespace MyCSharpLib.Services.Serialization
 {
     public interface IDeserializer
     {
