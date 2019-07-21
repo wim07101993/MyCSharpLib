@@ -63,7 +63,7 @@ namespace MyCSharpLib.Services.Serialization.Extensions
             => Task.Factory.StartNew(() => serializer.Deserialize<T>(xmlReader, events));
 
         public static Task<T> DeserializeAsync<T>(this System.Xml.Serialization.XmlSerializer serializer, XmlReader xmlReader, string encodingStyle)
-            => Task.Factory.StartNew(() => serializer.Deserialize<T>(xmlReader, encodingStyle, encodingStyle));
+            => Task.Factory.StartNew(() => serializer.Deserialize<T>(xmlReader, encodingStyle));
 
 
         public static Task<object> DeserializeAsync(this System.Xml.Serialization.XmlSerializer serializer, Stream stream)
