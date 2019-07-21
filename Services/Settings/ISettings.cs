@@ -1,9 +1,11 @@
-﻿namespace MyCSharpLib.Services
+﻿using System.ComponentModel;
+
+namespace MyCSharpLib.Services
 {
     /// <summary>
     /// Interface for the settings of the application.
     /// </summary>
-    public interface ISettings
+    public interface ISettings : INotifyPropertyChanged
     {
         /// <summary>
         /// Vendor of the application. Should be set before using the service. (Ex.: in App.xaml.cs or program.cs)

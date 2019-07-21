@@ -6,7 +6,7 @@ namespace MyCSharpLib.Services
     /// Mock class to test classes that depend on the <see cref="ISettingsProvider{T}"/> or <see cref="ISettingsProvider"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MockSettingsProvider<T> : ASettingsProvider<T> where T : Settings, new()
+    public class MockSettingsProvider<T> : ASettingsProvider<T> where T : class, ISettings, new()
     {
         /// <summary>
         /// Internal method to perform the actual fetching of the settings. (do nothing in this case)

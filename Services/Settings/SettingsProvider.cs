@@ -7,7 +7,7 @@ namespace MyCSharpLib.Services
     /// Provider to get <see cref="Settings"/> from the settings file.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SettingsProvider<T> : ASettingsProvider<T> where T : Settings, new()
+    public class SettingsProvider<T> : ASettingsProvider<T> where T : class, ISettings, new()
     {
         #region FIELDS
 
