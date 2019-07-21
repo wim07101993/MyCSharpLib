@@ -16,14 +16,22 @@ namespace MyCSharpLib.Services
     {
         #region FIELDS
 
-        private readonly ISettingsProvider _settingsProvider;
+        /// <summary>Provider of the settings of the application.</summary>
+        private readonly ISettingsProvider<ISettingsForFileService> _settingsProvider;
 
         #endregion FIELDS
 
 
         #region CONSTRUCTOR
 
-        public FileService(ISettingsProvider settingsProvider, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
+        /// <summary>
+        /// Constructs a new instance of the <see cref="FileService"/>.
+        /// </summary>
+        /// <param name="settingsProvider">Provider of the settings of the application.</param>
+        /// <param name="serializer">Serializer used to serialize objects to write to a file.</param>
+        /// <param name="deserializer">Deserializer used to deserialize objects read from a file.</param>
+        /// <param name="cryptoTransform">Transformer used to encrypt and decrypt data to write and read from encrypted files.</param>
+        public FileService(ISettingsProvider<ISettingsForFileService> settingsProvider, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
         {
             _settingsProvider = settingsProvider;
             Serializer = serializer;

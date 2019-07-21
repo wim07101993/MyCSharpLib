@@ -3,7 +3,11 @@ using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services
 {
-    public interface ISettingsProvider<T> where T : Settings
+    /// <summary>
+    /// Provider to get <see cref="Settings"/> from the settings of the application.
+    /// </summary>
+    /// <typeparam name="T">Type of settings to handle.</typeparam>
+    public interface ISettingsProvider<T> where T : class, ISettings
     {
         /// <summary>The settings</summary>
         T Settings { get; }
@@ -24,8 +28,8 @@ namespace MyCSharpLib.Services
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        /// <param name="settings">Settings to save.</param>
-        Task SaveSettingsAsync(T settings);
+        /// <param name="settings">Settings to save. If this parameter is null, the property value is used.</param>
+        Task SaveSettingsAsync(T settings = null);
 
         /// <summary>
         /// Event that is fired when the settings are loaded.
@@ -37,10 +41,13 @@ namespace MyCSharpLib.Services
         event EventHandler<T> SavedSettings;
     }
 
+    /// <summary>
+    /// Provider to get <see cref="Settings"/> from the settings of the application.
+    /// </summary>
     public interface ISettingsProvider
     {
         /// <summary>The settings</summary>
-        Settings Settings { get; }
+        ISettings Settings { get; }
 
         /// <summary>Is the service currently fetching settings.</summary>
         bool IsFetching { get; }
@@ -58,16 +65,16 @@ namespace MyCSharpLib.Services
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        /// <param name="settings">Settings to save.</param>
-        Task SaveSettingsAsync(Settings settings);
+        /// <param name="settings">Settings to save. If this parameter is null, the property value is used.</param>
+        Task SaveSettingsAsync(ISettings settings = null);
 
         /// <summary>
         /// Event that is fired when the settings are loaded.
         /// </summary>
-        event EventHandler<Settings> FetchedSettings;
+        event EventHandler<ISettings> FetchedSettings;
         /// <summary>
         /// Event that is fired when the settings are saved.
         /// </summary>
-        event EventHandler<Settings> SavedSettings;
+        event EventHandler<ISettings> SavedSettings;
     }
 }
