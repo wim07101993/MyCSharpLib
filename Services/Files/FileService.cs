@@ -17,9 +17,6 @@ namespace MyCSharpLib.Services
         #region FIELDS
 
         private readonly ISettingsProvider _settingsProvider;
-        private readonly ISerializer _serializer;
-        private readonly IDeserializer _deserializer;
-        private readonly ICryptoTransform _cryptoTransform;
 
         #endregion FIELDS
 
@@ -29,9 +26,9 @@ namespace MyCSharpLib.Services
         public FileService(ISettingsProvider settingsProvider, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
         {
             _settingsProvider = settingsProvider;
-            _serializer = serializer;
-            _deserializer = deserializer;
-            _cryptoTransform = cryptoTransform;
+            Serializer = serializer;
+            Deserializer = deserializer;
+            CryptoTransform = cryptoTransform;
         }
 
         #endregion CONSTRUCTOR
@@ -39,24 +36,52 @@ namespace MyCSharpLib.Services
 
         #region PROPERTIES
 
-        public string LogDirectory => throw new NotImplementedException();
+        /// <summary>Serializer used to serialize objects to write to a file.</summary>
+        public ISerializer Serializer { get; }
+
+        /// <summary>Deserializer used to deserialize objects read from a file.</summary>
+        public IDeserializer Deserializer { get; }
+
+        /// <summary>Transformer used to encrypt and decrypt data to write and read from encrypted files.</summary>
+        public ICryptoTransform CryptoTransform { get; }
 
         #endregion PROPERTIES
 
 
         #region METHODS
 
+        /// <summary>
+        /// Generates a new data file path for type T.
+        /// {data directory}\{type name}.{extension}
+        /// </summary>
+        /// <typeparam name="T">Type for which the file is ment.</typeparam>
+        /// <param name="extension">The extension of the file</param>
+        /// <returns>The path to write a file to.</returns>
         public string GenerateDataFilePath<T>(string extension)
         {
             var type = typeof(T);
             return $@"{_settingsProvider.Settings.FileSettings.DataDirectory}\{type.Name}.{extension}";
         }
 
-        private string GetPath<T>(string path, string extension)
+        /// <summary>
+        /// If the path is not null or empty, it is just returned.
+        /// Else the path is searched for in the dictionary in the settings.
+        /// Finally if there is no path yet for the type, it is generated and added.
+        /// </summary>
+        /// <typeparam name="T">Type of the data to store in the file.</typeparam>
+        /// <param name="path">
+        /// Path to save the file to. If this parameter is null, it is filled in with the correct value 
+        /// (generated or from the dictionary)
+        /// </param>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        private string GetPath<T>(string extension, string path = null)
         {
+            if (!string.IsNullOrWhiteSpace(path))
+                return path;
+
             var type = typeof(T);
-            if (string.IsNullOrWhiteSpace(path))
-                path = _settingsProvider.Settings.FileSettings.FilePaths.FirstOrDefault(x => x.Key == type).Value;
+            path = _settingsProvider.Settings.FileSettings.FilePaths.FirstOrDefault(x => x.Key == type).Value;
 
             if (!string.IsNullOrWhiteSpace(path))
                 return path;
@@ -69,10 +94,10 @@ namespace MyCSharpLib.Services
         #region read
 
         /// <summary>
-        /// Read the text from a specified path asynchronously
+        /// Read the text from a specified path as text.
         /// </summary>
-        /// <param name="path">Path to the file to read the content from</param>
-        /// <returns>The string content of the file</returns>
+        /// <param name="path">Path to the file to read the content from.</param>
+        /// <returns>The string content of the file.</returns>
         /// <exception cref="UnauthorizedAccessException">
         ///     The caller does not have the required permission.
         /// </exception>
@@ -109,13 +134,46 @@ namespace MyCSharpLib.Services
                 return await fileStream.ReadToEndAsync();
         }
 
+        /// <summary>
+        /// Read the encrypted text from a specified encrypted path.
+        /// </summary>
+        /// <param name="path">Path to the file to read the content from.</param>
+        /// <param name="cryptoTransform">Transformer that is use to decrypt the data. If this parameter is null, the property value is used.</param>
+        /// <returns>The string content of the file.</returns>
+        /// <exception cref="UnauthorizedAccessException">
+        ///     The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     Path is a zero-length string, contains only white space, or contains one or more 
+        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     Path is null.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///     The number of characters is larger than <see cref="int.MaxValue"/>.
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        ///     The specified path, file name, or both exceed the system-defined maximum length.
+        ///     For example, on Windows-based platforms, paths must be less than 248 characters,
+        ///     and file names must be less than 260 characters.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        ///     The specified path is invalid, (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        ///     The file specified in path was not found.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        ///     Path is in an invalid format.
+        /// </exception>
         public async Task<string> ReadEncryptedTextAsync(string path, ICryptoTransform cryptoTransform = null)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
             if (cryptoTransform == null)
-                cryptoTransform = _cryptoTransform;
+                cryptoTransform = CryptoTransform;
 
             using (var fileStream = File.OpenRead(path))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
@@ -174,13 +232,49 @@ namespace MyCSharpLib.Services
             }
         }
 
+        /// <summary>
+        /// Reads all lines from a specified encrypted file.
+        /// </summary>
+        /// <param name="path">Path to the file to read from.</param>
+        /// <param name="cryptoTransform">Transformer that is use to decrypt the data. If this parameter is null, the property value is used.</param>
+        /// <returns>The lines of the file.</returns>
+        /// <exception cref="UnauthorizedAccessException">
+        ///     The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     Path is a zero-length string, contains only white space, or contains one or more 
+        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     Path is null.
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        ///     The specified path, file name, or both exceed the system-defined maximum length.
+        ///     For example, on Windows-based platforms, paths must be less than 248 characters,
+        ///     and file names must be less than 260 characters.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        ///     The specified path is invalid, (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        ///     The file specified in path was not found.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        ///     Path is in an invalid format.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        ///     There is insufficient memory to allocate a buffer for the returned string.
+        /// </exception>
+        /// <exception cref="IOException">
+        ///     An I/O error occurs.
+        /// </exception>
         public IEnumerable<string> ReadEncryptedLines(string path, ICryptoTransform cryptoTransform = null)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
             if (cryptoTransform == null)
-                cryptoTransform = _cryptoTransform;
+                cryptoTransform = CryptoTransform;
 
             using (var fileStream = File.OpenRead(path))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
@@ -195,6 +289,14 @@ namespace MyCSharpLib.Services
             }
         }
 
+        /// <summary>
+        /// Reads the content of a file and parses it to an object.
+        /// TODO exceptions
+        /// </summary>
+        /// <typeparam name="T">Type to parse the content to.</typeparam>
+        /// <param name="path">Path to the file to read the json from.</param>
+        /// <param name="deserializer">Deserializer to deserialize the content of the file. If this parameter is null, the property value is used.</param>
+        /// <returns>The parsed value.</returns>
         public async Task<T> ReadAsync<T>(string path = null, IDeserializer deserializer = null)
         {
             if (path == null)
@@ -210,12 +312,21 @@ namespace MyCSharpLib.Services
             }
 
             if (deserializer == null)
-                deserializer = _deserializer;
+                deserializer = Deserializer;
 
             using (var fileStream = File.OpenText(path))
                 return await deserializer.DeserializeAsync<T>(fileStream);
         }
 
+        /// <summary>
+        /// Reads the encrypted content of a file and parses it to an object.
+        /// TODO exceptions
+        /// </summary>
+        /// <typeparam name="T">Type to parse the content to.</typeparam>
+        /// <param name="path">Path to the file to read the json from.</param>
+        /// <param name="deserializer">Deserializer to deserialize the content of the file. If this parameter is null, the property value is used.</param>
+        /// <param name="cryptoTransform">Transformer that is use to decrypt the data. If this parameter is null, the property value is used.</param>
+        /// <returns>The parsed value.</returns>
         public async Task<T> ReadEncryptedAsync<T>(string path = null, IDeserializer deserializer = null, ICryptoTransform cryptoTransform = null)
         {
             if (path == null)
@@ -231,10 +342,10 @@ namespace MyCSharpLib.Services
             }
 
             if (deserializer == null)
-                deserializer = _deserializer;
+                deserializer = Deserializer;
 
             if (cryptoTransform == null)
-                cryptoTransform = _cryptoTransform;
+                cryptoTransform = CryptoTransform;
 
             using (var fileStream = File.OpenRead(path))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
@@ -248,36 +359,11 @@ namespace MyCSharpLib.Services
         #region write
 
         /// <summary>
-        /// Writes a string to a file asynchronously.
+        /// Writes a string to a file.
+        /// TODO exceptions
         /// </summary>
         /// <param name="text">Text to write to the file.</param>
         /// <param name="path">Path to the file to write to.</param>
-        /// <exception cref="IOException">
-        ///     The directory specified by path is a file.-or-The network name is not known. 
-        ///     Or An I/O error occurred while opening the file.
-        /// </exception>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters. You can query for invalid characters by using the <see cref="Path.GetInvalidPathChars"/>
-        ///     method.-or- path is prefixed with, or contains, only a colon character (:).
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        ///     path is null.
-        /// </exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length.
-        ///     For example, on Windows-based platforms, paths must be less than 248 characters
-        ///     and file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///     path is in an invalid format.
-        /// </exception>
         public async Task WriteTextAsync(string text, string path)
         {
             if (path == null)
@@ -301,6 +387,13 @@ namespace MyCSharpLib.Services
             }
         }
 
+        /// <summary>
+        /// Writes a string encrypted to a file.
+        /// TODO exceptions
+        /// </summary>
+        /// <param name="text">Text to write to the file.</param>
+        /// <param name="path">Path to the file to write to.</param>
+        /// <param name="cryptoTransform">Transformer that is use to encrypt the data. If this parameter is null, the property value is used.</param>
         public async Task WriteEncryptedTextAsync(string text, string path, ICryptoTransform cryptoTransform = null)
         {
             if (path == null)
@@ -317,7 +410,7 @@ namespace MyCSharpLib.Services
             }
 
             if (cryptoTransform == null)
-                cryptoTransform = _cryptoTransform;
+                cryptoTransform = CryptoTransform;
 
             using (var fileStream = File.Open(path, FileMode.Create))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
@@ -329,35 +422,11 @@ namespace MyCSharpLib.Services
         }
 
         /// <summary>
-        /// Writes a list of lines to a file asynchronoulsy.
+        /// Writes a list of lines to a file.
+        /// TODO exceptions
         /// </summary>
         /// <param name="path">Path to the file to write to.</param>
         /// <param name="text">Lines to write to the file.</param>
-        /// <exception cref="IOException">
-        ///     The directory specified by path is a file.-or-The network name is not known. 
-        /// </exception>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters. You can query for invalid characters by using the <see cref="Path.GetInvalidPathChars"/>
-        ///     method.-or- path is prefixed with, or contains, only a colon character (:).
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        ///     path is null.
-        /// </exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length.
-        ///     For example, on Windows-based platforms, paths must be less than 248 characters
-        ///     and file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///     path is in an invalid format.
-        /// </exception>
         public async Task WriteLinesAsync(IEnumerable<string> lines, string path)
         {
             if (path == null)
@@ -380,6 +449,13 @@ namespace MyCSharpLib.Services
             }
         }
 
+        /// <summary>
+        /// Writes a list of lines encrypted to a file.
+        /// TODO exceptions
+        /// </summary>
+        /// <param name="path">Path to the file to write to.</param>
+        /// <param name="lines">Lines to write to the file.</param>
+        /// <param name="cryptoTransform">Transformer that is use to encrypt the data. If this parameter is null, the property value is used.</param>
         public async Task WriteEncryptedLinesAsync(IEnumerable<string> lines, string path, ICryptoTransform cryptoTransform = null)
         {
             if (path == null)
@@ -392,7 +468,7 @@ namespace MyCSharpLib.Services
                 Directory.CreateDirectory(directory);
 
             if (cryptoTransform == null)
-                cryptoTransform = _cryptoTransform;
+                cryptoTransform = CryptoTransform;
 
             using (var fileStream = File.OpenRead(path))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
@@ -406,24 +482,39 @@ namespace MyCSharpLib.Services
             }
         }
 
+        /// <summary>
+        /// Writes an object, serialized with json, to a file.
+        /// TODO exceptions
+        /// </summary>
+        /// <param name="path">Path to the file to write to.</param>
+        /// <param name="value">Value to write to the file as json</param>
+        /// <param name="serializer"></param>
         public async Task WriteAsync<T>(T value, string path = null, ISerializer serializer = null)
         {
             if (serializer == null)
-                serializer = _serializer;
+                serializer = Serializer;
 
-            path = GetPath<T>(path, serializer.FileExtension);
+            path = GetPath<T>(serializer.FileExtension, path);
 
             using (var fileStream = File.Open(path, FileMode.Create))
             using (var streamWriter = new StreamWriter(fileStream))
                 await serializer.SerializeAsync(value, streamWriter);
         }
 
+        /// <summary>
+        /// Writes an object, serialized with json, to an encrypted file.
+        /// TODO exceptions
+        /// </summary>
+        /// <param name="path">Path to the file to write to.</param>
+        /// <param name="value">Value to write to the file as json</param>
+        /// <param name="deserializer">Serializer to serialize the object. If this parameter is null, the property value is used.</param>
+        /// <param name="cryptoTransform">Transformer that is use to encrypt the data. If this parameter is null, the property value is used.</param>
         public async Task WriteEncryptedAsync<T>(T value, string path = null, ISerializer serializer = null, ICryptoTransform cryptoTransform = null)
         {
             if (serializer == null)
-                serializer = _serializer;
+                serializer = Serializer;
 
-            path = GetPath<T>(path, serializer.FileExtension);
+            path = GetPath<T>(serializer.FileExtension, path);
 
             using (var fileStream = File.Open(path, FileMode.Create))
             using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
