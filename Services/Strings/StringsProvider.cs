@@ -15,9 +15,6 @@ namespace MyCSharpLib.Services
         /// <summary>Service to read and write the strings to files.</summary>
         private readonly IFileService _fileService;
 
-        /// <summary>Field for the <see cref="Strings"/> property.</summary>
-        private IStringsSettings _settings;
-
         /// <summary>Field for the the <see cref="Languages"/> property.</summary>
         private string[] _languages;
 
@@ -26,23 +23,26 @@ namespace MyCSharpLib.Services
 
         #region CONSTRUCTOR
 
-        public StringsProvider(ISettingsProvider<IStringsSettings> settingsProvider, IFileService fileService)
+        public StringsProvider(IStringsFileSettings settings, IFileService fileService)
+            : base(settings)
         {
-            _settings = settingsProvider.Settings;
             _fileService = fileService;
 
-            if (!Directory.Exists(_settings.LanguagesDirectory))
-                Directory.CreateDirectory(_settings.LanguagesDirectory);
+            if (!Directory.Exists(Settings.LanguagesDirectory))
+                Directory.CreateDirectory(Settings.LanguagesDirectory);
 
             FetchLanguagePossibilities();
-            settingsProvider.Settings.PropertyChanged += OnSettingsPropertyChanged;
+            Settings.PropertyChanged += OnSettingsPropertyChanged;
         }
 
         #endregion CONSTRUCTOR
 
 
         #region PROPERTIES
-        
+
+        /// <summary>Field for the <see cref="Strings"/> property.</summary>
+        private IStringsFileSettings Settings => settings as IStringsFileSettings;
+
         public override string[] Languages
         {
             get => _languages;
@@ -56,28 +56,27 @@ namespace MyCSharpLib.Services
 
         protected override async Task<T> InternalFetchStringsAsync(string language) 
         {
-            return await _fileService.ReadAsync<T>($@"{_settings.LanguagesDirectory}\{language}");
+            return await _fileService.ReadAsync<T>($@"{Settings.LanguagesDirectory}\{language}");
         }
 
         protected override async Task InternalSaveStringsAsync(T strings, string language)
         {
-            await _fileService.WriteAsync(strings, $@"{_settings.LanguagesDirectory}\{language}");
+            await _fileService.WriteAsync(strings, $@"{Settings.LanguagesDirectory}\{language}");
         }
         
         public void FetchLanguagePossibilities()
         {
             Languages = Directory
-                .GetFiles(_settings.LanguagesDirectory)
+                .GetFiles(Settings.LanguagesDirectory)
                 .Select(x => x.Split('/').Last())
                 .ToArray();
         }
 
         protected override void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var settings = (T)sender;
             switch (e.PropertyName)
             {
-                case nameof(Settings.Settings.LanguagesDirectory):
+                case nameof(Settings.LanguagesDirectory):
                     FetchLanguagePossibilities();
                     break;
             }

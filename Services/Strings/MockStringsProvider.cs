@@ -4,6 +4,11 @@ namespace MyCSharpLib.Services
 {
     public class MockStringsProvider<T> : AStringsProvider<T> where T : IStrings, new()
     {
+        public MockStringsProvider() : base(new StringSettings())
+        {
+        }
+
+
         public override string[] Languages
         {
             get => new[] { "eng" };
@@ -14,5 +19,15 @@ namespace MyCSharpLib.Services
 
         protected override Task<T> InternalFetchStringsAsync(string language) => Task.FromResult(Strings);
         protected override Task InternalSaveStringsAsync(T strings, string language) => Task.CompletedTask;
+
+
+        private class StringSettings : Settings, IStringsSettings
+        {
+            public string Language
+            {
+                get => "eng";
+                set { }
+            }
+        }
     }
 }

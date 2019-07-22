@@ -11,12 +11,26 @@ namespace MyCSharpLib.Services
     {
         #region FIELDS
 
+        /// <summary>Field for the <see cref="Strings"/> property.</summary>
+        protected readonly IStringsSettings settings;
+
         private bool _isFetching;
         private bool _isSaving;
 
         private string _language;
-       
+
         #endregion FIELDS
+
+
+        #region CONSTRUCTOR
+
+        public AStringsProvider(IStringsSettings settings)
+        {
+            this.settings = settings;
+            this.settings.PropertyChanged += OnSettingsPropertyChanged;
+        }
+
+        #endregion CONSTRUCTOR
 
 
         #region PROPERTIES
@@ -103,11 +117,9 @@ namespace MyCSharpLib.Services
 
         protected virtual void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var settings = (T)sender;
             switch (e.PropertyName)
             {
-                case nameof(StringsSettings.LanguagesDirectory):
-                case nameof(StringsSettings.Language):
+                case nameof(IStringsSettings.Language):
                     _ = FetchStringsAsync(settings.Language);
                     break;
             }
