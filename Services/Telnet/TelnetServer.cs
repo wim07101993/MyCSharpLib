@@ -14,7 +14,7 @@ namespace MyCSharpLib.Services.Telnet
     {
         #region FIELDS
 
-        private readonly ISettingsForTelnetServer _settings;
+        private readonly ITelnetServerSettings _settings;
 
         private readonly object _lock = new object();
         private readonly List<TcpClient> _clients = new List<TcpClient>();
@@ -27,7 +27,7 @@ namespace MyCSharpLib.Services.Telnet
 
         #region CONSTRUCTOR
 
-        public TelnetServer(ISettingsForTelnetServer settings)
+        public TelnetServer(ITelnetServerSettings settings)
         {
             _settings = settings;
         }
@@ -40,7 +40,7 @@ namespace MyCSharpLib.Services.Telnet
         public Task ListenAndServeAsync()
             => Task.Factory.StartNew(() =>
         {
-            var listener = new TcpListener(IPAddress.Any, _settings.TelnetServerSettings.PortNumber);
+            var listener = new TcpListener(IPAddress.Any, _settings.PortNumber);
             listener.Start();
 
             _cancellationTokenSource = new CancellationTokenSource();
