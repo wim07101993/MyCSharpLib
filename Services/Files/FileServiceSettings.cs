@@ -10,7 +10,7 @@ namespace MyCSharpLib.Services
     /// This class should be used in the <see cref="Settings"/> class for the <see cref="ISettingsProvider"/>.
     /// Extends <see cref="BindableBase"/>.
     /// </summary>
-    public class FileServiceSettings : BindableBase
+    public class FileServiceSettings : Settings, IFileServiceSettings
     {
         #region FIELDS
 
@@ -44,7 +44,7 @@ namespace MyCSharpLib.Services
         public Dictionary<Type, string> FilePaths
         {
             get => _filePaths;
-            private set => SetProperty(ref _filePaths, value);
+            set => SetProperty(ref _filePaths, value);
         }
 
         #endregion PROPERTIES
