@@ -1,12 +1,14 @@
 ﻿using MyCSharpLib.Extensions;
 using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace MyCSharpLib.Services.Telnet
 {
@@ -17,10 +19,8 @@ namespace MyCSharpLib.Services.Telnet
         private readonly ITelnetServerSettings _settings;
 
         private readonly object _lock = new object();
-        private readonly List<TcpClient> _clients = new List<TcpClient>();
-        private readonly List<NetworkStream> _streams = new List<NetworkStream>();
 
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         #endregion FIELDS
 
@@ -30,89 +30,123 @@ namespace MyCSharpLib.Services.Telnet
         public TelnetServer(ITelnetServerSettings settings)
         {
             _settings = settings;
+
+            Connections = new ObservableCollection<TelnetServerConnection>();
+            Connections.CollectionChanged += OnClientsCollectionChanged;
         }
 
         #endregion CONSTRUCTOR
 
 
+        #region PROPERTIES
+
+        public bool IsListening { get; private set; }
+
+        /// <summary>
+        /// A collection that holds all active connections.
+        /// If a new connection is added, it is automatically listened to.
+        /// When a connection is removed, it is disposed.
+        /// If one of the connections throws an exception while trying to read or write, it is also automatically removed.
+        /// </summary>
+        public ObservableCollection<TelnetServerConnection> Connections { get; }
+
+        #endregion PROPERTIES
+
+
         #region METHODS
 
-        public Task ListenAndServeAsync()
+        /// <summary>
+        /// Starts listening to any ip address on the given port number (settings).
+        /// If a new listener comes in, it is added to the connections collection.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task ListenAndServeAsync(CancellationToken cancellationToken = default)
             => Task.Factory.StartNew(() =>
         {
             var listener = new TcpListener(IPAddress.Any, _settings.PortNumber);
             listener.Start();
 
-            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
 
+            IsListening = true;
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
                 try
-                {
-                    var client = listener.AcceptTcpClient();
-                    lock (_lock)
+                {   lock (_lock)
                     {
-                        _clients.Add(client);
-                        _ = HandleClientAsync(client, _cancellationTokenSource.Token);
+                        Connections.Add(new TelnetServerConnection
+                        {
+                            Id = Guid.NewGuid(),
+                            Client = listener.AcceptTcpClient(),
+                            CancellationTokenSource = _cancellationTokenSource
+                        });
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine(e.Message);
+                    IsListening = false;
                     throw;
                 }
             }
+            IsListening = false;
         });
-
-        public async Task StopListeningAndServingAsync()
+        
+        public void StopListeningAndServing()
         {
-            _cancellationTokenSource.Cancel();
-
-            await Task.Delay(1000);
-
             lock (_lock)
             {
-                foreach (var stream in _streams)
-                    stream.TryDispose();
-                foreach (var client in _clients)
-                    client.TryDispose();
-
-                _clients.Clear();
-                _streams.Clear();
+                Connections.Clear();
             }
         }
 
-        public async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
+        private void OnClientsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var addedConnections = e.NewItems?.Cast<TelnetServerConnection>();
+            var removedConnections = e.OldItems?.Cast<TelnetServerConnection>();
+
+            if (addedConnections != null)
+                foreach (var connection in addedConnections)
+                    _ = HandleClientAsync(connection);
+
+            if (removedConnections != null)
+                foreach (var connection in removedConnections)
+                    if (!connection.IsDisposed)
+                        connection.Client.TryDispose();
+        }
+
+        private async Task HandleClientAsync(TelnetServerConnection connection)
         {
             NetworkStream stream = null;
+
             try
             {
-                using (client)
+                using (connection.Client)
                 {
-                    stream = client.GetStream();
+                    stream = connection.Client.GetStream();
                     using (stream)
                     {
-                        _streams.Add(stream);
-                        var ipAdress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
+                        var ipAdress = ((IPEndPoint)connection.Client.Client.RemoteEndPoint).Address;
                         var i = 0;
                         var buffer = new byte[256];
 
                         do
                         {
                             // read the message
-                            i = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                            i = await stream.ReadAsync(buffer, 0, buffer.Length, connection.CancellationTokenSource.Token);
                             var receivedMessage = Encoding.ASCII.GetString(buffer, 0, i);
 
                             // fire event
-                            var returnMessage = ReceivedMessage?.Invoke(ipAdress, receivedMessage);
+                            var returnMessage = await ReceivedMessage?.Invoke(ipAdress, receivedMessage);
                             if (string.IsNullOrEmpty(returnMessage))
                                 continue;
 
                             // return message to client
                             var returnBytes = returnMessage.ToAsciiBytes();
-                            await stream.WriteAsync(returnBytes, 0, returnBytes.Length, cancellationToken);
+                            await stream.WriteAsync(returnBytes, 0, returnBytes.Length, connection.CancellationTokenSource.Token);
                         }
-                        while (i != 0 && !cancellationToken.IsCancellationRequested);
+                        while (i != 0 && !connection.CancellationTokenSource.IsCancellationRequested);
                     }
                 }
             }
@@ -123,14 +157,12 @@ namespace MyCSharpLib.Services.Telnet
             }
             finally
             {
-                client.TryDispose();
-                stream?.TryDispose();
+                Connections.RemoveFirst(x => x.Id == connection.Id);
             }
 
-            _clients.Remove(client);
-            _streams.Remove(stream);
+            Connections.RemoveFirst(x => x.Id == connection.Id);
         }
-
+        
         #endregion METHODS
 
 
