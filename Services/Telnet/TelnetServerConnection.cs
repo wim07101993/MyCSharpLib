@@ -80,7 +80,15 @@ namespace MyCSharpLib.Services.Telnet
             StopListening();
             await Task.Delay(10);
             TcpClient.Dispose();
-            _cancellationTokenSource.Dispose();
+            try
+            {
+                _cancellationTokenSource.Dispose();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.Message);
+            }
+            
             IsDisposed = true;
         }
 
@@ -108,7 +116,7 @@ namespace MyCSharpLib.Services.Telnet
             }
 
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
-            cancellationTokenSource.Token.Register(() => TcpClient.Close());
+            cancellationTokenSource.Token.Register(Dispose);
 
             _ = DisposeOnDisconnectAsync();
 
@@ -130,7 +138,14 @@ namespace MyCSharpLib.Services.Telnet
         {
             while (await CheckAliveAsync())
             {
-                await Task.Delay(1000, CancellationToken);
+                try
+                {
+                    await Task.Delay(AreYouThereInterval, CancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
             }
 
             await DisposeAsync();

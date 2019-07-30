@@ -16,7 +16,7 @@ namespace MyCSharpLib.Services.Telnet
 
         void Stop();
 
-        event ReceivedAsyncEventHandler ReceivedMessage;
+        event ReceivedAsyncEventHandler ReceivedAsync;
         event EventHandler<bool> StateChanged;
     }
 }

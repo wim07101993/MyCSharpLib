@@ -175,14 +175,14 @@ namespace MyCSharpLib.Services.Telnet
         protected abstract T CreateNewConnection(TcpClient tcpClient, CancellationToken cancellationToken);
 
         protected virtual Task RaiseReceivedAsync(ITelnetConnection connection, ReceivedEventArgs args)
-            => ReceivedMessage?.Invoke(connection, args);
+            => ReceivedAsync?.Invoke(connection, args);
 
         #endregion METHODS
 
 
         #region EVENTS
 
-        public event ReceivedAsyncEventHandler ReceivedMessage;
+        public event ReceivedAsyncEventHandler ReceivedAsync;
         public event EventHandler<bool> StateChanged;
 
         #endregion EVENTS
