@@ -14,6 +14,8 @@ namespace MyCSharpLib.Services.Telnet
         Guid Id { get; }
 
         TcpClient TcpClient { get; }
+        string RemoteHost { get; }
+
         CancellationToken CancellationToken { get; }
 
         bool IsDisposed { get; }

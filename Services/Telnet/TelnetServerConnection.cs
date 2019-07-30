@@ -2,6 +2,8 @@
 using MyCSharpLib.Services.Serialization;
 using Prism.Mvvm;
 using System;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +14,8 @@ namespace MyCSharpLib.Services.Telnet
     {
         #region FIELDS
 
-        private const int BufferSize = 1048576;
+        private const int BufferSize = 256;
+        private const int AreYouThereInterval = 1000;
 
         private readonly object _lock = new object();
         private readonly byte[] _buffer = new byte[BufferSize];
@@ -43,7 +46,10 @@ namespace MyCSharpLib.Services.Telnet
         public ISerializerDeserializer SerializerDeserializer { get; }
 
         public Guid Id { get; }
+
         public TcpClient TcpClient { get; }
+        public string RemoteHost => (TcpClient?.Client.RemoteEndPoint as IPEndPoint)?.ToString();
+
         public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         public bool IsDisposed
@@ -102,6 +108,10 @@ namespace MyCSharpLib.Services.Telnet
             }
 
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
+            cancellationTokenSource.Token.Register(() => TcpClient.Close());
+
+            _ = DisposeOnDisconnectAsync();
+
             while (!cancellationTokenSource.IsCancellationRequested)
             {
                 var i = await TcpClient.GetStream().ReadAsync(_buffer, 0, _buffer.Length, cancellationTokenSource.Token);
@@ -114,6 +124,22 @@ namespace MyCSharpLib.Services.Telnet
 
                 _ = RaiseReceivedAsync(bytes);
             }
+        }
+
+        protected async Task DisposeOnDisconnectAsync()
+        {
+            while (await CheckAliveAsync())
+            {
+                await Task.Delay(1000, CancellationToken);
+            }
+
+            await DisposeAsync();
+        }
+
+        protected async Task<bool> CheckAliveAsync()
+        {
+            await TcpClient.GetStream().WriteAsync(new byte[1], 0, 1);
+            return TcpClient.Connected;
         }
 
         public void StopListening()
@@ -150,7 +176,13 @@ namespace MyCSharpLib.Services.Telnet
 
         public virtual async Task RaiseReceivedAsync(byte[] bytes)
         {
-            await ReceivedAsync?.Invoke(this, new ReceivedEventArgs(bytes, SerializerDeserializer));
+            var args = new ReceivedEventArgs(bytes, SerializerDeserializer);
+
+#if DEBUG
+            Debug.WriteLine($"Received: {args.StringContent}");
+#endif
+
+            await ReceivedAsync?.Invoke(this, args);
         }
 
         #endregion METHODS
