@@ -1,19 +1,22 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services.Telnet
 {
-    public interface ITelnetServer
+    public interface ITelnetServer<T>
+        where T : ITelnetConnection
     {
-        bool IsListening { get; }
+        bool IsRunning { get; }
 
-        ObservableCollection<TelnetServerConnection> Connections { get; }
+        ObservableCollection<T> Connections { get; }
 
-        Task ListenAndServeAsync(CancellationToken cancellationToken = default);
+        Task StartAsync(CancellationToken cancellationToken = default);
 
-        void StopListeningAndServing();
+        void Stop();
 
-        event ReceivedTelnetMessageEventHandler ReceivedMessage;
+        event ReceivedAsyncEventHandler ReceivedMessage;
+        event EventHandler<bool> StateChanged;
     }
 }

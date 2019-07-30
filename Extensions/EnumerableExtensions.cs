@@ -5,7 +5,18 @@ namespace MyCSharpLib.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static IEnumerable<T> Add<T>(this IEnumerable<T> source, IEnumerable<T> items)
+        public static void Add<T>(this IList<T> source, IEnumerable<T> items)
+        {
+            if (source == null)
+                throw new NullReferenceException(nameof(source));
+            if (items == null)
+                throw new NullReferenceException(nameof(source));
+
+            foreach (var item in items)
+                source.Add(item);
+        }
+
+        public static IEnumerable<T> Combine<T>(this IEnumerable<T> source, IEnumerable<T> items)
         {
             if (source == null)
                 throw new NullReferenceException(nameof(source));
