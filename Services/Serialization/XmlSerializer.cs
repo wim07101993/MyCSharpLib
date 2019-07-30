@@ -7,7 +7,7 @@ namespace MyCSharpLib.Services.Serialization
     /// <summary>
     /// Serializes an object of a given type to xml format.
     /// </summary>
-    public class XmlSerializer : ISerializer, IDeserializer
+    public class XmlSerializer : ISerializerDeserializer
     {
         /// <summary>
         /// Extension for the files with the serialized content. (.xml)

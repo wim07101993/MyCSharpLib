@@ -7,7 +7,7 @@ namespace MyCSharpLib.Services.Serialization
     /// <summary>
     /// Serializes an object of a given type to json format.
     /// </summary>
-    public class JsonSerializer : ISerializer, IDeserializer
+    public class JsonSerializer : ISerializerDeserializer
     {
         /// <summary>
         /// Extension for the files with the serialized content. (.json)
