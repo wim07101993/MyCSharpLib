@@ -1,5 +1,6 @@
 ﻿using MyCSharpLib.Services.Serialization;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Threading;
@@ -18,6 +19,8 @@ namespace MyCSharpLib.Services.Telnet
 
         bool IsDisposed { get; }
         bool IsListening { get; }
+
+        ObservableCollection<TelnetMessage> MessageHistory { get; }
 
 
         Task StartListeningAsync(CancellationToken cancellationToken = default);
