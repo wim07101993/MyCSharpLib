@@ -16,8 +16,6 @@ namespace MyCSharpLib.Services.Telnet
         TcpClient TcpClient { get; }
         string RemoteHost { get; }
 
-        CancellationToken CancellationToken { get; }
-
         bool IsDisposed { get; }
         bool IsListening { get; }
 
@@ -25,11 +23,12 @@ namespace MyCSharpLib.Services.Telnet
         Task StartListeningAsync(CancellationToken cancellationToken = default);
         void StopListening();
 
-        Task WriteAsync(string value);
-        Task WriteLineAsync(string value);
-        Task WriteAsync(object value, ISerializer serializer = null);
-        Task WriteAsync(byte[] buffer, int offset, int count);
+        Task WriteAsync(string value, CancellationToken cancellationToken = default);
+        Task WriteLineAsync(string value, CancellationToken cancellationToken = default);
+        Task WriteAsync(object value, ISerializer serializer = null, CancellationToken cancellationToken = default);
+        Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default);
 
+        void StopAllTransactions();
 
         event ReceivedAsyncEventHandler ReceivedAsync;
     }

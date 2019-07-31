@@ -3,7 +3,9 @@ using MyCSharpLib.Services.Logging;
 using MyCSharpLib.Services.Serialization;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -20,25 +22,28 @@ namespace MyCSharpLib.Services.Telnet
         private const int AreYouThereInterval = 1000;
 
         private readonly object _lock = new object();
-        private readonly byte[] _buffer = new byte[BufferSize];
 
-        private CancellationTokenSource _cancellationTokenSource;
+        private readonly CancellationTokenSource _checkAliveCancelTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _receiveCancelTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource _sendCancelTokenSource = new CancellationTokenSource();
+        
         private bool _isDisposed;
         private bool _isDisposing;
         private bool _isListening;
-        
+
         #endregion FIELDS
 
 
         #region CONSTRUCTOR
 
-        public TelnetServerConnection(TcpClient tcpClient, CancellationToken cancellationToken, ISerializerDeserializer serializerDeserializer)
+        public TelnetServerConnection(TcpClient tcpClient, ISerializerDeserializer serializerDeserializer)
         {
             SerializerDeserializer = serializerDeserializer;
             Id = Guid.NewGuid();
 
             TcpClient = tcpClient;
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            _ = DisposeOnDisconnectAsync(_checkAliveCancelTokenSource.Token);
 
             Trace.WriteLines($"Created new telnetServerConnection with {RemoteHost}. Id = {Id}");
         }
@@ -53,12 +58,11 @@ namespace MyCSharpLib.Services.Telnet
         public Guid Id { get; }
 
         public TcpClient TcpClient { get; }
+
         public string RemoteHost 
             => IsDisposed 
                 ? null 
                 : (TcpClient?.Client.RemoteEndPoint as IPEndPoint)?.ToString();
-
-        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         public bool IsDisposed
         {
@@ -77,20 +81,27 @@ namespace MyCSharpLib.Services.Telnet
 
         #region METHDOS
 
+        public void StopAllTransactions()
+        {
+            _receiveCancelTokenSource?.Cancel();
+            _sendCancelTokenSource?.Cancel();
+
+            _receiveCancelTokenSource.Dispose();
+            _sendCancelTokenSource.Dispose();
+        }
+
         public void Dispose()
         {
             lock (_lock)
             {
                 if (_isDisposing)
                     return;
-
                 _isDisposing = true;
 
                 var remoteHost = RemoteHost;
                 Trace.WriteLines($"Disposing connection to {remoteHost}.", $"({Id})");
 
-                if (IsListening)
-                    StopListening();
+                StopAllTransactions();
 
                 if (IsDisposed)
                 {
@@ -98,8 +109,10 @@ namespace MyCSharpLib.Services.Telnet
                     return;
                 }
 
+                _checkAliveCancelTokenSource.Cancel();
+                _checkAliveCancelTokenSource.Dispose();
+
                 TcpClient.Dispose();
-                _cancellationTokenSource.Dispose();
 
                 IsDisposed = true;
                 _isDisposing = false;
@@ -107,7 +120,9 @@ namespace MyCSharpLib.Services.Telnet
                 Trace.WriteLines($"Disposed connection to {remoteHost}.", $"({Id})");
             }
         }
-        
+
+        #region reading
+
         public async Task StartListeningAsync(CancellationToken cancellationToken = default)
         {
             lock (_lock)
@@ -116,47 +131,12 @@ namespace MyCSharpLib.Services.Telnet
                     throw new NotSupportedException("Cannot start listening twice");
                 IsListening = true;
             }
-
+            
             var remoteHost = RemoteHost;
+            _receiveCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            
             Trace.WriteLines($"Started listening to {remoteHost}.", $"({Id})");
-
-            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
-            //cancellationTokenSource.Token.Register(Dispose);
-
-            _ = DisposeOnDisconnectAsync();
-
-            while (!cancellationTokenSource.IsCancellationRequested && IsListening)
-            {
-                try
-                {
-                    var i = await TcpClient.GetStream().ReadAsync(_buffer, 0, _buffer.Length, cancellationTokenSource.Token);
-
-                    if (i <= 0)
-                        continue;
-
-                    var bytes = new byte[i];
-                    Array.Copy(_buffer, 0, bytes, 0, i);
-
-                    _ = RaiseReceivedAsync(bytes);
-                }
-                catch (ObjectDisposedException)
-                {
-                    if (cancellationTokenSource.IsCancellationRequested)
-                        Trace.WriteLines("Disposed the tcp client (server probalby stopped), nothing to worry about");
-                    else
-                        throw;
-                }
-                catch(IOException)
-                {
-                    lock(_lock)
-                    {
-                        Trace.WriteLines("There was an error while trying to read from the connection. Disposing the connection.");
-                        if (!IsDisposed)
-                            Dispose();
-                    }
-                }
-            }
-
+            await ListenAsync(_receiveCancelTokenSource.Token);
             Trace.WriteLines($"Stopped listening to {remoteHost}.", $"({Id})");
 
             lock (_lock)
@@ -165,13 +145,171 @@ namespace MyCSharpLib.Services.Telnet
             }
         }
 
-        protected async Task DisposeOnDisconnectAsync()
+        public void StopListening()
+        {
+            lock (_lock)
+            {
+                if (!IsListening)
+                    return;
+
+                Trace.WriteLines($"Stopping to listen to {RemoteHost}.", $"({Id})");
+                _receiveCancelTokenSource.Cancel();
+            }
+        }
+
+        private Task ListenAsync(CancellationToken cancellationToken)
+            => Task.Factory.StartNew(() =>
+        {
+            var remoteHost = RemoteHost;
+            var readState = new ReadState();
+            while (!cancellationToken.IsCancellationRequested && IsListening)
+            {
+                readState.IsReading = true;
+                try
+                {
+                    TcpClient.GetStream().BeginRead(readState.Buffer, 0, readState.Buffer.Length, EndReadCallback, readState);
+                }
+                catch (IOException)
+                {
+                    Trace.WriteLine($"Client at {remoteHost} closed connection");
+                }
+                
+
+                while (readState.IsReading)
+                {
+                    if (cancellationToken.IsCancellationRequested || !IsListening)
+                        return;
+                }
+
+                if (readState.IsMessageComplete)
+                {
+                    _ = RaiseReceivedAsync(readState.CompleteMessage);
+                    readState = new ReadState();
+                }
+            }
+        });
+
+        private void EndReadCallback(IAsyncResult asyncResult)
+        {
+            if (!IsListening)
+                return;
+
+            try
+            {
+                var i = TcpClient.GetStream().EndRead(asyncResult);
+
+                var readState = (ReadState)asyncResult.AsyncState;
+                if (i <= 0)
+                {
+                    readState.IsReading = false;
+                    return;
+                }
+
+                var buffer = readState.Buffer;
+                var message = readState.CompleteMessage;
+
+                var bytes = new byte[i];
+                Array.Copy(buffer, 0, bytes, 0, i);
+                message.AddRange(bytes);
+
+                if (bytes[i - 2] == '\r' && bytes[i - 1] == '\n')
+                    readState.IsMessageComplete = true;
+                else
+                    readState.IsMessageComplete = false;
+
+                readState.IsReading = false;
+            }
+            catch (InvalidOperationException)
+            {
+                if (!IsDisposed)
+                    throw;
+                return;
+            }
+        }
+
+        protected virtual async Task RaiseReceivedAsync(IEnumerable<byte> bytes)
+        {
+            var args = new ReceivedEventArgs(bytes, SerializerDeserializer);
+
+            Trace.WriteLines($"Received content from {RemoteHost}.",
+                $"({Id})",
+                args.BytesContent,
+                "As ASCII:",
+                args.StringContent);
+
+            await ReceivedAsync?.Invoke(this, args);
+        }
+
+        #endregion reading
+
+
+        #region writing
+
+        public async Task WriteAsync(string value, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+
+            var bytes = value.ToAsciiBytes();
+            await WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+        }
+
+        public async Task WriteLineAsync(string value, CancellationToken cancellationToken = default) 
+            => await WriteAsync($"{value ?? string.Empty}\r\n", cancellationToken);
+
+        public async Task WriteAsync(object value, ISerializer serializer = null, CancellationToken cancellationToken = default)
+        {
+            if (serializer == null)
+                serializer = SerializerDeserializer;
+
+            var serialized = await serializer.SerializeAsync(value);
+            await WriteLineAsync(serialized, cancellationToken);
+        }
+
+        public Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+            => Task.Factory.StartNew(() =>
+        {
+            if (_sendCancelTokenSource?.IsCancellationRequested != false)
+                _sendCancelTokenSource = new CancellationTokenSource();
+
+            var sendCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _sendCancelTokenSource.Token);
+
+            Trace.WriteLines($"Writeing bytes to {RemoteHost}.",
+                $"({Id})",
+                buffer,
+                "As ASCII",
+                Encoding.ASCII.GetString(buffer));
+
+            var sendState = new SendState { IsSending = true };
+            TcpClient.GetStream().BeginWrite(buffer, 0, buffer.Length, EndWriteCallBack, sendState);
+
+            while (sendState.IsSending)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+            }
+        });
+
+        private void EndWriteCallBack(IAsyncResult asyncResult)
+        {
+            var sendState = (SendState)asyncResult.AsyncState;
+
+            TcpClient.GetStream().EndWrite(asyncResult);
+            sendState.IsSending = false;
+        }
+
+        #endregion writing
+
+
+        #region check alive
+
+        protected async Task DisposeOnDisconnectAsync(CancellationToken cancellationToken)
         {
             while (await CheckAliveAsync())
             {
                 try
                 {
-                    await Task.Delay(AreYouThereInterval, CancellationToken);
+                    await Task.Delay(AreYouThereInterval, cancellationToken);
                 }
                 catch (TaskCanceledException)
                 {
@@ -189,73 +327,18 @@ namespace MyCSharpLib.Services.Telnet
             if (!TcpClient.Connected)
                 return false;
 
+            //if (_isSending)
+            //{
+            //    while (_isSending) { }
+            //    return TcpClient.Connected;
+            //}
+
             await TcpClient.GetStream().WriteAsync(new byte[1], 0, 1);
 
             return TcpClient.Connected;
         }
 
-        public void StopListening()
-        {
-            lock (_lock)
-            {
-                if (!IsListening)
-                    return;
-                
-                Trace.WriteLines($"Stopping to listen to {RemoteHost}.", $"({Id})");
-                _cancellationTokenSource.Cancel();
-                
-                IsListening = false;
-            }
-        }
-
-        public async Task WriteAsync(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return;
-
-            var bytes = value.ToAsciiBytes();
-            await WriteAsync(bytes, 0, bytes.Length);
-        }
-
-        public async Task WriteLineAsync(string value) => await WriteAsync($"{value ?? string.Empty}\r\n");
-
-        public async Task WriteAsync(object value, ISerializer serializer = null)
-        {
-            if (serializer == null)
-                serializer = SerializerDeserializer;
-
-            var serialized = await serializer.SerializeAsync(value);
-            await WriteLineAsync(serialized);
-        }
-
-        public async Task WriteAsync(byte[] buffer, int offset, int count)
-        {
-            Trace.WriteLines($"Writeing bytes to {RemoteHost}.", 
-                $"({Id})", 
-                buffer, 
-                "As ASCII", 
-                Encoding.ASCII.GetString(buffer));
-
-            await TcpClient.GetStream().WriteAsync(buffer, offset, count, CancellationToken);
-        }
-
-        #endregion PROPERTIES
-
-
-        #region METHODS
-
-        public virtual async Task RaiseReceivedAsync(byte[] bytes)
-        {
-            var args = new ReceivedEventArgs(bytes, SerializerDeserializer);
-
-            Trace.WriteLines($"Received content from {RemoteHost}.", 
-                $"({Id})", 
-                args.BytesContent, 
-                "As ASCII:", 
-                args.StringContent);
-
-            await ReceivedAsync?.Invoke(this, args);
-        }
+        #endregion check alive
 
         #endregion METHODS
 
@@ -265,5 +348,31 @@ namespace MyCSharpLib.Services.Telnet
         public event ReceivedAsyncEventHandler ReceivedAsync;
 
         #endregion EVENTS
+
+
+        #region CLASSES
+
+        private class ReadState
+        {
+            public ReadState()
+            {
+                Buffer = new byte[BufferSize];
+                CompleteMessage = new List<byte>();
+            }
+
+
+            public byte[] Buffer { get; }
+            public List<byte> CompleteMessage { get; }
+
+            public bool IsMessageComplete { get; set; }
+            public bool IsReading { get; set; }
+        }
+
+        private class SendState
+        {
+            public bool IsSending { get; set; }
+        }
+
+        #endregion CLASSES
     }
 }

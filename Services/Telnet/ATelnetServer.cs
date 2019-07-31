@@ -1,9 +1,10 @@
 ﻿using MyCSharpLib.Extensions;
+using MyCSharpLib.Services.Logging;
 using MyCSharpLib.Services.Serialization;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -19,6 +20,7 @@ namespace MyCSharpLib.Services.Telnet
 
         private bool _isRunning;
         private bool _isAccepting;
+        private bool _isDisposingAllConnections;
 
         #endregion FIELDS
 
@@ -45,7 +47,7 @@ namespace MyCSharpLib.Services.Telnet
 
         protected ITelnetServerSettings Settings { get; }
         protected ISerializerDeserializer SerializerDeserializer { get; }
-        protected CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
+        protected CancellationTokenSource AcceptClientCancelTokenSource { get; set; }
 
         public bool IsRunning
         {
@@ -84,27 +86,34 @@ namespace MyCSharpLib.Services.Telnet
         public virtual Task StartAsync(CancellationToken cancellationToken = default)
             => Task.Factory.StartNew(() =>
             {
-                var listener = new TcpListener(IPAddress.Any, Settings.TelnetPortNumber);
+                TcpListener listener;
                 lock (Lock)
                 {
                     if (IsRunning)
                         throw new NotSupportedException("Cannot start listening twice");
 
-                    Connections.Clear();
+                    Connections.RemoveWhere(x => x.IsDisposed);
+                    listener = new TcpListener(IPAddress.Any, Settings.TelnetPortNumber);
                     listener.Start();
                     IsRunning = true;
                 }
 
+                if (AcceptClientCancelTokenSource?.IsCancellationRequested != false)
+                    AcceptClientCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                else
+                    AcceptClientCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, AcceptClientCancelTokenSource?.Token ?? default);
+
                 Trace.WriteLine($"Telnet server started listening on port {Settings.TelnetPortNumber}");
 
-                var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationTokenSource.Token);
+                foreach (var connection in Connections)
+                    _ = connection.StartListeningAsync(AcceptClientCancelTokenSource.Token);
 
-                while (!cancellationTokenSource.IsCancellationRequested)
+                while (!AcceptClientCancelTokenSource.IsCancellationRequested)
                 {
-                    listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), Tuple.Create(listener, cancellationTokenSource.Token));
                     _isAccepting = true;
+                    listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), Tuple.Create(listener, AcceptClientCancelTokenSource.Token));
 
-                    while (!cancellationTokenSource.IsCancellationRequested && _isAccepting) { }
+                    while (!AcceptClientCancelTokenSource.IsCancellationRequested && _isAccepting) { }
                 }
 
                 lock (Lock)
@@ -128,7 +137,7 @@ namespace MyCSharpLib.Services.Telnet
 
                 var tcpClient = listener.EndAcceptTcpClient(asyncResult);
 
-                var connection = CreateNewConnection(tcpClient, cancellationToken);
+                var connection = CreateNewConnection(tcpClient);
                 Connections.Add(connection);
                 Trace.WriteLine($"Added new connection ({connection.RemoteHost})");
                 _isAccepting = false;
@@ -140,8 +149,7 @@ namespace MyCSharpLib.Services.Telnet
             lock (Lock)
             {
                 Trace.WriteLine($"Stopping {GetType().Name}");
-                Connections.Clear();
-                CancellationTokenSource.Cancel();
+                AcceptClientCancelTokenSource.Cancel();
                 Trace.WriteLine($"Stopped {GetType().Name}");
             }
         }
@@ -156,12 +164,19 @@ namespace MyCSharpLib.Services.Telnet
 
             if (addedConnections != null)
                 foreach (var connection in addedConnections)
+                {
                     _ = HandleClientAsync(connection);
+                    connection.PropertyChanged += OnConnectionPropertyChanged;
+                }
 
             if (removedConnections != null)
                 foreach (var connection in removedConnections)
+                {
                     if (!connection.IsDisposed)
                         connection.TryDispose();
+
+                    connection.PropertyChanged -= OnConnectionPropertyChanged;
+                }
         }
 
         protected virtual async Task HandleClientAsync(T connection)
@@ -170,20 +185,64 @@ namespace MyCSharpLib.Services.Telnet
 
             try
             {
-                await connection.StartListeningAsync(CancellationTokenSource.Token);
+                await connection.StartListeningAsync(AcceptClientCancelTokenSource.Token);
             }
             finally
             {
-                Connections.RemoveFirst(x => x.Id == connection.Id);
             }
 
-            Connections.RemoveFirst(x => x.Id == connection.Id);
+            // Connections.RemoveFirst(x => x.Id == connection.Id);
         }
 
-        protected abstract T CreateNewConnection(TcpClient tcpClient, CancellationToken cancellationToken);
+        protected abstract T CreateNewConnection(TcpClient tcpClient);
 
         protected virtual Task RaiseReceivedAsync(ITelnetConnection connection, ReceivedEventArgs args)
             => ReceivedAsync?.Invoke(connection, args);
+
+        public virtual Task DisposeConnectionsAsync()
+            => Task.Factory.StartNew(() =>
+        {
+            lock (Lock)
+            {
+                _isDisposingAllConnections = true;
+
+                foreach (var connection in Connections)
+                {
+                    try
+                    {
+                        connection.Dispose();
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLines(e.GetType(), e.Message);
+                        throw;
+                    }
+                }
+
+                Connections.Clear();
+                _isDisposingAllConnections = false;
+            }
+        });
+
+        public void Dispose()
+        {
+            DisposeConnectionsAsync();
+        }
+
+        private void OnConnectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender is ITelnetConnection connection))
+                return;
+            if (_isDisposingAllConnections)
+                return;
+
+            switch (e.PropertyName)
+            {
+                case nameof(ITelnetConnection.IsDisposed):
+                    Connections.RemoveWhere(x => x.Id == connection.Id);
+                    break;
+            }
+        }
 
         #endregion METHODS
 

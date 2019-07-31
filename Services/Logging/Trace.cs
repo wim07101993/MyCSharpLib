@@ -1,53 +1,71 @@
 ﻿using MyCSharpLib.Services.Serialization.Extensions;
 using Newtonsoft.Json;
+using System.Collections;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services.Logging
 {
     public static class Trace
     {
+        private static readonly object _lock = new object();
+
+
         public static void WriteLineIndented(string message)
+            => Task.Factory.StartNew(() =>
         {
-            System.Diagnostics.Trace.Indent();
-            System.Diagnostics.Trace.WriteLine(message);
-            System.Diagnostics.Trace.Unindent();
-        }
+            lock (_lock)
+            {
+                System.Diagnostics.Trace.Indent();
+                System.Diagnostics.Trace.WriteLine(message);
+                System.Diagnostics.Trace.Unindent();
+            }
+        });
 
         public static void WriteLines(params string[] args)
+            => Task.Factory.StartNew(() =>
         {
-            if (args == null || args.Length == 0)
+            lock (_lock)
             {
-                System.Diagnostics.Trace.WriteLine("");
-                return;
-            }
-            System.Diagnostics.Trace.WriteLine(args[0]);
-            System.Diagnostics.Trace.Indent();
+                if (args == null || args.Length == 0)
+                {
+                    System.Diagnostics.Trace.WriteLine("");
+                    return;
+                }
 
-            if (args.Length == 2)
-                System.Diagnostics.Trace.WriteLine(args[1]);
-            else
-                for (var i = 1; i < args.Length; i++)
-                    System.Diagnostics.Trace.WriteLine(args[i]);
-            System.Diagnostics.Trace.Unindent();
-        }
+                System.Diagnostics.Trace.WriteLine(args[0]);
+                System.Diagnostics.Trace.Indent();
+
+                if (args.Length == 2)
+                    System.Diagnostics.Trace.WriteLine(args[1]);
+                else
+                    for (var i = 1; i < args.Length; i++)
+                        System.Diagnostics.Trace.WriteLine(args[i]);
+                System.Diagnostics.Trace.Unindent();
+            }
+        });
 
         public static void WriteLines(params object[] args)
         {
-            if (args == null || args.Length == 0)
+            lock (_lock)
             {
-                System.Diagnostics.Trace.WriteLine("");
-                return;
-            }
-            System.Diagnostics.Trace.WriteLine(ToString(args[0]));
-            System.Diagnostics.Trace.Indent();
+                if (args == null || args.Length == 0)
+                {
+                    System.Diagnostics.Trace.WriteLine("");
+                    return;
+                }
 
-            if (args.Length == 2)
-                System.Diagnostics.Trace.WriteLine(ToString(args[1]));
-            else
-                for (var i = 1; i < args.Length; i++)
-                    System.Diagnostics.Trace.WriteLine(ToString(args[i]));
-            System.Diagnostics.Trace.Unindent();
+                System.Diagnostics.Trace.WriteLine(ToString(args[0]));
+                System.Diagnostics.Trace.Indent();
+
+                if (args.Length == 2)
+                    System.Diagnostics.Trace.WriteLine(ToString(args[1]));
+                else
+                    for (var i = 1; i < args.Length; i++)
+                        System.Diagnostics.Trace.WriteLine(ToString(args[i]));
+                System.Diagnostics.Trace.Unindent();
+            }
         }
 
         private static string ToString(object obj)
@@ -56,12 +74,12 @@ namespace MyCSharpLib.Services.Logging
             {
                 case string s:
                     return s;
-                case byte[] bytes:
+                case IEnumerable bytes:
                 {
                     var bytesBuilder = new StringBuilder("[ ");
 
                     foreach (var b in bytes)
-                        bytesBuilder.Append(b).Append("");
+                        bytesBuilder.Append(ToString(b)).Append(" ");
 
                     bytesBuilder.Append("]");
                     return bytesBuilder.ToString();
@@ -111,68 +129,68 @@ namespace MyCSharpLib.Services.Logging
         public static TraceListenerCollection Listeners => System.Diagnostics.Trace.Listeners;
 
         [Conditional("TRACE")]
-        public static void Assert(bool condition) => System.Diagnostics.Trace.Assert(condition);
+        public static void Assert(bool condition) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Assert(condition));
         [Conditional("TRACE")]
-        public static void Assert(bool condition, string message) => System.Diagnostics.Trace.Assert(condition, message);
+        public static void Assert(bool condition, string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Assert(condition, message));
         [Conditional("TRACE")]
-        public static void Assert(bool condition, string message, string detailMessage) => System.Diagnostics.Trace.Assert(condition, message, detailMessage);
+        public static void Assert(bool condition, string message, string detailMessage) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Assert(condition, message, detailMessage));
         [Conditional("TRACE")]
-        public static void Close() => System.Diagnostics.Trace.Close();
+        public static void Close() => Task.Factory.StartNew(() => System.Diagnostics.Trace.Close());
         [Conditional("TRACE")]
-        public static void Fail(string message, string detailMessage) => System.Diagnostics.Trace.Fail(message, detailMessage);
+        public static void Fail(string message, string detailMessage) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Fail(message, detailMessage));
         [Conditional("TRACE")]
-        public static void Fail(string message) => System.Diagnostics.Trace.Fail(message);
+        public static void Fail(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Fail(message));
         [Conditional("TRACE")]
-        public static void Flush() => System.Diagnostics.Trace.Flush();
+        public static void Flush() => Task.Factory.StartNew(() => System.Diagnostics.Trace.Flush());
         [Conditional("TRACE")]
-        public static void Indent() => System.Diagnostics.Trace.Indent();
-        public static void Refresh() => System.Diagnostics.Trace.Refresh();
+        public static void Indent() => Task.Factory.StartNew(() => System.Diagnostics.Trace.Indent());
+        public static void Refresh() => Task.Factory.StartNew(() => System.Diagnostics.Trace.Refresh());
         [Conditional("TRACE")]
-        public static void TraceError(string message) => System.Diagnostics.Trace.TraceError(message);
+        public static void TraceError(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceError(message));
         [Conditional("TRACE")]
-        public static void TraceError(string format, params object[] args) => System.Diagnostics.Trace.TraceError(format, args);
+        public static void TraceError(string format, params object[] args) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceError(format, args));
         [Conditional("TRACE")]
-        public static void TraceInformation(string message) => System.Diagnostics.Trace.TraceInformation(message);
+        public static void TraceInformation(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceInformation(message));
         [Conditional("TRACE")]
-        public static void TraceInformation(string format, params object[] args) => System.Diagnostics.Trace.TraceInformation(format, args);
+        public static void TraceInformation(string format, params object[] args) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceInformation(format, args));
         [Conditional("TRACE")]
-        public static void TraceWarning(string message) => System.Diagnostics.Trace.TraceWarning(message);
+        public static void TraceWarning(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceWarning(message));
         [Conditional("TRACE")]
-        public static void TraceWarning(string format, params object[] args) => System.Diagnostics.Trace.TraceWarning(format, args);
+        public static void TraceWarning(string format, params object[] args) => Task.Factory.StartNew(() => System.Diagnostics.Trace.TraceWarning(format, args));
         [Conditional("TRACE")]
-        public static void Unindent() => System.Diagnostics.Trace.Unindent();
+        public static void Unindent() => Task.Factory.StartNew(() => System.Diagnostics.Trace.Unindent());
         [Conditional("TRACE")]
-        public static void Write(string message) => System.Diagnostics.Trace.Write(message);
+        public static void Write(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Write(message));
         [Conditional("TRACE")]
-        public static void Write(string message, string category) => System.Diagnostics.Trace.Write(message, category);
+        public static void Write(string message, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Write(message, category));
         [Conditional("TRACE")]
-        public static void Write(object value, string category) => System.Diagnostics.Trace.Write(ToString(value), category);
+        public static void Write(object value, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Write(ToString(value), category));
         [Conditional("TRACE")]
-        public static void Write(object value) => System.Diagnostics.Trace.Write(ToString(value));
+        public static void Write(object value) => Task.Factory.StartNew(() => System.Diagnostics.Trace.Write(ToString(value)));
         [Conditional("TRACE")]
-        public static void WriteIf(bool condition, string message, string category) => System.Diagnostics.Trace.WriteIf(condition, message, category);
+        public static void WriteIf(bool condition, string message, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteIf(condition, message, category));
         [Conditional("TRACE")]
-        public static void WriteIf(bool condition, object value) => System.Diagnostics.Trace.WriteIf(condition, ToString(value));
+        public static void WriteIf(bool condition, object value) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteIf(condition, ToString(value)));
         [Conditional("TRACE")]
-        public static void WriteIf(bool condition, object value, string category) => System.Diagnostics.Trace.WriteIf(condition, ToString(value), category);
+        public static void WriteIf(bool condition, object value, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteIf(condition, ToString(value), category));
         [Conditional("TRACE")]
-        public static void WriteIf(bool condition, string message) => System.Diagnostics.Trace.WriteIf(condition, message);
+        public static void WriteIf(bool condition, string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteIf(condition, message));
         [Conditional("TRACE")]
-        public static void WriteLine(object value) => System.Diagnostics.Trace.WriteLine(ToString(value));
+        public static void WriteLine(object value) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLine(ToString(value)));
         [Conditional("TRACE")]
-        public static void WriteLine(object value, string category) => System.Diagnostics.Trace.WriteLine(ToString(value), category);
+        public static void WriteLine(object value, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLine(ToString(value), category));
         [Conditional("TRACE")]
-        public static void WriteLine(string message) => System.Diagnostics.Trace.WriteLine(message);
+        public static void WriteLine(string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLine(message));
         [Conditional("TRACE")]
-        public static void WriteLine(string message, string category) => System.Diagnostics.Trace.WriteLine(message, category);
+        public static void WriteLine(string message, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLine(message, category));
         [Conditional("TRACE")]
-        public static void WriteLineIf(bool condition, object value) => System.Diagnostics.Trace.WriteLineIf(condition, ToString(value));
+        public static void WriteLineIf(bool condition, object value) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLineIf(condition, ToString(value)));
         [Conditional("TRACE")]
-        public static void WriteLineIf(bool condition, object value, string category) => System.Diagnostics.Trace.WriteLineIf(condition, ToString(value), category);
+        public static void WriteLineIf(bool condition, object value, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLineIf(condition, ToString(value), category));
         [Conditional("TRACE")]
-        public static void WriteLineIf(bool condition, string message) => System.Diagnostics.Trace.WriteLineIf(condition, message);
+        public static void WriteLineIf(bool condition, string message) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLineIf(condition, message));
         [Conditional("TRACE")]
-        public static void WriteLineIf(bool condition, string message, string category) => System.Diagnostics.Trace.WriteLineIf(condition, message, category);
+        public static void WriteLineIf(bool condition, string message, string category) => Task.Factory.StartNew(() => System.Diagnostics.Trace.WriteLineIf(condition, message, category));
 
         #endregion FORWARDERS
     }

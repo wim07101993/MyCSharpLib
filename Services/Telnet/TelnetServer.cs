@@ -18,9 +18,9 @@ namespace MyCSharpLib.Services.Telnet
 
         #region METHODS
 
-        protected override TelnetServerConnection CreateNewConnection(TcpClient tcpClient, CancellationToken cancellationToken)
+        protected override TelnetServerConnection CreateNewConnection(TcpClient tcpClient)
         {
-            return new TelnetServerConnection(tcpClient, cancellationToken, SerializerDeserializer);
+            return new TelnetServerConnection(tcpClient, SerializerDeserializer);
         }
 
         #endregion METHODS

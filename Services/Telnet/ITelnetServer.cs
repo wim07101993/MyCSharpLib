@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services.Telnet
 {
-    public interface ITelnetServer<T>
+    public interface ITelnetServer<T> : IDisposable
         where T : ITelnetConnection
     {
         bool IsRunning { get; }
@@ -15,6 +15,7 @@ namespace MyCSharpLib.Services.Telnet
         Task StartAsync(CancellationToken cancellationToken = default);
 
         void Stop();
+        Task DisposeConnectionsAsync();
 
         event ReceivedAsyncEventHandler ReceivedAsync;
         event EventHandler<bool> StateChanged;
