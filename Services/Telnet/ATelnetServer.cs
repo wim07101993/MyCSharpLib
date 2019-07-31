@@ -32,6 +32,8 @@ namespace MyCSharpLib.Services.Telnet
 
             Connections = new ObservableCollection<T>();
             Connections.CollectionChanged += OnClientsCollectionChanged;
+
+            Trace.WriteLine($"Created new telnetServer on {settings.TelnetPortNumber}.");
         }
 
         #endregion CONSTRUCTOR
@@ -52,7 +54,10 @@ namespace MyCSharpLib.Services.Telnet
             {
                 if (Equals(_isRunning, value))
                     return;
+
                 _isRunning = value;
+
+                Trace.WriteLine($"Telnet server state changed to {value}");
                 StateChanged?.Invoke(this, value);
             }
         }
@@ -90,6 +95,8 @@ namespace MyCSharpLib.Services.Telnet
                     IsRunning = true;
                 }
 
+                Trace.WriteLine($"Telnet server started listening on port {Settings.TelnetPortNumber}");
+
                 var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationTokenSource.Token);
 
                 while (!cancellationTokenSource.IsCancellationRequested)
@@ -104,6 +111,7 @@ namespace MyCSharpLib.Services.Telnet
                 {
                     IsRunning = false;
                     listener.Stop();
+                    Trace.WriteLine($"Telnet server stopped listening at port {Settings.TelnetPortNumber}");
                 }
             });
 
@@ -120,7 +128,9 @@ namespace MyCSharpLib.Services.Telnet
 
                 var tcpClient = listener.EndAcceptTcpClient(asyncResult);
 
-                Connections.Add(CreateNewConnection(tcpClient, cancellationToken));
+                var connection = CreateNewConnection(tcpClient, cancellationToken);
+                Connections.Add(connection);
+                Trace.WriteLine($"Added new connection ({connection.RemoteHost})");
                 _isAccepting = false;
             }
         }
@@ -129,8 +139,10 @@ namespace MyCSharpLib.Services.Telnet
         {
             lock (Lock)
             {
+                Trace.WriteLine($"Stopping {GetType().Name}");
                 Connections.Clear();
                 CancellationTokenSource.Cancel();
+                Trace.WriteLine($"Stopped {GetType().Name}");
             }
         }
 
@@ -155,14 +167,10 @@ namespace MyCSharpLib.Services.Telnet
         protected virtual async Task HandleClientAsync(T connection)
         {
             connection.ReceivedAsync += RaiseReceivedAsync;
+
             try
             {
                 await connection.StartListeningAsync(CancellationTokenSource.Token);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
             }
             finally
             {

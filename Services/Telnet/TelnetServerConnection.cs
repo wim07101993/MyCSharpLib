@@ -1,10 +1,12 @@
 ﻿using MyCSharpLib.Extensions;
+using MyCSharpLib.Services.Logging;
 using MyCSharpLib.Services.Serialization;
 using Prism.Mvvm;
 using System;
-using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,6 +24,7 @@ namespace MyCSharpLib.Services.Telnet
 
         private CancellationTokenSource _cancellationTokenSource;
         private bool _isDisposed;
+        private bool _isDisposing;
         private bool _isListening;
         
         #endregion FIELDS
@@ -36,6 +39,8 @@ namespace MyCSharpLib.Services.Telnet
 
             TcpClient = tcpClient;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            Trace.WriteLines($"Created new telnetServerConnection with {RemoteHost}. Id = {Id}");
         }
 
         #endregion CONSTRUCTOR
@@ -48,7 +53,10 @@ namespace MyCSharpLib.Services.Telnet
         public Guid Id { get; }
 
         public TcpClient TcpClient { get; }
-        public string RemoteHost => (TcpClient?.Client.RemoteEndPoint as IPEndPoint)?.ToString();
+        public string RemoteHost 
+            => IsDisposed 
+                ? null 
+                : (TcpClient?.Client.RemoteEndPoint as IPEndPoint)?.ToString();
 
         public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
@@ -61,11 +69,7 @@ namespace MyCSharpLib.Services.Telnet
         public bool IsListening
         {
             get => _isListening;
-            private set
-            {
-                lock (_lock)
-                    SetProperty(ref _isListening, value);
-            }
+            private set => SetProperty(ref _isListening, value);
         }
 
         #endregion PROPERTIES
@@ -73,39 +77,37 @@ namespace MyCSharpLib.Services.Telnet
 
         #region METHDOS
 
-        public void Dispose() => _ = DisposeAsync();
-
-        public async Task DisposeAsync()
+        public void Dispose()
         {
-            StopListening();
-            await Task.Delay(10);
-            TcpClient.Dispose();
-            try
+            lock (_lock)
             {
+                if (_isDisposing)
+                    return;
+
+                _isDisposing = true;
+
+                var remoteHost = RemoteHost;
+                Trace.WriteLines($"Disposing connection to {remoteHost}.", $"({Id})");
+
+                if (IsListening)
+                    StopListening();
+
+                if (IsDisposed)
+                {
+                    Trace.WriteLines($"Connection already disposed.", $"({Id})");
+                    return;
+                }
+
+                TcpClient.Dispose();
                 _cancellationTokenSource.Dispose();
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.Message);
-            }
-            
-            IsDisposed = true;
-        }
 
-        public async Task TryDisposeAsync()
-        {
-            try
-            {
-                await DisposeAsync();
-            }
-#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
-            catch
-#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
-            {
-                // TODO
+                IsDisposed = true;
+                _isDisposing = false;
+
+                Trace.WriteLines($"Disposed connection to {remoteHost}.", $"({Id})");
             }
         }
-
+        
         public async Task StartListeningAsync(CancellationToken cancellationToken = default)
         {
             lock (_lock)
@@ -115,22 +117,51 @@ namespace MyCSharpLib.Services.Telnet
                 IsListening = true;
             }
 
+            var remoteHost = RemoteHost;
+            Trace.WriteLines($"Started listening to {remoteHost}.", $"({Id})");
+
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
-            cancellationTokenSource.Token.Register(Dispose);
+            //cancellationTokenSource.Token.Register(Dispose);
 
             _ = DisposeOnDisconnectAsync();
 
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!cancellationTokenSource.IsCancellationRequested && IsListening)
             {
-                var i = await TcpClient.GetStream().ReadAsync(_buffer, 0, _buffer.Length, cancellationTokenSource.Token);
+                try
+                {
+                    var i = await TcpClient.GetStream().ReadAsync(_buffer, 0, _buffer.Length, cancellationTokenSource.Token);
 
-                if (i <= 0)
-                    continue;
+                    if (i <= 0)
+                        continue;
 
-                var bytes = new byte[i];
-                Array.Copy(_buffer, 0, bytes, 0, i);
+                    var bytes = new byte[i];
+                    Array.Copy(_buffer, 0, bytes, 0, i);
 
-                _ = RaiseReceivedAsync(bytes);
+                    _ = RaiseReceivedAsync(bytes);
+                }
+                catch (ObjectDisposedException)
+                {
+                    if (cancellationTokenSource.IsCancellationRequested)
+                        Trace.WriteLines("Disposed the tcp client (server probalby stopped), nothing to worry about");
+                    else
+                        throw;
+                }
+                catch(IOException)
+                {
+                    lock(_lock)
+                    {
+                        Trace.WriteLines("There was an error while trying to read from the connection. Disposing the connection.");
+                        if (!IsDisposed)
+                            Dispose();
+                    }
+                }
+            }
+
+            Trace.WriteLines($"Stopped listening to {remoteHost}.", $"({Id})");
+
+            lock (_lock)
+            {
+                IsListening = false;
             }
         }
 
@@ -144,22 +175,37 @@ namespace MyCSharpLib.Services.Telnet
                 }
                 catch (TaskCanceledException)
                 {
+                    Trace.WriteLineIndented("Stopped the server => Task.Delay threw error in DisposeOnDisconnectAsync");
                     return;
                 }
             }
 
-            await DisposeAsync();
+            Trace.WriteLines($"Client disconnected.", $"({Id})");
+            Dispose();
         }
 
         protected async Task<bool> CheckAliveAsync()
         {
+            if (!TcpClient.Connected)
+                return false;
+
             await TcpClient.GetStream().WriteAsync(new byte[1], 0, 1);
+
             return TcpClient.Connected;
         }
 
         public void StopListening()
         {
-            _cancellationTokenSource.Cancel();
+            lock (_lock)
+            {
+                if (!IsListening)
+                    return;
+                
+                Trace.WriteLines($"Stopping to listen to {RemoteHost}.", $"({Id})");
+                _cancellationTokenSource.Cancel();
+                
+                IsListening = false;
+            }
         }
 
         public async Task WriteAsync(string value)
@@ -182,7 +228,16 @@ namespace MyCSharpLib.Services.Telnet
             await WriteLineAsync(serialized);
         }
 
-        public async Task WriteAsync(byte[] buffer, int offset, int count) => await TcpClient.GetStream().WriteAsync(buffer, offset, count, CancellationToken);
+        public async Task WriteAsync(byte[] buffer, int offset, int count)
+        {
+            Trace.WriteLines($"Writeing bytes to {RemoteHost}.", 
+                $"({Id})", 
+                buffer, 
+                "As ASCII", 
+                Encoding.ASCII.GetString(buffer));
+
+            await TcpClient.GetStream().WriteAsync(buffer, offset, count, CancellationToken);
+        }
 
         #endregion PROPERTIES
 
@@ -193,9 +248,11 @@ namespace MyCSharpLib.Services.Telnet
         {
             var args = new ReceivedEventArgs(bytes, SerializerDeserializer);
 
-#if DEBUG
-            Debug.WriteLine($"Received: {args.StringContent}");
-#endif
+            Trace.WriteLines($"Received content from {RemoteHost}.", 
+                $"({Id})", 
+                args.BytesContent, 
+                "As ASCII:", 
+                args.StringContent);
 
             await ReceivedAsync?.Invoke(this, args);
         }

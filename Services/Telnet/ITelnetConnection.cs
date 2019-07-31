@@ -22,9 +22,6 @@ namespace MyCSharpLib.Services.Telnet
         bool IsListening { get; }
 
 
-        Task DisposeAsync();
-        Task TryDisposeAsync();
-
         Task StartListeningAsync(CancellationToken cancellationToken = default);
         void StopListening();
 
