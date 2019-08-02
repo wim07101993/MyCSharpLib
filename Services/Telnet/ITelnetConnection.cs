@@ -1,6 +1,5 @@
 ﻿using MyCSharpLib.Services.Serialization;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Threading;
@@ -16,12 +15,11 @@ namespace MyCSharpLib.Services.Telnet
 
         TcpClient TcpClient { get; }
         string RemoteHost { get; }
+        string LocalHost { get; }
 
         bool IsDisposed { get; }
         bool IsListening { get; }
-
-        ObservableCollection<TelnetMessage> MessageHistory { get; }
-
+        
 
         Task StartListeningAsync(CancellationToken cancellationToken = default);
         void StopListening();

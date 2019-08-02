@@ -4,7 +4,6 @@ using MyCSharpLib.Services.Serialization;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -63,6 +62,9 @@ namespace MyCSharpLib.Services.Telnet
             => IsDisposed 
                 ? null 
                 : (TcpClient?.Client.RemoteEndPoint as IPEndPoint)?.ToString();
+        public string LocalHost => IsDisposed
+                ? null
+                : (TcpClient?.Client.LocalEndPoint as IPEndPoint)?.ToString();
 
         public bool IsDisposed
         {
@@ -75,9 +77,7 @@ namespace MyCSharpLib.Services.Telnet
             get => _isListening;
             private set => SetProperty(ref _isListening, value);
         }
-
-        public ObservableCollection<TelnetMessage> MessageHistory { get; }
-
+        
         #endregion PROPERTIES
 
 
@@ -115,24 +115,12 @@ namespace MyCSharpLib.Services.Telnet
                 _checkAliveCancelTokenSource.Dispose();
 
                 TcpClient.Dispose();
-                MessageHistory.Clear();
 
                 IsDisposed = true;
                 _isDisposing = false;
 
                 Trace.WriteLines($"Disposed connection to {remoteHost}.", $"({Id})");
             }
-        }
-
-        protected virtual TelnetMessage CreateTelnetMessage(IEnumerable<byte> content, bool wasReceived)
-        {
-            return new TelnetMessage
-            {
-                Content = content,
-                Sender = wasReceived
-                    ? RemoteHost
-                    : "me"
-            };
         }
 
         #region reading
@@ -250,9 +238,7 @@ namespace MyCSharpLib.Services.Telnet
                 args.BytesContent,
                 "As ASCII:",
                 args.StringContent);
-
-            MessageHistory.Add(CreateTelnetMessage(bytes, true));
-
+            
             await ReceivedAsync?.Invoke(this, args);
         }
 
@@ -307,7 +293,6 @@ namespace MyCSharpLib.Services.Telnet
 
             byte[] bufferCopy = new byte[count - offset];
             Array.Copy(buffer, offset, bufferCopy, 0, count);
-            MessageHistory.Add(CreateTelnetMessage(bufferCopy, false));
             _ = RaiseSentAsync(bufferCopy);
         });
 
