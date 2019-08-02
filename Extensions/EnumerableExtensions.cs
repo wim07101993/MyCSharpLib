@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace MyCSharpLib.Extensions
 {
@@ -27,6 +29,12 @@ namespace MyCSharpLib.Extensions
                 yield return item;
             foreach (var item in items)
                 yield return item;
+        }
+
+        public static string ToAsciiString(this IEnumerable<byte> bytes)
+        {
+            var array = bytes.ToArray();
+            return Encoding.ASCII.GetString(array, 0, array.Length);
         }
     }
 }

@@ -4,19 +4,17 @@ using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services.Logging
 {
-    public abstract class ALogger : TraceListener, ILogger
+    public abstract class ATraceListener : TraceListener, ILogger
     {
         #region CONSTRUCTOR
 
-        protected ALogger()
+        protected ATraceListener()
         {
-            Trace.Listeners.Add(this);
             Filter = TraceFilters.NoFilter;
         }
 
-        protected ALogger(TraceFilter filter)
+        protected ATraceListener(TraceFilter filter)
         {
-            Trace.Listeners.Add(this);
             Filter = filter;
         }
 
@@ -90,8 +88,13 @@ namespace MyCSharpLib.Services.Logging
             if (!ShouldTrace(DefaultTraceEventType))
                 return;
 
-            var json = await o.SerializeJsonAsync();
-            Write(json);
+            if (o is LogEntry log)
+                Write(log);
+            else
+            {
+                var json = await o.SerializeJsonAsync();
+                Write(json);
+            }
         }
 
         public override async void Write(object o, string category)
