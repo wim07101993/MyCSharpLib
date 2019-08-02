@@ -176,12 +176,14 @@ namespace MyCSharpLib.Services.Telnet
                         connection.TryDispose();
 
                     connection.PropertyChanged -= OnConnectionPropertyChanged;
+                    connection.SentAsync -= RaiseSentAsync;
                 }
         }
 
         protected virtual async Task HandleClientAsync(T connection)
         {
             connection.ReceivedAsync += RaiseReceivedAsync;
+            connection.SentAsync += RaiseSentAsync;
 
             try
             {
@@ -196,8 +198,10 @@ namespace MyCSharpLib.Services.Telnet
 
         protected abstract T CreateNewConnection(TcpClient tcpClient);
 
-        protected virtual Task RaiseReceivedAsync(ITelnetConnection connection, ReceivedEventArgs args)
+        protected virtual Task RaiseReceivedAsync(ITelnetConnection connection, SentReceivedEventArgs args)
             => ReceivedAsync?.Invoke(connection, args);
+        protected virtual Task RaiseSentAsync(ITelnetConnection connection, SentReceivedEventArgs args)
+            => SentAsync?.Invoke(connection, args);
 
         public virtual Task DisposeConnectionsAsync()
             => Task.Factory.StartNew(() =>
@@ -249,7 +253,8 @@ namespace MyCSharpLib.Services.Telnet
 
         #region EVENTS
 
-        public event ReceivedAsyncEventHandler ReceivedAsync;
+        public event SentReceivedEventHandler ReceivedAsync;
+        public event SentReceivedEventHandler SentAsync;
         public event EventHandler<bool> StateChanged;
 
         #endregion EVENTS

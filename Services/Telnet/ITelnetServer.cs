@@ -17,7 +17,8 @@ namespace MyCSharpLib.Services.Telnet
         void Stop();
         Task DisposeConnectionsAsync();
 
-        event ReceivedAsyncEventHandler ReceivedAsync;
+        event SentReceivedEventHandler ReceivedAsync;
+        event SentReceivedEventHandler SentAsync;
         event EventHandler<bool> StateChanged;
     }
 }

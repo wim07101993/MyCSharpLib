@@ -33,6 +33,7 @@ namespace MyCSharpLib.Services.Telnet
 
         void StopAllTransactions();
 
-        event ReceivedAsyncEventHandler ReceivedAsync;
+        event SentReceivedEventHandler ReceivedAsync;
+        event SentReceivedEventHandler SentAsync;
     }
 }

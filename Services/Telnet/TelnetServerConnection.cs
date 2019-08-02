@@ -226,7 +226,7 @@ namespace MyCSharpLib.Services.Telnet
                 Array.Copy(buffer, 0, bytes, 0, i);
                 message.AddRange(bytes);
 
-                if (bytes[i - 2] == '\r' && bytes[i - 1] == '\n')
+                if (bytes.Length >= 2 && bytes[i - 2] == '\r' && bytes[i - 1] == '\n')
                     readState.IsMessageComplete = true;
                 else
                     readState.IsMessageComplete = false;
@@ -243,7 +243,7 @@ namespace MyCSharpLib.Services.Telnet
 
         protected virtual async Task RaiseReceivedAsync(IEnumerable<byte> bytes)
         {
-            var args = new ReceivedEventArgs(bytes, SerializerDeserializer);
+            var args = new SentReceivedEventArgs(bytes, SerializerDeserializer);
 
             Trace.WriteLines($"Received content from {RemoteHost}.",
                 $"({Id})",
@@ -308,6 +308,7 @@ namespace MyCSharpLib.Services.Telnet
             byte[] bufferCopy = new byte[count - offset];
             Array.Copy(buffer, offset, bufferCopy, 0, count);
             MessageHistory.Add(CreateTelnetMessage(bufferCopy, false));
+            _ = RaiseSentAsync(bufferCopy);
         });
 
         private void EndWriteCallBack(IAsyncResult asyncResult)
@@ -316,6 +317,20 @@ namespace MyCSharpLib.Services.Telnet
 
             TcpClient.GetStream().EndWrite(asyncResult);
             sendState.IsSending = false;
+
+        }
+
+        protected virtual async Task RaiseSentAsync(IEnumerable<byte> bytes)
+        {
+            var args = new SentReceivedEventArgs(bytes, SerializerDeserializer);
+
+            Trace.WriteLines($"Received content from {RemoteHost}.",
+                $"({Id})",
+                args.BytesContent,
+                "As ASCII:",
+                args.StringContent);
+
+            await SentAsync?.Invoke(this, args);
         }
 
         #endregion writing
@@ -365,7 +380,8 @@ namespace MyCSharpLib.Services.Telnet
 
         #region EVENTS
 
-        public event ReceivedAsyncEventHandler ReceivedAsync;
+        public event SentReceivedEventHandler ReceivedAsync;
+        public event SentReceivedEventHandler SentAsync;
 
         #endregion EVENTS
 
