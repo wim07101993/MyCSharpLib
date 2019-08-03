@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace MyCSharpLib.Services.Logging
 {
     public interface ILogEntry
     {
+        Guid Id { get; }
+
         string Source { get; }
         string Tag { get; }
         TraceEventType EventType { get; }

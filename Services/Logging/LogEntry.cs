@@ -1,5 +1,6 @@
 ﻿using MyCSharpLib.Services.Serialization.Extensions;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,6 +24,7 @@ namespace MyCSharpLib.Services.Logging
             TraceOptions.Callstack;
 
         public const TraceOptions DefaultOptions = TraceOptions.DateTime;
+
         #endregion FIELDS
 
 
@@ -72,6 +74,8 @@ namespace MyCSharpLib.Services.Logging
 
 
         #region PROPERTIES
+
+        public Guid Id { get; } = Guid.NewGuid();
 
         public string Source { get; }
         public string Tag { get; }
