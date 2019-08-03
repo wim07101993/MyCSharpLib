@@ -1,9 +1,7 @@
-﻿using Prism.Mvvm;
-
-namespace MyCSharpLib.Services.Telnet
+﻿namespace MyCSharpLib.Services.Telnet
 {
-    public interface ITelnetServerSettings : ISettings
+    public interface ITelnetServerSettings
     {
-        int TelnetPortNumber { get; set; }
+        int PortNumber { get; set; }
     }
 }

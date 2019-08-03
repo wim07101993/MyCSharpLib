@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace MyCSharpLib.Services.Logging
+namespace MyCSharpLib.Services.Logging.Loggers
 {
     public interface IMemoryLogger : ILogger
     {
-        ObservableCollection<string> Logs { get; }
+        ReadOnlyObservableCollection<ILogEntry> Logs { get; }
     }
 }

@@ -2,15 +2,15 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace MyCSharpLib.Services
 {
     /// <summary>
     /// Interface that describes the settings needed to get the <see cref="FileService"/> working.
-    /// This class should be used in the <see cref="Settings"/> class for the <see cref="ISettingsProvider"/>.
     /// Extends <see cref="BindableBase"/>.
     /// </summary>
-    public interface IFileServiceSettings : ISettings
+    public interface IFileServiceSettings : INotifyPropertyChanged
     {
         string DataDirectory { get; set; }
 

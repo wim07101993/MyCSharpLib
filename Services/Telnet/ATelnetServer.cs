@@ -1,10 +1,12 @@
 ﻿using MyCSharpLib.Extensions;
 using MyCSharpLib.Services.Logging;
+using MyCSharpLib.Services.Logging.Loggers;
 using MyCSharpLib.Services.Serialization;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -17,7 +19,7 @@ namespace MyCSharpLib.Services.Telnet
        where T : ITelnetConnection
     {
         #region FIELDS
-
+        
         private bool _isRunning;
         private bool _isAccepting;
         private bool _isDisposingAllConnections;
@@ -26,8 +28,8 @@ namespace MyCSharpLib.Services.Telnet
 
 
         #region CONSTRUCTOR
-
-        protected ATelnetServer(ITelnetServerSettings settings, ISerializerDeserializer serializerDeserializer)
+        
+        protected ATelnetServer(ITelnetServerSettings settings, ILogDispatcher logDispatcher, ISerializerDeserializer serializerDeserializer)
         {
             Settings = settings;
             SerializerDeserializer = serializerDeserializer;
@@ -35,7 +37,8 @@ namespace MyCSharpLib.Services.Telnet
             Connections = new ObservableCollection<T>();
             Connections.CollectionChanged += OnClientsCollectionChanged;
 
-            Trace.WriteLine($"Created new telnetServer on {settings.TelnetPortNumber}.");
+            Logger = logDispatcher;
+            Logger.Log(ClassName, $"Created new telnetServer on {settings.PortNumber}.");
         }
 
         #endregion CONSTRUCTOR
@@ -43,11 +46,15 @@ namespace MyCSharpLib.Services.Telnet
 
         #region PROPERTIES
 
+        protected abstract string ClassName { get; }
+
         protected object Lock { get; } = new object();
 
         protected ITelnetServerSettings Settings { get; }
         protected ISerializerDeserializer SerializerDeserializer { get; }
         protected CancellationTokenSource AcceptClientCancelTokenSource { get; set; }
+
+        protected ILogDispatcher Logger { get; }
 
         public bool IsRunning
         {
@@ -59,7 +66,7 @@ namespace MyCSharpLib.Services.Telnet
 
                 _isRunning = value;
 
-                Trace.WriteLine($"Telnet server state changed to {value}");
+                Logger.Log(ClassName, $"Telnet server state changed to {value}");
                 StateChanged?.Invoke(this, value);
             }
         }
@@ -93,7 +100,7 @@ namespace MyCSharpLib.Services.Telnet
                         throw new NotSupportedException("Cannot start listening twice");
 
                     Connections.RemoveWhere(x => x.IsDisposed);
-                    listener = new TcpListener(IPAddress.Any, Settings.TelnetPortNumber);
+                    listener = new TcpListener(IPAddress.Any, Settings.PortNumber);
                     listener.Start();
                     IsRunning = true;
                 }
@@ -103,7 +110,7 @@ namespace MyCSharpLib.Services.Telnet
                 else
                     AcceptClientCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, AcceptClientCancelTokenSource?.Token ?? default);
 
-                Trace.WriteLine($"Telnet server started listening on port {Settings.TelnetPortNumber}");
+                Logger.Log(ClassName, $"Telnet server started listening on port {Settings.PortNumber}");
 
                 foreach (var connection in Connections)
                     _ = connection.StartListeningAsync(AcceptClientCancelTokenSource.Token);
@@ -120,7 +127,7 @@ namespace MyCSharpLib.Services.Telnet
                 {
                     IsRunning = false;
                     listener.Stop();
-                    Trace.WriteLine($"Telnet server stopped listening at port {Settings.TelnetPortNumber}");
+                    Logger.Log(ClassName, $"Telnet server stopped listening at port {Settings.PortNumber}");
                 }
             });
 
@@ -139,7 +146,7 @@ namespace MyCSharpLib.Services.Telnet
 
                 var connection = CreateNewConnection(tcpClient);
                 Connections.Add(connection);
-                Trace.WriteLine($"Added new connection ({connection.RemoteHost})");
+                Logger.Log(ClassName, $"Added new connection ({connection.RemoteHost})");
                 _isAccepting = false;
             }
         }
@@ -148,9 +155,9 @@ namespace MyCSharpLib.Services.Telnet
         {
             lock (Lock)
             {
-                Trace.WriteLine($"Stopping {GetType().Name}");
+                Logger.Log(ClassName, $"Stopping {GetType().Name}");
                 AcceptClientCancelTokenSource.Cancel();
-                Trace.WriteLine($"Stopped {GetType().Name}");
+                Logger.Log(ClassName, $"Stopped {GetType().Name}");
             }
         }
 
@@ -218,7 +225,7 @@ namespace MyCSharpLib.Services.Telnet
                     }
                     catch (Exception e)
                     {
-                        Trace.WriteLines(e.GetType(), e.Message);
+                        Logger.Log(ClassName, new object[] { e.GetType().Name, e.Message }, TraceEventType.Error);
                         throw;
                     }
                 }

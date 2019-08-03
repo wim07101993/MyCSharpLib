@@ -53,18 +53,7 @@ namespace MyCSharpLib.Extensions
                     return i;
             return -1;
         }
-
-        public static IEnumerable<T> Slice<T>(this IList<T> list, int startIndex, int endIndex = -1)
-        {
-            if (startIndex < 0)
-                startIndex = 0;
-            if (endIndex < 0)
-                endIndex = list.Count;
-
-            for (var i = startIndex; i < endIndex; i++)
-                yield return list[i];
-        }
-
+        
         #endregion FINDING
 
 

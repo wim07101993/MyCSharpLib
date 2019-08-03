@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Prism.Mvvm;
+using System.Threading.Tasks;
 
 namespace MyCSharpLib.Services
 {
@@ -21,7 +22,7 @@ namespace MyCSharpLib.Services
         protected override Task InternalSaveStringsAsync(T strings, string language) => Task.CompletedTask;
 
 
-        private class StringSettings : Settings, IStringsSettings
+        private class StringSettings : BindableBase, IStringsSettings
         {
             public string Language
             {

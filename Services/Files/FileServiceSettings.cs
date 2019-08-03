@@ -7,15 +7,17 @@ namespace MyCSharpLib.Services
 {
     /// <summary>
     /// Class that contains the settings needed to get the <see cref="FileService"/> working.
-    /// This class should be used in the <see cref="Settings"/> class for the <see cref="ISettingsProvider"/>.
     /// Extends <see cref="BindableBase"/>.
     /// </summary>
-    public class FileServiceSettings : Settings, IFileServiceSettings
+    public class FileServiceSettings : BindableBase, IFileServiceSettings
     {
         #region FIELDS
 
+        private readonly string _vendor;
+        private readonly string _applicationName;
+
         /// <summary>Path to directory in which the data of the application is stored.</summary>
-        private string _dataDirectory = $@"{ApplicationDataDirectory}\Data";
+        private string _dataDirectory;
 
         /// <summary>Dictionary that contains the different file paths to different types of data.</summary>
         private Dictionary<Type, string> _filePaths;
@@ -23,15 +25,29 @@ namespace MyCSharpLib.Services
         #endregion FIELDS
 
 
+        #region CONSTRUCTOR
+
+        public FileServiceSettings(string vendor, string applicationName)
+        {
+            _applicationName = applicationName;
+            _vendor = vendor;
+
+            if (string.IsNullOrEmpty(_dataDirectory))
+                _dataDirectory = $@"{ApplicationDataDirectory}\Data";
+        }
+
+        #endregion CONSTRUCTOR
+
+
         #region PROPERTIES
 
         /// <summary>Path that points to the {AppData}/{vendor}/{application name}.</summary>
         [JsonIgnore]
-        public static string ApplicationDataDirectory => $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\{Settings.Vendor}\{Settings.ApplicationName}";
+        public string ApplicationDataDirectory => $@"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\{_vendor}\{_applicationName}";
 
         /// <summary>Path to the settings of the application. ({ApplicationDataDirectory}/settings.json)</summary>
         [JsonIgnore]
-        public static string SettingsPath => $@"{ApplicationDataDirectory}\settings.json";
+        public string SettingsPath => $@"{ApplicationDataDirectory}\settings.json";
 
         /// <summary>Path to directory in which the data of the application is stored.</summary>
         public string DataDirectory

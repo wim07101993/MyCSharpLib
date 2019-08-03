@@ -1,5 +1,5 @@
 ﻿using MyCSharpLib.Extensions;
-using MyCSharpLib.Services.Logging;
+using MyCSharpLib.Services.Logging.Loggers;
 using MyCSharpLib.Services.Serialization;
 using Prism.Mvvm;
 using System;
@@ -35,8 +35,9 @@ namespace MyCSharpLib.Services.Telnet
 
         #region CONSTRUCTOR
 
-        public TelnetServerConnection(TcpClient tcpClient, ISerializerDeserializer serializerDeserializer)
+        public TelnetServerConnection(ILogDispatcher logDispatcher, ISerializerDeserializer serializerDeserializer, TcpClient tcpClient)
         {
+            Logger = logDispatcher;
             SerializerDeserializer = serializerDeserializer;
             Id = Guid.NewGuid();
 
@@ -44,7 +45,7 @@ namespace MyCSharpLib.Services.Telnet
 
             _ = DisposeOnDisconnectAsync(_checkAliveCancelTokenSource.Token);
 
-            Trace.WriteLines($"Created new telnetServerConnection with {RemoteHost}. Id = {Id}");
+            Logger.Log(ClassName, $"Created new telnetServerConnection with {RemoteHost}. Id = {Id}");
         }
 
         #endregion CONSTRUCTOR
@@ -52,6 +53,9 @@ namespace MyCSharpLib.Services.Telnet
 
         #region PROPERTIES
 
+        protected virtual string ClassName => nameof(TelnetServerConnection);
+
+        protected ILogDispatcher Logger { get; }
         public ISerializerDeserializer SerializerDeserializer { get; }
 
         public Guid Id { get; }
@@ -101,13 +105,13 @@ namespace MyCSharpLib.Services.Telnet
                 _isDisposing = true;
 
                 var remoteHost = RemoteHost;
-                Trace.WriteLines($"Disposing connection to {remoteHost}.", $"({Id})");
+                Logger.Log(ClassName, new[] { $"Disposing connection to {remoteHost}.", $"({Id})" });
 
                 StopAllTransactions();
 
                 if (IsDisposed)
                 {
-                    Trace.WriteLines($"Connection already disposed.", $"({Id})");
+                    Logger.Log(ClassName, new[] { $"Connection already disposed.", $"({Id})" });
                     return;
                 }
 
@@ -119,7 +123,7 @@ namespace MyCSharpLib.Services.Telnet
                 IsDisposed = true;
                 _isDisposing = false;
 
-                Trace.WriteLines($"Disposed connection to {remoteHost}.", $"({Id})");
+                Logger.Log( nameof(TelnetServerConnection), new[] { $"Disposed connection to {remoteHost}.", $"({Id})" });
             }
         }
 
@@ -137,9 +141,9 @@ namespace MyCSharpLib.Services.Telnet
             var remoteHost = RemoteHost;
             _receiveCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             
-            Trace.WriteLines($"Started listening to {remoteHost}.", $"({Id})");
+            Logger.Log(ClassName, new[] { $"Started listening to {remoteHost}.", $"({Id})" });
             await ListenAsync(_receiveCancelTokenSource.Token);
-            Trace.WriteLines($"Stopped listening to {remoteHost}.", $"({Id})");
+            Logger.Log(ClassName, new[] { $"Stopped listening to {remoteHost}.", $"({Id})" });
 
             lock (_lock)
             {
@@ -154,7 +158,7 @@ namespace MyCSharpLib.Services.Telnet
                 if (!IsListening)
                     return;
 
-                Trace.WriteLines($"Stopping to listen to {RemoteHost}.", $"({Id})");
+                Logger.Log(ClassName, new[] { $"Stopping to listen to {RemoteHost}.", $"({Id})" });
                 _receiveCancelTokenSource.Cancel();
             }
         }
@@ -173,7 +177,7 @@ namespace MyCSharpLib.Services.Telnet
                 }
                 catch (IOException)
                 {
-                    Trace.WriteLine($"Client at {remoteHost} closed connection");
+                    Logger.Log(ClassName, $"Client at {remoteHost} closed connection");
                 }
                 
 
@@ -233,11 +237,14 @@ namespace MyCSharpLib.Services.Telnet
         {
             var args = new SentReceivedEventArgs(bytes, SerializerDeserializer);
 
-            Trace.WriteLines($"Received content from {RemoteHost}.",
+            Logger.Log(ClassName, new object[] 
+            {
+                $"Received content from {RemoteHost}.",
                 $"({Id})",
                 args.BytesContent,
                 "As ASCII:",
-                args.StringContent);
+                args.StringContent
+            });
             
             await ReceivedAsync?.Invoke(this, args);
         }
@@ -276,11 +283,14 @@ namespace MyCSharpLib.Services.Telnet
 
             var sendCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _sendCancelTokenSource.Token);
 
-            Trace.WriteLines($"Writeing bytes to {RemoteHost}.",
+            Logger.Log(ClassName, new object[] 
+            {
+                $"Writeing bytes to {RemoteHost}.",
                 $"({Id})",
                 buffer,
                 "As ASCII",
-                Encoding.ASCII.GetString(buffer));
+                Encoding.ASCII.GetString(buffer)
+            });
 
             var sendState = new SendState { IsSending = true };
             TcpClient.GetStream().BeginWrite(buffer, 0, buffer.Length, EndWriteCallBack, sendState);
@@ -309,11 +319,14 @@ namespace MyCSharpLib.Services.Telnet
         {
             var args = new SentReceivedEventArgs(bytes, SerializerDeserializer);
 
-            Trace.WriteLines($"Received content from {RemoteHost}.",
+            Logger.Log(ClassName, new object[]
+            {
+                $"Received content from {RemoteHost}.",
                 $"({Id})",
                 args.BytesContent,
                 "As ASCII:",
-                args.StringContent);
+                args.StringContent
+            });
 
             await SentAsync?.Invoke(this, args);
         }
@@ -333,12 +346,12 @@ namespace MyCSharpLib.Services.Telnet
                 }
                 catch (TaskCanceledException)
                 {
-                    Trace.WriteLineIndented("Stopped the server => Task.Delay threw error in DisposeOnDisconnectAsync");
+                    Logger.Log(ClassName, "Stopped the server => Task.Delay threw error in DisposeOnDisconnectAsync");
                     return;
                 }
             }
 
-            Trace.WriteLines($"Client disconnected.", $"({Id})");
+            Logger.Log(ClassName, new[] { $"Client disconnected.", $"({Id})" });
             Dispose();
         }
 

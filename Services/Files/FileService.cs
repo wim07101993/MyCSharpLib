@@ -16,8 +16,7 @@ namespace MyCSharpLib.Services
     {
         #region FIELDS
 
-        /// <summary>Provider of the settings of the application.</summary>
-        private readonly ISettingsProvider<IFileServiceSettings> _settingsProvider;
+        private IFileServiceSettings _settings;
 
         #endregion FIELDS
 
@@ -27,13 +26,13 @@ namespace MyCSharpLib.Services
         /// <summary>
         /// Constructs a new instance of the <see cref="FileService"/>.
         /// </summary>
-        /// <param name="settingsProvider">Provider of the settings of the application.</param>
+        /// <param name="settings">Settings of the application.</param>
         /// <param name="serializer">Serializer used to serialize objects to write to a file.</param>
         /// <param name="deserializer">Deserializer used to deserialize objects read from a file.</param>
         /// <param name="cryptoTransform">Transformer used to encrypt and decrypt data to write and read from encrypted files.</param>
-        public FileService(ISettingsProvider<IFileServiceSettings> settingsProvider, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
+        public FileService(IFileServiceSettings settings, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
         {
-            _settingsProvider = settingsProvider;
+            _settings = settings;
             Serializer = serializer;
             Deserializer = deserializer;
             CryptoTransform = cryptoTransform;
@@ -68,7 +67,7 @@ namespace MyCSharpLib.Services
         public string GenerateDataFilePath<T>(string extension)
         {
             var type = typeof(T);
-            return $@"{_settingsProvider.Settings.DataDirectory}\{type.Name}.{extension}";
+            return $@"{_settings.DataDirectory}\{type.Name}.{extension}";
         }
 
         /// <summary>
@@ -89,13 +88,13 @@ namespace MyCSharpLib.Services
                 return path;
 
             var type = typeof(T);
-            path = _settingsProvider.Settings.FilePaths.FirstOrDefault(x => x.Key == type).Value;
+            path = _settings.FilePaths.FirstOrDefault(x => x.Key == type).Value;
 
             if (!string.IsNullOrWhiteSpace(path))
                 return path;
 
             path = GenerateDataFilePath<T>(extension);
-            _settingsProvider.Settings.FilePaths.Add(typeof(T), path);
+            _settings.FilePaths.Add(typeof(T), path);
             return path;
         }
 
@@ -311,7 +310,7 @@ namespace MyCSharpLib.Services
             {
                 try
                 {
-                    path = _settingsProvider.Settings.FilePaths[typeof(T)];
+                    path = _settings.FilePaths[typeof(T)];
                 }
                 catch (KeyNotFoundException e)
                 {
@@ -341,7 +340,7 @@ namespace MyCSharpLib.Services
             {
                 try
                 {
-                    path = _settingsProvider.Settings.FilePaths[typeof(T)];
+                    path = _settings.FilePaths[typeof(T)];
                 }
                 catch (KeyNotFoundException e)
                 {
