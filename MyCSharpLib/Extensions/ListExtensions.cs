@@ -61,6 +61,9 @@ namespace MyCSharpLib.Extensions
 
         public static bool RemoveFirst<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
+            if (list.Count <= 0)
+                return false;
+
             if (predicate == null)
             {
                 list.RemoveAt(0);
