@@ -13,4 +13,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Tests\Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyCSharpLib\MyCSharpLib.csproj" />
+  </ItemGroup>
+
 </Project>
