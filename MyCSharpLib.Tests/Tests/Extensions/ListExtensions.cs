@@ -66,6 +66,35 @@ namespace MyCSharpLib.Tests.Tests.Extensions
                 .BeNull("there is no iten in the collection that is 'doesn't exist'");
         }
 
+        [Test]
+        public void IndexOfLastNullPredicate()
+        {
+            new List<string> { "hello", "world", "this", "is", "another", "test" }
+                .IndexOfLast(null)
+                .Should()
+                .Be(5, "when there is no predicate defined, the method should return the index of the last item (0 if the list contains any items)");
+
+            new List<string>()
+                .IndexOfLast(null)
+                .Should()
+                .Be(-1, "when there is no predicate defined, the method should return -1 if there are not items in the collection");
+        }
+
+        [Test]
+        public void IndexOfLast()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+
+            list.IndexOfLast(x => x.Contains('i'))
+                .Should()
+                .Be(3, "the last item that contains an 'i' is 'this' which is in the third position (index 2)");
+
+            list.IndexOfLast(x => x == "doesn't exist")
+                .Should()
+                .Be(-1, "there is no iten in the collection that is 'doesn't exist'");
+        }
+
         #endregion FINDING
     }
 }
