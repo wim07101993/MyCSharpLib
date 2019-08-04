@@ -79,6 +79,8 @@ namespace MyCSharpLib.Extensions
 
         public static bool RemoveWhere<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
+            if (list.Count <= 0)
+                return false;
             if (predicate == null)
             {
                 list.Clear();
@@ -90,6 +92,7 @@ namespace MyCSharpLib.Extensions
             if (indexes == null)
                 return false;
 
+            indexes.Reverse();
             foreach (var i in indexes)
                 list.RemoveAt(i);
 

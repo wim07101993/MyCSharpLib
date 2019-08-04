@@ -145,6 +145,51 @@ namespace MyCSharpLib.Tests.Tests.Extensions
                 
         }
 
+        [Test]
+        public void RemoveWhereNull()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveWhere(null)
+                .Should()
+                .BeTrue("The method should return true when an items was removed");
+
+            list.Should()
+                .HaveCount(0, "all the items should have been removed");
+
+            new List<string>()
+                .RemoveWhere(null)
+                .Should()
+                .BeFalse("if there are not items in the list, none can be remove and so the method should return false.");
+        }
+
+        [Test]
+        public void RemoveWhere()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveWhere(x => x.Contains('i'))
+                .Should()
+                .BeTrue("there is an item that contains the letter 'i'");
+
+            list.Should()
+                .NotContain("this", "that was the first item that contains an 'i'")
+                .And
+                .NotContain("is", "that was the other item that contains an 'i'")
+                .And
+                .HaveCount(4, "two items should be removed");
+
+            list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveWhere(x => x == "doesn't exist")
+                .Should()
+                .BeFalse("there is no item that is 'doesn't exist'");
+
+            list.Should()
+                .HaveCount(6);
+
+        }
+
         #endregion REMOVING
     }
 }
