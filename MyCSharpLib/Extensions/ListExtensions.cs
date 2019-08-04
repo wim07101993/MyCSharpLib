@@ -28,7 +28,7 @@ namespace MyCSharpLib.Extensions
             if (predicate == null)
             {
                 return list.Count > 0
-                    ? System.Linq.Enumerable.Range(0, list.Count).ToList()
+                    ? Enumerable.Range(0, list.Count).ToList()
                     : null;
             }
 
