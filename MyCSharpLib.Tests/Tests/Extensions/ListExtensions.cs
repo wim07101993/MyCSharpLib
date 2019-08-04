@@ -190,6 +190,51 @@ namespace MyCSharpLib.Tests.Tests.Extensions
 
         }
 
+        [Test]
+        public void RemoveLastNull()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveLast(null)
+                .Should()
+                .BeTrue("The method should return true when an items was removed");
+
+            list.Should()
+                .NotContain("test", "that was the first item. It should be removed")
+                .And
+                .HaveCount(5, "only one item should be removed");
+
+            new List<string>()
+                .RemoveLast(null)
+                .Should()
+                .BeFalse("if there are not items in the list, none can be remove and so the method should return false.");
+        }
+
+        [Test]
+        public void RemoveLast()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveLast(x => x.Contains('i'))
+                .Should()
+                .BeTrue("there is an item that contains the letter 'i'");
+
+            list.Should()
+                .NotContain("is", "that was the last item that contains an 'i'")
+                .And
+                .HaveCount(5, "only one item should be removed");
+
+            list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+
+            list.RemoveLast(x => x == "doesn't exist")
+                .Should()
+                .BeFalse("there is no item that is 'doesn't exist'");
+
+            list.Should()
+                .HaveCount(6);
+
+        }
+
         #endregion REMOVING
     }
 }

@@ -101,6 +101,9 @@ namespace MyCSharpLib.Extensions
 
         public static bool RemoveLast<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
+            if (list.Count == 0)
+                return false;
+
             if (predicate == null)
             {
                 list.RemoveAt(list.Count - 1);
