@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using MyCSharpLib.Services.Serialization;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,10 +12,7 @@ namespace MyCSharpLib.Services
     public class StringsProvider<T> : AStringsProvider<T> where T : IStrings, new()
     {
         #region FIELDS
-
-        /// <summary>Service to read and write the strings to files.</summary>
-        private readonly IFileService _fileService;
-
+        
         /// <summary>Field for the the <see cref="Languages"/> property.</summary>
         private string[] _languages;
 
@@ -23,10 +21,10 @@ namespace MyCSharpLib.Services
 
         #region CONSTRUCTOR
 
-        public StringsProvider(IStringsFileSettings settings, IFileService fileService)
+        public StringsProvider(IStringsFileSettings settings, ISerializerDeserializer serializerDeserializer)
             : base(settings)
         {
-            _fileService = fileService;
+            SerializerDeserializer = serializerDeserializer;
 
             if (!Directory.Exists(Settings.LanguagesDirectory))
                 Directory.CreateDirectory(Settings.LanguagesDirectory);
@@ -39,6 +37,8 @@ namespace MyCSharpLib.Services
 
 
         #region PROPERTIES
+
+        public ISerializerDeserializer SerializerDeserializer { get; }
 
         /// <summary>Field for the <see cref="Strings"/> property.</summary>
         private IStringsFileSettings Settings => settings as IStringsFileSettings;
@@ -56,19 +56,25 @@ namespace MyCSharpLib.Services
 
         protected override async Task<T> InternalFetchStringsAsync(string language) 
         {
-            return await _fileService.ReadAsync<T>($@"{Settings.LanguagesDirectory}\{language}");
+            var path = $@"{Settings.LanguagesDirectory}\{language}.{((IDeserializer)SerializerDeserializer).FileExtension}";
+
+            using (var fileStream = File.OpenText(path))
+                return await SerializerDeserializer.DeserializeAsync<T>(fileStream);
         }
 
         protected override async Task InternalSaveStringsAsync(T strings, string language)
         {
-            await _fileService.WriteAsync(strings, $@"{Settings.LanguagesDirectory}\{language}");
+            var path = $@"{Settings.LanguagesDirectory}\{language}.{((ISerializer)SerializerDeserializer).FileExtension}";
+
+            using (var writer = new StreamWriter(path))
+                await SerializerDeserializer.SerializeAsync(strings, writer);
         }
         
         public void FetchLanguagePossibilities()
         {
             Languages = Directory
                 .GetFiles(Settings.LanguagesDirectory)
-                .Select(x => x.Split('/').Last())
+                .Select(Path.GetFileNameWithoutExtension)
                 .ToArray();
         }
 
@@ -81,7 +87,7 @@ namespace MyCSharpLib.Services
                     break;
             }
         }
-
+        
         #endregion METHODS
     }
 }
