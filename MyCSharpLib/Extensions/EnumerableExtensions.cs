@@ -12,7 +12,7 @@ namespace MyCSharpLib.Extensions
             if (source == null)
                 throw new NullReferenceException(nameof(source));
             if (items == null)
-                throw new NullReferenceException(nameof(source));
+                throw new ArgumentNullException(nameof(items));
 
             foreach (var item in items)
                 source.Add(item);
@@ -23,7 +23,7 @@ namespace MyCSharpLib.Extensions
             if (source == null)
                 throw new NullReferenceException(nameof(source));
             if (items == null)
-                throw new NullReferenceException(nameof(source));
+                throw new ArgumentNullException(nameof(items));
 
             foreach (var item in source)
                 yield return item;
