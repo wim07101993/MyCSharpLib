@@ -35,7 +35,35 @@ namespace MyCSharpLib.Tests.Tests.Extensions
 
             list.IndexOfFirst(x => x == "doesn't exist")
                 .Should()
-                .Be(-1, "There is no iten in the collection that is 'doesn't exist'");
+                .Be(-1, "there is no iten in the collection that is 'doesn't exist'");
+        }
+
+        [Test]
+        public void IndexWhereNull()
+        {
+            new List<string> { "hello", "world", "this", "is", "another", "test" }
+                .IndexesWhere(null)
+                .Should()
+                .BeEquivalentTo(new[] { 0, 1, 2, 3, 4, 5 }, "when there is no predicate defined, all the indexes if the list should be returned.");
+
+            new List<string>()
+                .IndexesWhere(null)
+                .Should()
+                .BeNull("when there is no predicate defined and the list is 'null', there are no indexes to return");
+        }
+
+        [Test]
+        public void IndexesWhere()
+        {
+            var list = new List<string> { "hello", "world", "this", "is", "another", "test" };
+            
+            list.IndexesWhere(x => x.Contains('i'))
+                .Should()
+                .BeEquivalentTo(new[] { 2, 3 }, "all the indexes of the items that contain an 'i' should be returned");
+
+            list.IndexesWhere(x => x == "doesn't exist")
+                .Should()
+                .BeNull("there is no iten in the collection that is 'doesn't exist'");
         }
 
         #endregion FINDING
