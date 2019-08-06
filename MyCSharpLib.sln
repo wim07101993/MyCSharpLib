@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCSharpLib", "MyCSharpLib/MyCSharpLib.csproj", "{A9EBD273-E73F-4051-BF56-E6A98FF2AA52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCSharpLib", "MyCSharpLib\MyCSharpLib.csproj", "{A9EBD273-E73F-4051-BF56-E6A98FF2AA52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Tests", "MyCSharpLib.Tests\MyCSharpLib.Tests.csproj", "{79B07336-2D2F-404E-9B1E-81F426CFD27F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCSharpLib.Tests", "MyCSharpLib.Tests\MyCSharpLib.Tests.csproj", "{79B07336-2D2F-404E-9B1E-81F426CFD27F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Wpf.Controls", "MyCSharpLib.Wpf.Controls\MyCSharpLib.Wpf.Controls.csproj", "{05322358-E260-438C-8CF2-A40235320819}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Wpf.Demo", "MyCSharpLib.Wpf.Demo\MyCSharpLib.Wpf.Demo.csproj", "{359C8C4F-5C25-4995-9128-476A060514BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05322358-E260-438C-8CF2-A40235320819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05322358-E260-438C-8CF2-A40235320819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05322358-E260-438C-8CF2-A40235320819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05322358-E260-438C-8CF2-A40235320819}.Release|Any CPU.Build.0 = Release|Any CPU
+		{359C8C4F-5C25-4995-9128-476A060514BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{359C8C4F-5C25-4995-9128-476A060514BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{359C8C4F-5C25-4995-9128-476A060514BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{359C8C4F-5C25-4995-9128-476A060514BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
