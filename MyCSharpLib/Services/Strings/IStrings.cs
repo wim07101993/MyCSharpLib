@@ -7,7 +7,6 @@ namespace MyCSharpLib.Services
     /// </summary>
     public interface IStrings : INotifyPropertyChanged
     {
-        string Title { get; set; }
         string WrongStringsTypeExceptionMessage { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿<Window
-    x:Class="MyCSharpLib.Wpf.Controls.Demo.MainWindow"
+    x:Class="MyCSharpLib.Wpf.Controls.Demo.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
+    xmlns:views="clr-namespace:MyCSharpLib.Wpf.Demo.Views"
+    Title="{Binding Strings.Title}"
     Width="800"
     Height="450"
     Background="{DynamicResource MaterialDesignPaper}"
@@ -18,14 +19,8 @@
     TextOptions.TextRenderingMode="Auto"
     mc:Ignorable="d">
     <dragablz:TabablzControl>
-        <TabItem Header="HELLO">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Hello World</TextBlock>
-        </TabItem>
-        <TabItem Header="MATERIAL">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Material Design</TextBlock>
-        </TabItem>
-        <TabItem Header="DESIGN">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Looks Quite Nice</TextBlock>
+        <TabItem Header="{Binding Strings.Logging}">
+            <views:Logging DataContext="{Binding LoggingViewModel}" />
         </TabItem>
     </dragablz:TabablzControl>
 </Window>

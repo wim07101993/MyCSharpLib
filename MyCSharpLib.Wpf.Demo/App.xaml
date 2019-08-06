@@ -2,8 +2,7 @@
     x:Class="MyCSharpLib.Wpf.Controls.Demo.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-    StartupUri="MainWindow.xaml">
+    xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -14,6 +13,8 @@
 
                 <!--  Include the Dragablz Material Design style  -->
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/materialdesign.xaml" />
+
+                <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
 

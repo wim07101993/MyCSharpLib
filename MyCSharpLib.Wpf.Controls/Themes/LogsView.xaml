@@ -1,0 +1,66 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:MyCSharpLib.Wpf.Controls"
+    xmlns:converters="clr-namespace:MyCSharpLib.Wpf.Converters">
+
+    <converters:ListToStringConverter x:Key="ListToStringConverter" />
+    <converters:NewLineRemover x:Key="NewLineRemover" />
+
+    <Style TargetType="{x:Type controls:LogsView}">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type controls:LogsView}">
+                        <DataGrid
+                            AutoGenerateColumns="False"
+                            IsReadOnly="True"
+                            ItemsSource="{TemplateBinding FilteredItemsSource}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn x:Name="IdCollumn" Binding="{Binding Id, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TimeCollumn" Binding="{Binding EventCache.DateTime, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="SourceCollumn" Binding="{Binding Source, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TagCollumn" Binding="{Binding Tag, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="EventTypeCollumn" Binding="{Binding EventType, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TitleCollumn" Binding="{Binding Title, Mode=OneWay}" />
+                                <DataGridTemplateColumn x:Name="PayloadCollumn" MaxWidth="400">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                MaxWidth="400"
+                                                Text="{Binding Payload, Mode=OneWay, Converter={StaticResource ListToStringConverter}}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn x:Name="OperationStackCollumn" MaxWidth="200">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                MaxWidth="200"
+                                                Text="{Binding EventCache.LogicalOperationStack, Mode=OneWay, Converter={StaticResource ListToStringConverter}}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn x:Name="TimeStampCollumn" Binding="{Binding EventCache.Timestamp, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="ProcessIdCollumn" Binding="{Binding EventCache.ProcessId, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="ThreadIdCollumn" Binding="{Binding EventCach.ThreadId, Mode=OneWay}" />
+                                <DataGridTemplateColumn x:Name="CallStackCollumn" MaxWidth="200">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                MaxWidth="200"
+                                                Text="{Binding EventCache.Callstack, Mode=OneWay, Converter={StaticResource NewLineRemover}}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>
