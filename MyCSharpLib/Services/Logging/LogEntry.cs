@@ -38,7 +38,7 @@ namespace MyCSharpLib.Services.Logging
             IReadOnlyList<object> payload = null, 
             TraceOptions traceOptions = DefaultOptions, 
             ushort indentLevel = 0, 
-            ushort indentSize = 0)
+            ushort indentSize = 4)
         {
             if (!string.IsNullOrWhiteSpace(source))
                 Source = source;
@@ -107,9 +107,12 @@ namespace MyCSharpLib.Services.Logging
                 if (!string.IsNullOrWhiteSpace(Tag))
                     builder.Append(Tag).Append(":");
 
-                if (EventCache != null && IsEnabled(TraceOptions.DateTime) &&
-                    !string.IsNullOrWhiteSpace(Source) && string.IsNullOrWhiteSpace(Tag))
-                    builder.Append(EventType).Append(" -> ");
+                builder.Append(EventType);
+                if (!string.IsNullOrWhiteSpace(Title) ||
+                    (Payload != null && Payload.Count > 0))
+                    builder.Append(" -> ");
+                else
+                    builder.AppendLine();
 
                 if (!string.IsNullOrWhiteSpace(Title))
                     builder.AppendLine(Title);
@@ -135,9 +138,9 @@ namespace MyCSharpLib.Services.Logging
                     return builder.ToString();
 
                 var slice = Payload.Skip(1).ToList();
-                var strPayload = PayloadToString(slice, IndentSize, (ushort)(IndentLevel + 1));
+                var strPayload = PayloadToString(slice, IndentSize, (ushort)(IndentLevel + 2));
 
-                return builder.AppendLine(strPayload).ToString();
+                return builder.Append(strPayload).ToString();
             }
         }
 
@@ -157,33 +160,47 @@ namespace MyCSharpLib.Services.Logging
                 if (IsEnabled(TraceOptions.ProcessId))
                 {
                     hasFooter = true;
-                    builder.Append("ProcessId=").Append(EventCache.ProcessId);
+                    builder
+                        .Append("ProcessId=")
+                        .Append(EventCache.ProcessId)
+                        .Append("|");
                 }
 
                 if (IsEnabled(TraceOptions.LogicalOperationStack))
                 {
                     hasFooter = true;
-                    builder.Append("LogicalOperationStack=");
                     Stack operationStack = EventCache.LogicalOperationStack;
-                    builder.Append(OperationStackToString(operationStack));
+                    builder
+                        .Append("LogicalOperationStack=")
+                        .Append(OperationStackToString(operationStack))
+                        .Append("|");
                 }
 
                 if (IsEnabled(TraceOptions.ThreadId))
                 {
                     hasFooter = true;
-                    builder.Append("ThreadId=").Append(EventCache.ThreadId);
+                    builder
+                        .Append("ThreadId=")
+                        .Append(EventCache.ThreadId)
+                        .Append("|");
                 }
 
                 if (IsEnabled(TraceOptions.Timestamp))
                 {
                     hasFooter = true;
-                    builder.Append("Timestamp=").Append(EventCache.Timestamp);
+                    builder
+                        .Append("Timestamp=")
+                        .Append(EventCache.Timestamp)
+                        .Append("|");
                 }
 
                 if (IsEnabled(TraceOptions.Callstack))
                 {
                     hasFooter = true;
-                    builder.Append("Callstack=").Append(EventCache.Callstack);
+                    builder
+                        .Append("Callstack=")
+                        .Append(EventCache.Callstack)
+                        .Append("|");
                 }
 
                 return hasFooter
@@ -205,7 +222,7 @@ namespace MyCSharpLib.Services.Logging
             var builder = new StringBuilder();
             foreach (var p in payLoad)
                 builder.Append(' ', indentSize * indentLevel)
-                    .AppendLine(PayloadToString(payLoad));
+                    .AppendLine(PayloadToString(p));
 
             return builder.ToString();
         }
