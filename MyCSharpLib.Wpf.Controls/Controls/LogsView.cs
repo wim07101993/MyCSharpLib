@@ -32,47 +32,81 @@ namespace MyCSharpLib.Wpf.Controls
             typeof(LogsView),
             new PropertyMetadata(new ControlStrings(), OnStringsChanged));
 
+        #region collumn visibilities
+
         public static readonly DependencyProperty IdColumnVisibilityProperty = DependencyProperty.Register(
             nameof(IdColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Collapsed));
+            new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
 
         public static readonly DependencyProperty SourceColumnVisibilityProperty = DependencyProperty.Register(
             nameof(SourceColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
 
         public static readonly DependencyProperty TimeColumnVisibilityProperty = DependencyProperty.Register(
             nameof(TimeColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
 
         public static readonly DependencyProperty TagColumnVisibilityProperty = DependencyProperty.Register(
             nameof(TagColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
 
         public static readonly DependencyProperty EventTypeColumnVisibilityProperty = DependencyProperty.Register(
             nameof(EventTypeColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
         
         public static readonly DependencyProperty TitleColumnVisibilityProperty = DependencyProperty.Register(
             nameof(TitleColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
         
         public static readonly DependencyProperty PayloadColumnVisibilityProperty = DependencyProperty.Register(
             nameof(PayloadColumnVisibility),
             typeof(Visibility),
             typeof(LogsView),
-            new PropertyMetadata(Visibility.Visible));
+            new PropertyMetadata(Visibility.Visible, OnColumnVisibilityChanged));
+
+        public static readonly DependencyProperty OperationStackColumnVisibilityProperty = DependencyProperty.Register(
+           nameof(OperationStackColumnVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
+
+        public static readonly DependencyProperty TimeStampColumnVisibilityProperty = DependencyProperty.Register(
+           nameof(TimeStampColumnVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
+
+        public static readonly DependencyProperty ProcessIdColumnVisibilityProperty = DependencyProperty.Register(
+           nameof(ProcessIdColumnVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
+
+        public static readonly DependencyProperty ThreadIdColumnVisibilityProperty = DependencyProperty.Register(
+           nameof(ThreadIdColumnVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
+
+        public static readonly DependencyProperty CallStackColumnVisibilityProperty = DependencyProperty.Register(
+           nameof(CallStackColumnVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed, OnColumnVisibilityChanged));
+        
+        #endregion collumn visibilities
 
         #endregion DEPENDENCY PROPERTIES
 
@@ -83,18 +117,18 @@ namespace MyCSharpLib.Wpf.Controls
 
         private readonly Dictionary<string, DataGridColumn> _collumns = new Dictionary<string, DataGridColumn>
         {
-            { "IdCollumn", null },
-            { "TimeCollumn", null },
-            { "SourceCollumn", null },
-            { "TagCollumn", null },
-            { "EventTypeCollumn", null },
-            { "TitleCollumn", null },
-            { "PayloadCollumn", null },
-            { "OperationStackCollumn", null },
-            { "TimeStampCollumn", null },
-            { "ProcessIdCollumn", null },
-            { "ThreadIdCollumn", null },
-            { "CallStackCollumn", null }
+            { "IdColumn", null },
+            { "TimeColumn", null },
+            { "SourceColumn", null },
+            { "TagColumn", null },
+            { "EventTypeColumn", null },
+            { "TitleColumn", null },
+            { "PayloadColumn", null },
+            { "OperationStackColumn", null },
+            { "TimeStampColumn", null },
+            { "ProcessIdColumn", null },
+            { "ThreadIdColumn", null },
+            { "CallStackColumn", null }
         };
         
         #endregion FIELDS
@@ -129,6 +163,8 @@ namespace MyCSharpLib.Wpf.Controls
             get => (IControlsStrings)GetValue(StringsProperty);
             set => SetValue(StringsProperty, value);
         }
+
+        #region column visibilities
 
         public Visibility IdColumnVisibility
         {
@@ -171,7 +207,39 @@ namespace MyCSharpLib.Wpf.Controls
             get => (Visibility)GetValue(PayloadColumnVisibilityProperty);
             set => SetValue(PayloadColumnVisibilityProperty, value);
         }
-        
+
+        public Visibility OperationStackColumnVisibility
+        {
+            get => (Visibility)GetValue(OperationStackColumnVisibilityProperty);
+            set => SetValue(OperationStackColumnVisibilityProperty, value);
+        }
+
+        public Visibility TimeStampColumnVisibility
+        {
+            get => (Visibility)GetValue(TimeStampColumnVisibilityProperty);
+            set => SetValue(TimeStampColumnVisibilityProperty, value);
+        }
+
+        public Visibility ProcessIdColumnVisibility
+        {
+            get => (Visibility)GetValue(ProcessIdColumnVisibilityProperty);
+            set => SetValue(ProcessIdColumnVisibilityProperty, value);
+        }
+
+        public Visibility ThreadIdColumnVisibility
+        {
+            get => (Visibility)GetValue(ThreadIdColumnVisibilityProperty);
+            set => SetValue(ThreadIdColumnVisibilityProperty, value);
+        }
+
+        public Visibility CallStackColumnVisibility
+        {
+            get => (Visibility)GetValue(CallStackColumnVisibilityProperty);
+            set => SetValue(CallStackColumnVisibilityProperty, value);
+        }
+
+        #endregion column visibilities
+
         #endregion PROPERTIES
 
 
@@ -188,6 +256,7 @@ namespace MyCSharpLib.Wpf.Controls
                     throw new InvalidOperationException($"You failed to specify the {collumn} in the template.");
             }
 
+            UpdateColumnVisibilities();
             UpdateColumnNames();
         }
 
@@ -219,6 +288,19 @@ namespace MyCSharpLib.Wpf.Controls
             loggingControl.UpdateColumnNames();
         }
 
+        #region column visibilities
+
+        private static void OnColumnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is LogsView logsView))
+                return;
+
+            var newValue = e.NewValue as Visibility? ?? Visibility.Collapsed;
+            logsView.UpdateColumnVisibility(e.Property.Name, newValue);
+        }
+
+        #endregion column visibilities
+
         #endregion callbacks
 
         private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -228,7 +310,7 @@ namespace MyCSharpLib.Wpf.Controls
 
         private void OnStringsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            UpdateCollumnName(e.PropertyName);
+            UpdateColumnName(e.PropertyName);
         }
 
         public IEnumerable<ILogEntry> FilterItemsSource()
@@ -236,11 +318,11 @@ namespace MyCSharpLib.Wpf.Controls
             return ItemsSource;
         }
 
-        public void UpdateCollumnName(string propertyName)
+        public void UpdateColumnName(string propertyName)
         {
             foreach (var collumn in _collumns.Keys.ToList())
             {
-                if ($"{propertyName}Collumn" != collumn)
+                if ($"{propertyName}Column" != collumn)
                     continue;
 
                 foreach (var property in _controlStringProperties)
@@ -257,11 +339,33 @@ namespace MyCSharpLib.Wpf.Controls
         {
             foreach (var collumn in _collumns.Keys.ToList())
                 foreach (var property in _controlStringProperties)
-                    if (Equals($"{property.Name}Collumn", collumn))
+                    if (Equals($"{property.Name}Column", collumn))
                     {
                         _collumns[collumn].Header = property.GetValue(Strings);
                         break;
                     }
+        }
+
+        private void UpdateColumnVisibility(string propertyName, Visibility visibility)
+        {
+            var l = "Visibility".Length;
+            var columnName = propertyName.Remove(propertyName.Length - l,l);
+            _collumns[columnName].Visibility = visibility;
+        }
+        public void UpdateColumnVisibilities()
+        {
+            _collumns["IdColumn"].Visibility = IdColumnVisibility;
+            _collumns["TimeColumn"].Visibility = TimeColumnVisibility;
+            _collumns["SourceColumn"].Visibility = SourceColumnVisibility;
+            _collumns["TagColumn"].Visibility = TagColumnVisibility;
+            _collumns["EventTypeColumn"].Visibility = EventTypeColumnVisibility;
+            _collumns["TitleColumn"].Visibility = TitleColumnVisibility;
+            _collumns["PayloadColumn"].Visibility = PayloadColumnVisibility;
+            _collumns["OperationStackColumn"].Visibility = OperationStackColumnVisibility;
+            _collumns["TimeStampColumn"].Visibility = TimeStampColumnVisibility;
+            _collumns["ProcessIdColumn"].Visibility = ProcessIdColumnVisibility;
+            _collumns["ThreadIdColumn"].Visibility = ThreadIdColumnVisibility;
+            _collumns["CallStackColumn"].Visibility = CallStackColumnVisibility;
         }
 
         #endregion METHODS

@@ -17,13 +17,13 @@
                             IsReadOnly="True"
                             ItemsSource="{TemplateBinding FilteredItemsSource}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="IdCollumn" Binding="{Binding Id, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="TimeCollumn" Binding="{Binding EventCache.DateTime, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="SourceCollumn" Binding="{Binding Source, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="TagCollumn" Binding="{Binding Tag, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="EventTypeCollumn" Binding="{Binding EventType, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="TitleCollumn" Binding="{Binding Title, Mode=OneWay}" />
-                                <DataGridTemplateColumn x:Name="PayloadCollumn" MaxWidth="400">
+                                <DataGridTextColumn x:Name="IdColumn" Binding="{Binding Id, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TimeColumn" Binding="{Binding EventCache.DateTime, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="SourceColumn" Binding="{Binding Source, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TagColumn" Binding="{Binding Tag, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="EventTypeColumn" Binding="{Binding EventType, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="TitleColumn" Binding="{Binding Title, Mode=OneWay}" />
+                                <DataGridTemplateColumn x:Name="PayloadColumn" MaxWidth="400">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock
@@ -33,7 +33,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTemplateColumn x:Name="OperationStackCollumn" MaxWidth="200">
+                                <DataGridTemplateColumn x:Name="OperationStackColumn" MaxWidth="200">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock
@@ -43,10 +43,10 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn x:Name="TimeStampCollumn" Binding="{Binding EventCache.Timestamp, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="ProcessIdCollumn" Binding="{Binding EventCache.ProcessId, Mode=OneWay}" />
-                                <DataGridTextColumn x:Name="ThreadIdCollumn" Binding="{Binding EventCach.ThreadId, Mode=OneWay}" />
-                                <DataGridTemplateColumn x:Name="CallStackCollumn" MaxWidth="200">
+                                <DataGridTextColumn x:Name="TimeStampColumn" Binding="{Binding EventCache.Timestamp, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="ProcessIdColumn" Binding="{Binding EventCache.ProcessId, Mode=OneWay}" />
+                                <DataGridTextColumn x:Name="ThreadIdColumn" Binding="{Binding EventCach.ThreadId, Mode=OneWay}" />
+                                <DataGridTemplateColumn x:Name="CallStackColumn" MaxWidth="200">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock
