@@ -139,7 +139,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MyCSharpLib.Wpf.Controls\MyCSharpLib.Wpf.csproj">
+    <ProjectReference Include="..\MyCSharpLib.Wpf\MyCSharpLib.Wpf.csproj">
       <Project>{05322358-e260-438c-8cf2-a40235320819}</Project>
       <Name>MyCSharpLib.Wpf</Name>
     </ProjectReference>

@@ -12,17 +12,18 @@ using Unity;
 
 namespace MyCSharpLib.Wpf.Controls.Demo
 {
-    public partial class App
+    public partial class App : IWithUnityContainer
     {
-        public static IUnityContainer UnityContainer { get; private set; }
+        public IUnityContainer UnityContainer { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
             InitSettings();
             InitUnityContainer();
             InitLogging();
 
+            base.OnStartup(e);
+          
             MainWindow = UnityContainer.Resolve<MainWindow>();
             MainWindow.Show();
             UnityContainer.Resolve<ILogDispatcher>().Log("Application", "Show main window");
@@ -71,7 +72,8 @@ namespace MyCSharpLib.Wpf.Controls.Demo
 
             var strings = UnityContainer.Resolve<IStringsProvider<ApplicationStrings>>().Strings;
             UnityContainer
-                .RegisterInstance(strings);
+                .RegisterInstance(strings)
+                .RegisterInstance<IControlsStrings>(strings);
         }
 
         private void InitLogging()

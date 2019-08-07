@@ -5,6 +5,6 @@ namespace MyCSharpLib.Wpf.Demo.ViewModelInterfaces
 {
     public interface ILoggingViewModel : IViewModel
     {
-        ReadOnlyObservableCollection<ILogEntry> Entries { get; }
+        ReadOnlyObservableCollection<ILogEntry> Logs { get; }
     }
 }

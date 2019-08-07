@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/LogsView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/LogEntry.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

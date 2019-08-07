@@ -3,102 +3,198 @@
     public class ApplicationStrings : Services.Strings, IControlsStrings
     {
         private string _ApplicationTitle = "Demo";
+        private string _logging = "Logging";
+        
         public string ApplicationTitle
         {
             get => _ApplicationTitle;
             set => SetProperty(ref _ApplicationTitle, value);
         }
-
-
-        private string _logging = "Logging";
+        
         public string Logging
         {
             get => _logging;
             set => SetProperty(ref _logging, value);
         }
+        
+        #region log entry
 
         private string _id = "Id";
+        private string _time = "Time";
+        private string _source = "Source";
+        private string _tag = "Tag";
+        private string _eventType = "Event type";
+        private string _title = "Title";
+        private string _payload = "Payload";
+        private string _operationStack = "Operation stack";
+        private string _timeStamp = "Time stamp";
+        private string _processId = "Process id";
+        private string _threadId = "Thread id";
+        private string _callStack = "Call stack";
+        private string _header = "Header";
+        private string _body = "Body";
+        private string _footer = "Footer";
+        private string _filter = "Filter";
+        private string _search = "Search";
+
         public string Id
         {
             get => _id;
             set => SetProperty(ref _id, value);
         }
-
-        private string _time = "Time";
         public string Time
         {
             get => _time;
             set => SetProperty(ref _time, value);
         }
-
-        private string _source = "Source";
         public string Source
         {
             get => _source;
             set => SetProperty(ref _source, value);
         }
-
-        private string _tag = "Tag";
         public string Tag
         {
             get => _tag;
             set => SetProperty(ref _tag, value);
         }
-
-        private string _eventType = "Event type";
         public string EventType
         {
             get => _eventType;
             set => SetProperty(ref _eventType, value);
         }
-
-        private string _title = "Title";
         public string Title
         {
             get => _title;
             set => SetProperty(ref _title, value);
         }
-
-        private string _payload = "Payload";
         public string Payload
         {
             get => _payload;
             set => SetProperty(ref _payload, value);
         }
-        
-        private string _operationStack = "Operation stack";
         public string OperationStack
         {
             get => _operationStack;
             set => SetProperty(ref _operationStack, value);
         }
-
-        private string _timeStamp = "Time stamp";
         public string TimeStamp
         {
             get => _timeStamp;
             set => SetProperty(ref _timeStamp, value);
         }
-
-        private string _processId = "Process id";
         public string ProcessId
         {
             get => _processId;
             set => SetProperty(ref _processId, value);
         }
-
-        private string _threadId = "Thread id";
         public string ThreadId
         {
             get => _threadId;
             set => SetProperty(ref _threadId, value);
         }
-
-        private string _callStack = "Call stack";
         public string CallStack
         {
             get => _callStack;
             set => SetProperty(ref _callStack, value);
         }
+        public string Header
+        {
+            get => _header;
+            set => SetProperty(ref _header, value);
+        }
+        public string Body
+        {
+            get => _body;
+            set => SetProperty(ref _body, value);
+        }
+        public string Footer
+        {
+            get => _footer;
+            set => SetProperty(ref _footer, value);
+        }
+        public string Filter
+        {
+            get => _filter;
+            set => SetProperty(ref _filter, value);
+        }
+        public string Search
+        {
+            get => _search;
+            set => SetProperty(ref _search, value);
+        }
+        
+        #region trace event types
+
+        private string _critical = "Critical";
+        private string _error = "Error";
+        private string _warning = "Warning";
+        private string _information = "Information";
+        private string _verbose = "Verbose";
+        private string _start = "Start";
+        private string _stop = "Stop";
+        private string _suspend = "Suspend";
+        private string _resume = "Resume";
+        private string _transfer = "Transfer";
+        private string _everything = "Everything";
+
+        public string Everything
+        {
+            get => _everything;
+            set => SetProperty(ref _everything, value);
+        }
+        public string Critical
+        {
+            get => _critical;
+            set => SetProperty(ref _critical, value);
+        }
+        public string Error
+        {
+            get => _error;
+            set => SetProperty(ref _error, value);
+        }
+        public string Warning
+        {
+            get => _warning;
+            set => SetProperty(ref _warning, value);
+        }
+        public string Information
+        {
+            get => _information;
+            set => SetProperty(ref _information, value);
+        }
+        public string Verbose
+        {
+            get => _verbose;
+            set => SetProperty(ref _verbose, value);
+        }
+        public string Start
+        {
+            get => _start;
+            set => SetProperty(ref _start, value);
+        }
+        public string Stop
+        {
+            get => _stop;
+            set => SetProperty(ref _stop, value);
+        }
+        public string Suspend
+        {
+            get => _suspend;
+            set => SetProperty(ref _suspend, value);
+        }
+        public string Resume
+        {
+            get => _resume;
+            set => SetProperty(ref _resume, value);
+        }
+        public string Transfer
+        {
+            get => _transfer;
+            set => SetProperty(ref _transfer, value);
+        }
+
+        #endregion trace even types
+
+        #endregion log entry
     }
 }

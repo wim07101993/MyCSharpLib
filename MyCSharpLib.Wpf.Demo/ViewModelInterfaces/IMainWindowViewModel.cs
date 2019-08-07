@@ -2,5 +2,6 @@
 {
     public interface IMainWindowViewModel : IViewModel
     {
+        ILoggingViewModel LoggingViewModel { get; }
     }
 }

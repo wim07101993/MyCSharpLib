@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCSharpLib", "MyCSharpLib\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyCSharpLib.Tests", "MyCSharpLib.Tests\MyCSharpLib.Tests.csproj", "{79B07336-2D2F-404E-9B1E-81F426CFD27F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Wpf", "MyCSharpLib.Wpf.Controls\MyCSharpLib.Wpf.csproj", "{05322358-E260-438C-8CF2-A40235320819}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Wpf", "MyCSharpLib.Wpf\MyCSharpLib.Wpf.csproj", "{05322358-E260-438C-8CF2-A40235320819}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpLib.Wpf.Demo", "MyCSharpLib.Wpf.Demo\MyCSharpLib.Wpf.Demo.csproj", "{359C8C4F-5C25-4995-9128-476A060514BA}"
 EndProject
