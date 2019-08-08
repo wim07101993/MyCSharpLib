@@ -3,6 +3,7 @@ using MyCSharpLib.Services.Logging.Loggers;
 using MyCSharpLib.Wpf.Demo.Strings;
 using MyCSharpLib.Wpf.Demo.ViewModelInterfaces;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace MyCSharpLib.Wpf.Demo.ViewModels
 {
@@ -14,6 +15,12 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
             : base(strings, logger)
         {
             _memoryLogger = memoryLogger;
+            _memoryLogger.Log(nameof(LoggingViewModel), "Hello world, this is a test");
+            _memoryLogger.Log(
+                source: nameof(LoggingViewModel), 
+                payload: new[] { "Hello world", "this is a test" }, 
+                eventType: TraceEventType.Information, 
+                title: "test");
         }
 
         public ReadOnlyObservableCollection<ILogEntry> Logs => _memoryLogger.Logs;

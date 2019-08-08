@@ -25,6 +25,7 @@ namespace MyCSharpLib.Wpf
         public string Footer { get; set; } = "Footer";
 
         public string Filter { get; set; } = "Filter";
+        public string Clear { get; set; } = "Clear";
 
         public string Everything { get; set; } = "All";
         public string Critical { get; set; } = "Critical";
@@ -37,6 +38,13 @@ namespace MyCSharpLib.Wpf
         public string Suspend { get; set; } = "Suspend";
         public string Resume { get; set; } = "Resume";
         public string Transfer { get; set; } = "Transfer";
+
         public string Search { get; set; } = "Search";
+
+        public string End { get; set; } = "End";
+        public string StartDate { get; set; } = "Start date";
+        public string StartTime { get; set; } = "Start time";
+        public string EndDate { get; set; } = "End date";
+        public string EndTime { get; set; } = "End time";
     }
 }

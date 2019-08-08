@@ -37,5 +37,13 @@ namespace MyCSharpLib.Wpf
         string Transfer { get; set; }
 
         string Search { get; set; }
+        string Clear { get; set; }
+
+        string End { get; set; }
+        string StartDate { get; set; }
+        string StartTime { get; set; }
+        string EndDate { get; set; }
+        string EndTime { get; set; }
+
     }
 }

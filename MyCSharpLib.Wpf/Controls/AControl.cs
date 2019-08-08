@@ -61,6 +61,14 @@ namespace MyCSharpLib.Wpf.Controls
         {
         }
 
+        protected T GetTemplateChild<T>(string childName)
+            where T : class
+        {
+            if (!(GetTemplateChild(childName) is T child))
+                throw new InvalidOperationException($"You failed to specify the {childName} in the template.");
+            return child;
+        }
+
         #endregion METHODS
     }
 }

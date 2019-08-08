@@ -36,6 +36,12 @@
         private string _footer = "Footer";
         private string _filter = "Filter";
         private string _search = "Search";
+        private string _clear = "Clear";
+        private string _end = "End";
+        private string _startDate = "Start date";
+        private string _startTime = "Start time";
+        private string _endDate = "End date";
+        private string _endTime = "End time";
 
         public string Id
         {
@@ -122,7 +128,38 @@
             get => _search;
             set => SetProperty(ref _search, value);
         }
-        
+        public string Clear
+        {
+            get => _clear;
+            set => SetProperty(ref _clear, value);
+        }
+
+        public string End
+        {
+            get => _end;
+            set => SetProperty(ref _end, value);
+        }
+        public string StartDate
+        {
+            get => _startDate;
+            set => SetProperty(ref _startDate, value);
+        }
+        public string StartTime
+        {
+            get => _startTime;
+            set => SetProperty(ref _startTime, value);
+        }
+        public string EndDate
+        {
+            get => _endDate;
+            set => SetProperty(ref _endDate, value);
+        }
+        public string EndTime
+        {
+            get => _endTime;
+            set => SetProperty(ref _endTime, value);
+        }
+
         #region trace event types
 
         private string _critical = "Critical";

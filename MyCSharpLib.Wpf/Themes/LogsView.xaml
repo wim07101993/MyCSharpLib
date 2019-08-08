@@ -41,20 +41,39 @@
                                                 <Setter Property="MinWidth" Value="100" />
                                             </Style.Setters>
                                         </Style>
+                                        <Style BasedOn="{StaticResource MaterialDesignFloatingHintDatePicker}" TargetType="{x:Type DatePicker}">
+                                            <Style.Setters>
+                                                <Setter Property="Margin" Value="10,0,10,10" />
+                                                <Setter Property="MinWidth" Value="100" />
+                                            </Style.Setters>
+                                        </Style>
+                                        <Style BasedOn="{StaticResource MaterialDesignFloatingHintTimePicker}" TargetType="{x:Type materialDesign:TimePicker}">
+                                            <Style.Setters>
+                                                <Setter Property="Margin" Value="10,0,10,10" />
+                                                <Setter Property="MinWidth" Value="100" />
+                                            </Style.Setters>
+                                        </Style>
                                     </WrapPanel.Resources>
+
+                                    <!--  id  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Id}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IdFilter}"
-                                        Visibility="{TemplateBinding IdColumnVisibility}" />
+                                        Visibility="{TemplateBinding IdFilterVisibility}" />
+
+                                    <!--  source  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Source}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SourceFilter}"
-                                        Visibility="{TemplateBinding SourceColumnVisibility}" />
+                                        Visibility="{TemplateBinding SourceFilterVisibility}" />
+
+                                    <!--  tag  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Tag}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TagFilter}"
-                                        Visibility="{TemplateBinding TagColumnVisibility}" />
+                                        Visibility="{TemplateBinding TagFilterVisibility}" />
 
+                                    <!--  event type  -->
                                     <ComboBox
                                         MinWidth="100"
                                         Margin="10,0,10,10"
@@ -74,53 +93,94 @@
                                         <ComboBoxItem Content="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Transfer}" />
                                     </ComboBox>
 
+                                    <!--  title  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Title}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TitleFilter}"
-                                        Visibility="{TemplateBinding TitleColumnVisibility}" />
+                                        Visibility="{TemplateBinding TitleFilterVisibility}" />
+
+                                    <!--  payload  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Payload}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=PayloadFilter}"
-                                        Visibility="{TemplateBinding PayloadColumnVisibility}" />
+                                        Visibility="{TemplateBinding PayloadFilterVisibility}" />
+
+                                    <!--  operation stack  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.OperationStack}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=OperationStackFilter}"
-                                        Visibility="{TemplateBinding OperationStackColumnVisibility}" />
-                                    <TextBox
-                                        materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Start}"
-                                        Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeLowerLimit}"
-                                        Visibility="{TemplateBinding TimeColumnVisibility}" />
-                                    <TextBox
-                                        materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.End}"
-                                        Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeUpperLimit}"
-                                        Visibility="{TemplateBinding TimeColumnVisibility}" />
-                                    <TextBox
-                                        materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Start}"
-                                        Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeStampLowerLimit}"
-                                        Visibility="{TemplateBinding TimeStampColumnVisibility}" />
-                                    <TextBox
-                                        materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.End}"
-                                        Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeStampUpperLimit}"
-                                        Visibility="{TemplateBinding TimeStampColumnVisibility}" />
+                                        Visibility="{TemplateBinding OperationStackFilterVisibility}" />
+
+                                    <!--  time lower limit  -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <DatePicker
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.StartDate}"
+                                            SelectedDate="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=DateLowerLimit}"
+                                            Visibility="{TemplateBinding TimeFilterVisibility}" />
+                                        <materialDesign:TimePicker
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.StartTime}"
+                                            SelectedTime="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeLowerLimit}"
+                                            Visibility="{TemplateBinding TimeFilterVisibility}" />
+                                    </StackPanel>
+
+                                    <!--  time upper limit  -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <DatePicker
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.EndDate}"
+                                            SelectedDate="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=DateUpperLimit}"
+                                            Visibility="{TemplateBinding TimeFilterVisibility}" />
+                                        <materialDesign:TimePicker
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.EndTime}"
+                                            SelectedTime="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeUpperLimit}"
+                                            Visibility="{TemplateBinding TimeFilterVisibility}" />
+                                    </StackPanel>
+
+                                    <!--  timestamp lower limit  -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Start}"
+                                            Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeStampLowerLimit}"
+                                            Visibility="{TemplateBinding TimeStampFilterVisibility}" />
+                                        <!--  timestamp upper limit  -->
+                                        <TextBox
+                                            materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.End}"
+                                            Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=TimeStampUpperLimit}"
+                                            Visibility="{TemplateBinding TimeStampFilterVisibility}" />
+                                    </StackPanel>
+
+                                    <!--  process id  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.ProcessId}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=ProcessIdFilter}"
-                                        Visibility="{TemplateBinding ProcessIdColumnVisibility}" />
+                                        Visibility="{TemplateBinding ProcessIdFilterVisibility}" />
+
+                                    <!--  thread id  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.ThreadId}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=ThreadIdFilter}"
-                                        Visibility="{TemplateBinding ThreadIdColumnVisibility}" />
+                                        Visibility="{TemplateBinding ThreadIdFilterVisibility}" />
+
+                                    <!--  call stack  -->
                                     <TextBox
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.CallStack}"
                                         Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=CallStackFilter}"
-                                        Visibility="{TemplateBinding CallStackColumnVisibility}" />
+                                        Visibility="{TemplateBinding CallStackFilterVisibility}" />
 
-                                    <Button
-                                        x:Name="SearchButton"
-                                        Width="100"
-                                        Margin="10,0,10,10"
-                                        Content="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Search}"
-                                        Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+                                    <!--  buttons  -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button
+                                            x:Name="SearchButton"
+                                            Width="100"
+                                            Margin="10,0,10,10"
+                                            Content="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Search}"
+                                            Style="{StaticResource MaterialDesignRaisedAccentButton}" />
+
+                                        <Button
+                                            x:Name="ClearFilterButton"
+                                            Width="100"
+                                            Margin="10,0,10,10"
+                                            Content="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.Clear}" />
+                                    </StackPanel>
                                 </WrapPanel>
                             </Expander>
 

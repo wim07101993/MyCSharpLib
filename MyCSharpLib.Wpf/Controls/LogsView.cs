@@ -1,5 +1,5 @@
 ﻿using MyCSharpLib.Services.Logging;
-using MyCSharpLib.Services.Serialization.Extensions;
+using MyCSharpLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -23,6 +23,7 @@ namespace MyCSharpLib.Wpf.Controls
     [TemplatePart(Name = nameof(PartThreadIdColumn), Type = typeof(DataGridColumn))]
     [TemplatePart(Name = nameof(PartCallStackColumn), Type = typeof(DataGridColumn))]
     [TemplatePart(Name = nameof(PartSearchButton), Type = typeof(Button))]
+    [TemplatePart(Name = nameof(PartClearFilterButton), Type = typeof(Button))]
     public class LogsView : AControl
     {
         #region DEPENDENCY PROPERTIES
@@ -157,8 +158,18 @@ namespace MyCSharpLib.Wpf.Controls
             typeof(string),
             typeof(LogsView));
 
+        public static readonly DependencyProperty DateLowerLimitProperty = DependencyProperty.Register(
+            nameof(DateLowerLimit),
+            typeof(DateTime?),
+            typeof(LogsView));
+
         public static readonly DependencyProperty TimeLowerLimitProperty = DependencyProperty.Register(
             nameof(TimeLowerLimit),
+            typeof(DateTime?),
+            typeof(LogsView));
+
+        public static readonly DependencyProperty DateUpperLimitProperty = DependencyProperty.Register(
+            nameof(DateUpperLimit),
             typeof(DateTime?),
             typeof(LogsView));
 
@@ -194,6 +205,82 @@ namespace MyCSharpLib.Wpf.Controls
 
         #endregion filter
 
+        #region filter visibilities
+
+        public static readonly DependencyProperty IdFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(IdFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty SourceFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(SourceFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty TimeFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(TimeFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty TagFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(TagFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty EventTypeFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(EventTypeFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty TitleFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(TitleFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty PayloadFilterVisibilityProperty = DependencyProperty.Register(
+            nameof(PayloadFilterVisibility),
+            typeof(Visibility),
+            typeof(LogsView),
+            new PropertyMetadata(Visibility.Visible));
+
+        public static readonly DependencyProperty OperationStackFilterVisibilityProperty = DependencyProperty.Register(
+           nameof(OperationStackFilterVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty TimeStampFilterVisibilityProperty = DependencyProperty.Register(
+           nameof(TimeStampFilterVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty ProcessIdFilterVisibilityProperty = DependencyProperty.Register(
+           nameof(ProcessIdFilterVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty ThreadIdFilterVisibilityProperty = DependencyProperty.Register(
+           nameof(ThreadIdFilterVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed));
+
+        public static readonly DependencyProperty CallStackFilterVisibilityProperty = DependencyProperty.Register(
+           nameof(CallStackFilterVisibility),
+           typeof(Visibility),
+           typeof(LogsView),
+           new PropertyMetadata(Visibility.Collapsed));
+
+        #endregion filter visibilities
+
         #endregion DEPENDENCY PROPERTIES
 
 
@@ -226,10 +313,10 @@ namespace MyCSharpLib.Wpf.Controls
         private const string PartThreadIdColumn = "ThreadIdColumn";
         private const string PartCallStackColumn = "CallStackColumn";
         private const string PartSearchButton = "SearchButton";
+        private const string PartClearFilterButton = "ClearFilterButton";
 
         private static readonly PropertyInfo[] _controlStringProperties = typeof(IControlsStrings).GetProperties();
 
-        private Button _searchButton;
         private readonly Dictionary<string, DataGridColumn> _collumns = new Dictionary<string, DataGridColumn>
         {
             { PartIdColumn, null },
@@ -245,7 +332,10 @@ namespace MyCSharpLib.Wpf.Controls
             { PartThreadIdColumn, null },
             { PartCallStackColumn, null }
         };
-        
+
+        private Button _searchButton;
+        private Button _clearFilterButton;
+
         #endregion FIELDS
 
 
@@ -405,10 +495,22 @@ namespace MyCSharpLib.Wpf.Controls
             set => SetValue(TimeLowerLimitProperty, value);
         }
 
+        public DateTime? DateLowerLimit
+        {
+            get => (DateTime?)GetValue(DateLowerLimitProperty);
+            set => SetValue(DateLowerLimitProperty, value);
+        }
+
         public DateTime? TimeUpperLimit
         {
             get => (DateTime?)GetValue(TimeUpperLimitProperty);
             set => SetValue(TimeUpperLimitProperty, value);
+        }
+
+        public DateTime? DateUpperLimit
+        {
+            get => (DateTime?)GetValue(DateUpperLimitProperty);
+            set => SetValue(DateUpperLimitProperty, value);
         }
 
         public int? TimeStampLowerLimit
@@ -443,6 +545,82 @@ namespace MyCSharpLib.Wpf.Controls
 
         #endregion filter
 
+        #region filter visibilities
+
+        public Visibility IdFilterVisibility
+        {
+            get => (Visibility)GetValue(IdFilterVisibilityProperty);
+            set => SetValue(IdFilterVisibilityProperty, value);
+        }
+
+        public Visibility SourceFilterVisibility
+        {
+            get => (Visibility)GetValue(SourceFilterVisibilityProperty);
+            set => SetValue(SourceFilterVisibilityProperty, value);
+        }
+
+        public Visibility TimeFilterVisibility
+        {
+            get => (Visibility)GetValue(TimeFilterVisibilityProperty);
+            set => SetValue(TimeFilterVisibilityProperty, value);
+        }
+
+        public Visibility TagFilterVisibility
+        {
+            get => (Visibility)GetValue(TagFilterVisibilityProperty);
+            set => SetValue(TagFilterVisibilityProperty, value);
+        }
+
+        public Visibility EventTypeFilterVisibility
+        {
+            get => (Visibility)GetValue(EventTypeFilterVisibilityProperty);
+            set => SetValue(EventTypeFilterVisibilityProperty, value);
+        }
+
+        public Visibility TitleFilterVisibility
+        {
+            get => (Visibility)GetValue(TitleFilterVisibilityProperty);
+            set => SetValue(TitleFilterVisibilityProperty, value);
+        }
+
+        public Visibility PayloadFilterVisibility
+        {
+            get => (Visibility)GetValue(PayloadFilterVisibilityProperty);
+            set => SetValue(PayloadFilterVisibilityProperty, value);
+        }
+
+        public Visibility OperationStackFilterVisibility
+        {
+            get => (Visibility)GetValue(OperationStackFilterVisibilityProperty);
+            set => SetValue(OperationStackFilterVisibilityProperty, value);
+        }
+
+        public Visibility TimeStampFilterVisibility
+        {
+            get => (Visibility)GetValue(TimeStampFilterVisibilityProperty);
+            set => SetValue(TimeStampFilterVisibilityProperty, value);
+        }
+
+        public Visibility ProcessIdFilterVisibility
+        {
+            get => (Visibility)GetValue(ProcessIdFilterVisibilityProperty);
+            set => SetValue(ProcessIdFilterVisibilityProperty, value);
+        }
+
+        public Visibility ThreadIdFilterVisibility
+        {
+            get => (Visibility)GetValue(ThreadIdFilterVisibilityProperty);
+            set => SetValue(ThreadIdFilterVisibilityProperty, value);
+        }
+
+        public Visibility CallStackFilterVisibility
+        {
+            get => (Visibility)GetValue(CallStackFilterVisibilityProperty);
+            set => SetValue(CallStackFilterVisibilityProperty, value);
+        }
+
+        #endregion filter visibilities
+
         #endregion PROPERTIES
 
 
@@ -451,22 +629,23 @@ namespace MyCSharpLib.Wpf.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            
-            foreach (var collumn in _collumns.Keys.ToList())
-            {
-                _collumns[collumn] = GetTemplateChild(collumn) as DataGridColumn;
-                if (_collumns[collumn] == null)
-                    throw new InvalidOperationException($"You failed to specify the {collumn} in the template.");
-            }
 
-            _searchButton = GetTemplateChild(PartSearchButton) as Button;
-            if (_searchButton == null)
-                throw new InvalidOperationException($"You failed to specify the {PartSearchButton} in the template.");
-            _searchButton.Click += OnSearchButtonClick;
-
+            GetTemplateChilds();
 
             UpdateColumnVisibilities();
             UpdateColumnNames();
+        }
+
+        private void GetTemplateChilds()
+        {
+            foreach (var collumn in _collumns.Keys.ToList())
+                _collumns[collumn] = GetTemplateChild<DataGridColumn>(collumn);
+
+            _searchButton = GetTemplateChild<Button>(PartSearchButton);
+            _searchButton.Click += OnSearchButtonClick;
+
+            _clearFilterButton = GetTemplateChild<Button>(PartClearFilterButton);
+            _clearFilterButton.Click += OnClearFilterButtonClick;
         }
 
         #region callbacks
@@ -492,61 +671,71 @@ namespace MyCSharpLib.Wpf.Controls
             var newValue = e.NewValue as Visibility? ?? Visibility.Collapsed;
             logsView.UpdateColumnVisibility(e.Property.Name, newValue);
         }
-        
+
         #endregion callbacks
 
-        private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => UpdateFilteredItemsSource();
         protected override void OnStringsPropertyChanged(object sender, PropertyChangedEventArgs e) => UpdateColumnName(e.PropertyName);
+        private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => UpdateFilteredItemsSource();
         private void OnSearchButtonClick(object sender, RoutedEventArgs e) => UpdateFilteredItemsSource();
+        private void OnClearFilterButtonClick(object sender, RoutedEventArgs e) => ClearFilter();
 
+        public void ClearFilter()
+        {
+            IdFilter = null;
+            SourceFilter = null;
+            TagFilter = null;
+            TitleFilter = null;
+            ThreadIdFilter = null;
+            CallStackFilter = null;
+            PayloadFilter = null;
+            OperationStackFilter = null;
+            TimeStampUpperLimit = null;
+            TimeStampLowerLimit = null;
+            EventTypeFilter = NoEventTypeFilter;
+            ProcessIdFilter = null;
+            DateLowerLimit = null;
+            TimeLowerLimit = null;
+            DateUpperLimit = null;
+            DateLowerLimit = null;
+
+            FilteredItemsSource = ItemsSource;
+        }
         public void UpdateFilteredItemsSource()
         {
             var itemsSource = ItemsSource;
-
-            if (!string.IsNullOrWhiteSpace(IdFilter))
-                itemsSource = itemsSource.Where(x => x.Id.ToString().Contains(IdFilter));
-
-            if (!string.IsNullOrWhiteSpace(SourceFilter))
-                itemsSource = itemsSource.Where(x => x.Source?.Contains(SourceFilter) == true);
-
-            if (!string.IsNullOrWhiteSpace(TagFilter))
-                itemsSource = itemsSource.Where(x => x.Tag?.Contains(TagFilter) == true);
-
-            if (EventTypeFilter != NoEventTypeFilter)
-                itemsSource = itemsSource.Where(x => ShouldShowEvent(x.EventType));
-
-            if (!string.IsNullOrWhiteSpace(TitleFilter))
-                itemsSource = itemsSource.Where(x => x.Title?.Contains(TitleFilter) == true);
-
-            if (!string.IsNullOrWhiteSpace(PayloadFilter))
-                itemsSource = itemsSource.Where(x => x.Payload?.Any(p => p.SerializeJson().Contains(PayloadFilter)) == true);
-
-            if (!string.IsNullOrWhiteSpace(OperationStackFilter))
-                itemsSource = itemsSource.Where(x => x.EventCache?.LogicalOperationStack?.Cast<object>().Any(s => s.SerializeJson().Contains(PayloadFilter)) == true);
-
-            if (TimeStampLowerLimit != null && TimeStampUpperLimit != null)
-                itemsSource = itemsSource.Where(x => x.EventCache?.Timestamp >= TimeStampLowerLimit && x.EventCache?.Timestamp <= TimeStampUpperLimit);
-            else if (TimeStampLowerLimit != null)
-                itemsSource = itemsSource.Where(x => x.EventCache?.Timestamp >= TimeStampLowerLimit);
-            else if (TimeStampUpperLimit != null)
-                itemsSource = itemsSource.Where(x => x.EventCache?.Timestamp <= TimeStampUpperLimit);
+            
+            itemsSource = itemsSource
+                .WhereStringContains(x => x.Id.ToString(), IdFilter)
+                .WhereStringContains(x => x.Source, SourceFilter)
+                .WhereStringContains(x => x.Tag, TagFilter)
+                .WhereStringContains(x => x.Title, TitleFilter)
+                .WhereStringContains(x => x.EventCache?.ThreadId, ThreadIdFilter)
+                .WhereStringContains(x => x.EventCache?.Callstack, CallStackFilter)
+                .WhereCollectionContainsString(x => x.Payload, PayloadFilter)
+                .WhereCollectionContainsString(x => x.EventCache?.LogicalOperationStack, OperationStackFilter)
+                .WhereBetweenOrEqual(x => x.EventCache?.Timestamp, TimeStampUpperLimit, TimeStampLowerLimit);
 
             if (ProcessIdFilter != null)
                 itemsSource = itemsSource.Where(x => x.EventCache?.ProcessId == ProcessIdFilter);
 
-            if (!string.IsNullOrWhiteSpace(ThreadIdFilter))
-                itemsSource = itemsSource.Where(x => x.EventCache?.ThreadId == ThreadIdFilter);
+            if (DateLowerLimit != null)
+                itemsSource = itemsSource.WhereGreaterOrEqual(x => x.EventCache.DateTime, DateLowerLimit?.ChangeTime(TimeLowerLimit));
+            else if (TimeLowerLimit != null)
+                itemsSource = itemsSource.WhereGreaterOrEqual(x => x.EventCache?.DateTime.TimeOfDay, TimeLowerLimit?.TimeOfDay);
 
-            if (!string.IsNullOrWhiteSpace(CallStackFilter))
-                itemsSource = itemsSource.Where(x => x.EventCache?.Callstack?.Contains(CallStackFilter) == true);
+            if (DateUpperLimit != null)
+                itemsSource = itemsSource.WhereGreaterOrEqual(x => x.EventCache.DateTime, DateUpperLimit?.ChangeTime(TimeUpperLimit));
+            else if (TimeUpperLimit != null)
+                itemsSource = itemsSource.WhereGreaterOrEqual(x => x.EventCache?.DateTime.TimeOfDay, TimeUpperLimit?.TimeOfDay);
+
+#pragma warning disable RECS0016 // Bitwise operation on enum which has no [Flags] attribute
+            if (EventTypeFilter != NoEventTypeFilter)
+                itemsSource = itemsSource.Where(x => (EventTypeFilter & x.EventType) > 0);
+#pragma warning restore RECS0016 // Bitwise operation on enum which has no [Flags] attribute
 
             FilteredItemsSource = itemsSource.ToList();
         }
-
-#pragma warning disable RECS0016 // Bitwise operation on enum which has no [Flags] attribute
-        private bool ShouldShowEvent(TraceEventType eventType) => (EventTypeFilter & eventType) > 0;
-#pragma warning restore RECS0016 // Bitwise operation on enum which has no [Flags] attribute
-
+        
         public void UpdateColumnName(string propertyName)
         {
             foreach (var collumn in _collumns.Keys.ToList())
