@@ -60,11 +60,11 @@ namespace MyCSharpLib.Wpf.Helpers
                     break;
                 }
 
-                case Spinner spinner:
+                case NumericUpDown spinner:
                 {
                     if ((bool)e.NewValue)
                     {
-                        spinner.BeginInvoke(() => OnSpinnerValueChaged(spinner, new RoutedEventArgs(Spinner.ValueChangedEvent, spinner)));
+                        spinner.BeginInvoke(() => OnSpinnerValueChaged(spinner, new RoutedEventArgs(NumericUpDown.ValueChangedEvent, spinner)));
                         spinner.ValueChanged += OnSpinnerValueChaged;
                     }
                     else
@@ -96,7 +96,7 @@ namespace MyCSharpLib.Wpf.Helpers
         }
 
         private static void TextChanged(object sender, RoutedEventArgs e) => SetTextLength(sender as TextBox, textBox => textBox.Text.Length);
-        private static void OnSpinnerValueChaged(object sender, RoutedEventArgs e) => SetTextLength(sender as Spinner, numericUpDown => numericUpDown.Value.HasValue ? 1 : 0);
+        private static void OnSpinnerValueChaged(object sender, RoutedEventArgs e) => SetTextLength(sender as NumericUpDown, numericUpDown => numericUpDown.Value.HasValue ? 1 : 0);
         private static void PasswordChanged(object sender, RoutedEventArgs e) => SetTextLength(sender as PasswordBox, passwordBox => passwordBox.Password.Length);
         private static void OnDatePickerBaseSelectedDateChanged(object sender, RoutedEventArgs e) => SetTextLength(sender as DatePicker, timePickerBase => timePickerBase.SelectedDate.HasValue ? 1 : 0);
         private static void OnTimePickerBaseSelectedTimeChanged(object sender, RoutedEventArgs e) => SetTextLength(sender as TimePicker, timePickerBase => timePickerBase.SelectedTime.HasValue ? 1 : 0);
@@ -140,7 +140,7 @@ namespace MyCSharpLib.Wpf.Helpers
         [AttachedPropertyBrowsableForType(typeof(PasswordBox))]
         [AttachedPropertyBrowsableForType(typeof(ComboBox))]
         [AttachedPropertyBrowsableForType(typeof(DatePicker))]
-        [AttachedPropertyBrowsableForType(typeof(Spinner))]
+        [AttachedPropertyBrowsableForType(typeof(NumericUpDown))]
         public static bool GetHasText(DependencyObject obj) => (bool)obj.GetValue(HasTextProperty);
 
         public static void SetHasText(DependencyObject obj, bool value) => obj.SetValue(HasTextProperty, value);

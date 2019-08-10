@@ -3,159 +3,142 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:MyCSharpLib.Wpf.Controls"
     xmlns:converters="clr-namespace:MyCSharpLib.Wpf.Converters"
-    xmlns:helpers="clr-namespace:MyCSharpLib.Wpf.Helpers"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <converters:ThicknessBindingConverter x:Key="ThicknessBindingConverter" />
 
-    <Style TargetType="{x:Type controls:Spinner}">
-        <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="helpers:TextBoxHelper.IsMonitoring" Value="True" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FontFamily" Value="{DynamicResource ContentFontFamily}" />
-        <Setter Property="FontSize" Value="{DynamicResource ContentFontSize}" />
-        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="MinHeight" Value="26" />
-        <Setter Property="MinWidth" Value="62" />
-        <Setter Property="Padding" Value="1" />
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
-        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
-        <Setter Property="SnapsToDevicePixels" Value="true" />
+    <Style x:Key="MaterialDesignSpinner" TargetType="{x:Type controls:NumericUpDown}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource MaterialDesignValidationErrorTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type controls:Spinner}">
-                    <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                <ControlTemplate TargetType="{x:Type controls:NumericUpDown}">
+                    <Grid>
                         <Border
-                            x:Name="Base"
+                            x:Name="border"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding helpers:ControlHelper.CornerRadius}"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        
-                        <Grid Margin="{TemplateBinding BorderThickness}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="PART_TextBoxColumn" Width="*" />
-                                <ColumnDefinition x:Name="PART_ButtonsColumn" Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-
-                            <TextBox
-                                x:Name="PART_TextBox"
-                                Grid.Column="0"
-                                MinWidth="20"
-                                MinHeight="0"
-                                Margin="0,0,-2,0"
-                                Padding="0"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                helpers:TextBoxHelper.HasText="{TemplateBinding helpers:TextBoxHelper.HasText}"
-                                helpers:TextBoxHelper.SelectAllOnFocus="{TemplateBinding helpers:TextBoxHelper.SelectAllOnFocus}"
-                                Background="{x:Null}"
-                                BorderThickness="0"
-                                FocusVisualStyle="{x:Null}"
-                                Focusable="{TemplateBinding Focusable}"
-                                FontFamily="{TemplateBinding FontFamily}"
-                                FontSize="{TemplateBinding FontSize}"
-                                Foreground="{TemplateBinding Foreground}"
-                                HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                IsReadOnly="{TemplateBinding IsReadOnly}"
-                                IsTabStop="{TemplateBinding IsTabStop}"
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                TabIndex="{TemplateBinding TabIndex}"
-                                VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
-                            <StackPanel
-                                x:Name="PART_Buttons"
-                                Grid.Column="1"
-                                Margin="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Padding, Converter={StaticResource ThicknessBindingConverter}, ConverterParameter={x:Static converters:ThicknessSideType.Left}}"
-                                Orientation="Horizontal">
-                                <RepeatButton
-                                    x:Name="PART_NumericUp"
-                                    Width="{TemplateBinding UpDownButtonsWidth}"
-                                    Delay="{TemplateBinding Delay}"
-                                    IsTabStop="False"
-                                    Style="{StaticResource MaterialDesignFlatButton}">
-                                    <materialDesign:PackIcon Kind="Minus" />
-                                </RepeatButton>
-                                <!--  Width="{TemplateBinding UpDownButtonsWidth}"  -->
-                                <RepeatButton
-                                    x:Name="PART_NumericDown"
-                                    Width="100"
+                            SnapsToDevicePixels="True">
+                            <Grid
+                                x:Name="PART_Root"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Background="Transparent">
+                                
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBox
+                                    x:Name="TextBox"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
                                     VerticalContentAlignment="Center"
-                                    Delay="{TemplateBinding Delay}"
-                                    Foreground="{TemplateBinding Foreground}"
-                                    IsTabStop="False"
-                                    Style="{StaticResource MaterialDesignFlatButton}">
-                                    <materialDesign:PackIcon Kind="Add" />
-                                </RepeatButton>
-                            </StackPanel>
-                        </Grid>
-                        <Border
-                            x:Name="DisabledVisualElement"
-                            Background="{DynamicResource ControlsDisabledBrush}"
-                            BorderBrush="{DynamicResource ControlsDisabledBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding helpers:ControlHelper.CornerRadius}"
-                            IsHitTestVisible="False"
-                            Opacity="0"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="ButtonsAlignment" Value="Left">
-                            <Setter TargetName="PART_Buttons" Property="Grid.Column" Value="0" />
-                            <Setter TargetName="PART_Buttons" Property="Margin" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Padding, Converter={StaticResource ThicknessBindingConverter}, ConverterParameter={x:Static converters:ThicknessSideType.Right}}" />
-                            <Setter TargetName="PART_ButtonsColumn" Property="Width" Value="*" />
-                            <Setter TargetName="PART_TextBox" Property="Grid.Column" Value="1" />
-                            <Setter TargetName="PART_TextBox" Property="Margin" Value="-2,0,0,0" />
-                            <Setter TargetName="PART_TextBox" Property="Margin" Value="-2,0,0,0" />
-                            <Setter TargetName="PART_TextBoxColumn" Property="Width" Value="Auto" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="DisabledVisualElement" Property="Opacity" Value="0.6" />
-                        </Trigger>
-                        <Trigger Property="IsReadOnly" Value="True">
-                            <Setter Property="InterceptArrowKeys" Value="False" />
-                            <Setter Property="InterceptManualEnter" Value="False" />
-                            <Setter Property="InterceptMouseWheel" Value="False" />
-                            <Setter TargetName="PART_NumericDown" Property="IsEnabled" Value="False" />
-                            <Setter TargetName="PART_NumericUp" Property="IsEnabled" Value="False" />
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsReadOnly" Value="False" />
-                                <Condition Property="InterceptManualEnter" Value="False" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="PART_TextBox" Property="IsReadOnly" Value="True" />
-                        </MultiTrigger>
-                        <Trigger SourceName="PART_NumericUp" Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_NumericUp" Property="Background" Value="{DynamicResource GrayBrush8}" />
-                            <Setter TargetName="PolygonUp" Property="Fill" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                        <Trigger SourceName="PART_NumericUp" Property="IsPressed" Value="True">
-                            <Setter TargetName="PART_NumericUp" Property="Background" Value="{DynamicResource BlackBrush}" />
-                            <Setter TargetName="PolygonUp" Property="Fill" Value="{DynamicResource WhiteBrush}" />
-                        </Trigger>
-                        <Trigger SourceName="PART_NumericDown" Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_NumericDown" Property="Background" Value="{DynamicResource GrayBrush8}" />
-                            <Setter TargetName="PolygonDown" Property="Fill" Value="{DynamicResource AccentColorBrush}" />
-                        </Trigger>
-                        <Trigger SourceName="PART_NumericDown" Property="IsPressed" Value="True">
-                            <Setter TargetName="PART_NumericDown" Property="Background" Value="{DynamicResource BlackBrush}" />
-                            <Setter TargetName="PolygonDown" Property="Fill" Value="{DynamicResource WhiteBrush}" />
-                        </Trigger>
+                                    materialDesign:HintAssist.IsFloating="False"
+                                    materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
+                                    BorderThickness="0"
+                                    Focusable="{TemplateBinding Focusable}" />
 
-                        <Trigger Property="HideUpDownButtons" Value="True">
-                            <Setter TargetName="PART_Buttons" Property="Visibility" Value="Collapsed" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <RepeatButton
+                                        x:Name="UpButton"
+                                        Width="25"
+                                        Height="20"
+                                        Margin="1"
+                                        Padding="0"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
+                                        <materialDesign:PackIcon Kind="Add" />
+                                    </RepeatButton>
+                                    <RepeatButton
+                                        x:Name="DownButton"
+                                        Width="25"
+                                        Height="20"
+                                        Margin="0,1,1,1"
+                                        Padding="0"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
+                                        <materialDesign:PackIcon Kind="Minus" />
+                                    </RepeatButton>
+                                </StackPanel>
+                            </Grid>
+                            
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="PART_Root"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To=".56"
+                                                Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Border>
+                        
+                        <Line
+                            x:Name="DashedLine"
+                            VerticalAlignment="Bottom"
+                            Opacity="0.56"
+                            Stroke="{TemplateBinding BorderBrush}"
+                            StrokeDashArray="1,2.5"
+                            StrokeDashCap="Round"
+                            StrokeThickness="{Binding BorderThickness.Bottom, ElementName=border, Converter={StaticResource DivisionMathConverter}, ConverterParameter=0.75}"
+                            Visibility="Hidden"
+                            X1="0"
+                            X2="{Binding ActualWidth, ElementName=border}"
+                            Y1="0"
+                            Y2="0" />
+                        
+                        <materialDesign:Underline x:Name="Underline" Visibility="{Binding Path=(materialDesign:TextFieldAssist.DecorationVisibility), RelativeSource={RelativeSource TemplatedParent}}" />
+                    </Grid>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="border" Property="Opacity" Value="0.56" />
+                            <Setter TargetName="DashedLine" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="Transparent" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="true">
+                            <Setter TargetName="Underline" Property="IsActive" Value="True" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
+                        </Trigger>
+                        <Trigger Property="Validation.HasError" Value="true">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ValidationErrorBrush}" />
+                            <Setter TargetName="Underline" Property="Background" Value="{DynamicResource ValidationErrorBrush}" />
+                        </Trigger>
+                        <Trigger Property="materialDesign:HintAssist.IsFloating" Value="True">
+                            <Setter TargetName="border" Property="Margin" Value="0,12,0,0" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="UpDownButtonsWidth" Value="22" />
-        <Setter Property="Validation.ErrorTemplate" Value="{DynamicResource ValidationErrorTemplate}" />
     </Style>
+
+    <Style
+        x:Key="MaterialDesignFloatingHintSpinner"
+        BasedOn="{StaticResource MaterialDesignSpinner}"
+        TargetType="{x:Type controls:NumericUpDown}">
+        <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+    </Style>
+
+    <Style BasedOn="{StaticResource MaterialDesignFloatingHintSpinner}" TargetType="{x:Type controls:NumericUpDown}" />
+
 </ResourceDictionary>

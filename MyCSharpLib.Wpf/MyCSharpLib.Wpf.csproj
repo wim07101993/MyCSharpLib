@@ -100,9 +100,9 @@
     <Compile Include="Controls\ButtonsAlignment.cs" />
     <Compile Include="Controls\LogEntry.cs" />
     <Compile Include="Controls\LogsView.cs" />
-    <Compile Include="Controls\Spinner.cs" />
-    <Compile Include="Controls\SpinnerChangedRoutedEventArgs.cs" />
-    <Compile Include="Controls\SpinnerChangedRoutedEventHandler.cs" />
+    <Compile Include="Controls\NumericUpDown.cs" />
+    <Compile Include="Controls\NumericUpDownChangedRoutedEventArgs.cs" />
+    <Compile Include="Controls\NumericUpDownChangedRoutedEventHandler.cs" />
     <Compile Include="Controls\NumericInput.cs" />
     <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Converters\NewLineRemover.cs" />

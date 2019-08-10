@@ -20,12 +20,6 @@ namespace MyCSharpLib.Wpf.Controls
 
         #region CONSTRUCTORS
 
-        static AControl()
-        {
-            if (!(Application.Current is IWithUnityContainer app))
-                throw new InvalidOperationException($"For this control to work, you need to implement the {nameof(IWithUnityContainer)} interface in the application");
-        }
-
         protected AControl()
         {
             try
@@ -50,7 +44,16 @@ namespace MyCSharpLib.Wpf.Controls
             private set => SetValue(StringsProperty, value);
         }
 
-        public IUnityContainer UnityContainer => (Application.Current as IWithUnityContainer)?.UnityContainer;
+        public IUnityContainer UnityContainer
+        {
+            get
+            {
+                if  (!(Application.Current is IWithUnityContainer container))
+                    throw new InvalidOperationException($"For this control to work, you need to implement the {nameof(IWithUnityContainer)} interface in the application");
+
+                return container.UnityContainer;
+            }
+        }
 
         #endregion PROPERTIES
 
