@@ -9,7 +9,7 @@
     <StackPanel Orientation="Vertical">
         <controls:NumericUpDown
             Width="100"
-            Margin="10"
+            Margin="10" 
             HorizontalAlignment="Left"
             Value="10" />
 

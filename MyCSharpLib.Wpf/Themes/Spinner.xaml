@@ -31,12 +31,12 @@
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                 Background="Transparent">
-                                
+
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <TextBox
                                     x:Name="TextBox"
                                     Grid.Row="0"
@@ -49,30 +49,34 @@
                                     BorderThickness="0"
                                     Focusable="{TemplateBinding Focusable}" />
 
-                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" x:Name="ButtonsPanel">
                                     <RepeatButton
                                         x:Name="UpButton"
-                                        Width="25"
-                                        Height="20"
+                                        Width="{TemplateBinding UpDownButtonsWidth}"
+                                        Height="{TemplateBinding UpDownButtonsHeight}"
                                         Margin="1"
                                         Padding="0"
                                         VerticalAlignment="Center"
+                                        Delay="{TemplateBinding Delay}"
+                                        IsTabStop="False"
                                         Style="{StaticResource MaterialDesignFlatButton}">
                                         <materialDesign:PackIcon Kind="Add" />
                                     </RepeatButton>
                                     <RepeatButton
                                         x:Name="DownButton"
-                                        Width="25"
-                                        Height="20"
+                                        Width="{TemplateBinding UpDownButtonsWidth}"
+                                        Height="{TemplateBinding UpDownButtonsHeight}"
                                         Margin="0,1,1,1"
                                         Padding="0"
                                         VerticalAlignment="Center"
+                                        Delay="{TemplateBinding Delay}"
+                                        IsTabStop="False"
                                         Style="{StaticResource MaterialDesignFlatButton}">
                                         <materialDesign:PackIcon Kind="Minus" />
                                     </RepeatButton>
                                 </StackPanel>
                             </Grid>
-                            
+
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
@@ -88,7 +92,7 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                         </Border>
-                        
+
                         <Line
                             x:Name="DashedLine"
                             VerticalAlignment="Bottom"
@@ -102,10 +106,10 @@
                             X2="{Binding ActualWidth, ElementName=border}"
                             Y1="0"
                             Y2="0" />
-                        
+
                         <materialDesign:Underline x:Name="Underline" Visibility="{Binding Path=(materialDesign:TextFieldAssist.DecorationVisibility), RelativeSource={RelativeSource TemplatedParent}}" />
                     </Grid>
-                    
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter TargetName="border" Property="Opacity" Value="0.56" />
@@ -125,6 +129,9 @@
                         </Trigger>
                         <Trigger Property="materialDesign:HintAssist.IsFloating" Value="True">
                             <Setter TargetName="border" Property="Margin" Value="0,12,0,0" />
+                        </Trigger>
+                        <Trigger Property="HideUpDownButtons" Value="True">
+                            <Setter TargetName="ButtonsPanel" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

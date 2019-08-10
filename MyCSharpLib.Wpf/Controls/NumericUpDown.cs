@@ -147,6 +147,12 @@ namespace MyCSharpLib.Wpf.Controls
             nameof(UpDownButtonsWidth),
             typeof(double),
             typeof(NumericUpDown),
+            new PropertyMetadata(25d));
+
+        public static readonly DependencyProperty UpDownButtonsHeightProperty = DependencyProperty.Register(
+            nameof(UpDownButtonsHeight),
+            typeof(double),
+            typeof(NumericUpDown),
             new PropertyMetadata(20d));
 
         public static readonly DependencyProperty InterceptManualEnterProperty = DependencyProperty.Register(
@@ -368,11 +374,20 @@ namespace MyCSharpLib.Wpf.Controls
 
         [Bindable(true)]
         [Category("Appearance")]
-        [DefaultValue(20d)]
+        [DefaultValue(25d)]
         public double UpDownButtonsWidth
         {
             get => (double)GetValue(UpDownButtonsWidthProperty);
             set => SetValue(UpDownButtonsWidthProperty, value);
+        }
+
+        [Bindable(true)]
+        [Category("Appearance")]
+        [DefaultValue(20d)]
+        public double UpDownButtonsHeight
+        {
+            get => (double)GetValue(UpDownButtonsHeightProperty);
+            set => SetValue(UpDownButtonsHeightProperty, value);
         }
 
         [Bindable(true)]
@@ -817,11 +832,10 @@ namespace MyCSharpLib.Wpf.Controls
 
             if (char.IsDigit(text[0]))
             {
-                if (textBox.Text.IndexOf(numberFormatInfo.NegativeSign, textBox.SelectionStart + textBox.SelectionLength, StrComp) < 0
-                    && textBox.Text.IndexOf(numberFormatInfo.PositiveSign, textBox.SelectionStart + textBox.SelectionLength, StrComp) < 0)
-                {
+                var i = textBox.SelectionStart + textBox.SelectionLength;
+                if (textBox.Text.IndexOf(numberFormatInfo.NegativeSign, i, StrComp) < 0 &&
+                    textBox.Text.IndexOf(numberFormatInfo.PositiveSign, i, StrComp) < 0)
                     e.Handled = false;
-                }
             }
             else
             {
@@ -831,9 +845,7 @@ namespace MyCSharpLib.Wpf.Controls
                 {
                     if ((textBox.Text.All(i => i.ToString(equivalentCulture) != numberFormatInfo.NumberDecimalSeparator) || allTextSelected) && 
                         NumericInputMode.HasFlag(NumericInput.Decimal))
-                    {
                         e.Handled = false;
-                    }
                 }
                 else
                 {
