@@ -90,18 +90,32 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\AControl.cs" />
+    <Compile Include="Controls\ButtonsAlignment.cs" />
     <Compile Include="Controls\LogEntry.cs" />
     <Compile Include="Controls\LogsView.cs" />
+    <Compile Include="Controls\Spinner.cs" />
+    <Compile Include="Controls\SpinnerChangedRoutedEventArgs.cs" />
+    <Compile Include="Controls\SpinnerChangedRoutedEventHandler.cs" />
+    <Compile Include="Controls\NumericInput.cs" />
     <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Converters\NewLineRemover.cs" />
     <Compile Include="Converters\ObjectToBooleanConverter.cs" />
     <Compile Include="Converters\ObjectToVisibilityConverter.cs" />
+    <Compile Include="Converters\ThicknessBindingConverter.cs" />
+    <Compile Include="Converters\ThicknessSideType.cs" />
     <Compile Include="Converters\TraceEventTypeToStringConverter.cs" />
     <Compile Include="Converters\ToJsonConverter.cs" />
     <Compile Include="Converters\ToStringConverter.cs" />
+    <Compile Include="Extensions\DispatcherObjectExtensions.cs" />
+    <Compile Include="Helpers\ControlHelper.cs" />
+    <Compile Include="Helpers\TextBoxHelper.cs" />
     <Compile Include="IControlsStrings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

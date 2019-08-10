@@ -4,19 +4,26 @@
     {
         private string _ApplicationTitle = "Demo";
         private string _logging = "Logging";
+        private string _fields = "Fields";
         
         public string ApplicationTitle
         {
             get => _ApplicationTitle;
             set => SetProperty(ref _ApplicationTitle, value);
         }
-        
+
         public string Logging
         {
             get => _logging;
             set => SetProperty(ref _logging, value);
         }
-        
+
+        public string Fields
+        {
+            get => _fields;
+            set => SetProperty(ref _fields, value);
+        }
+
         #region log entry
 
         private string _id = "Id";
