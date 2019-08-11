@@ -222,54 +222,6 @@ namespace MyCSharpLib.Wpf.Controls
 
         #endregion CONSTRUCTOR
 
-
-        #region EVENTS
-
-        public event RoutedPropertyChangedEventHandler<double?> ValueChanged
-        {
-            add => AddHandler(ValueChangedEvent, value);
-            remove => RemoveHandler(ValueChangedEvent, value);
-        }
-
-        /// <summary>
-        ///     Event fired from this NumberBox when its value has reached the maximum value
-        /// </summary>
-        public event RoutedEventHandler MaximumReached
-        {
-            add => AddHandler(MaximumReachedEvent, value);
-            remove => RemoveHandler(MaximumReachedEvent, value);
-        }
-
-        /// <summary>
-        ///     Event fired from this NumberBox when its value has reached the minimum value
-        /// </summary>
-        public event RoutedEventHandler MinimumReached
-        {
-            add => AddHandler(MinimumReachedEvent, value);
-            remove => RemoveHandler(MinimumReachedEvent, value);
-        }
-
-        public event NumbericUpDownChangedRoutedEventHandler ValueIncremented
-        {
-            add => AddHandler(ValueIncrementedEvent, value); 
-            remove => RemoveHandler(ValueIncrementedEvent, value);
-        }
-
-        public event NumbericUpDownChangedRoutedEventHandler ValueDecremented
-        {
-            add => AddHandler(ValueDecrementedEvent, value);
-            remove => RemoveHandler(ValueDecrementedEvent, value);
-        }
-
-        public event RoutedEventHandler DelayChanged
-        {
-            add => AddHandler(DelayChangedEvent, value);
-            remove => RemoveHandler(DelayChangedEvent, value);
-        }
-
-        #endregion EVENTS
-
-
         #region PROPERTIES
 
         /// <summary>
@@ -1187,5 +1139,52 @@ namespace MyCSharpLib.Wpf.Controls
         }
 
         #endregion methods
+
+
+        #region EVENTS
+
+        public event RoutedPropertyChangedEventHandler<double?> ValueChanged
+        {
+            add => AddHandler(ValueChangedEvent, value);
+            remove => RemoveHandler(ValueChangedEvent, value);
+        }
+
+        /// <summary>
+        ///     Event fired from this NumberBox when its value has reached the maximum value
+        /// </summary>
+        public event RoutedEventHandler MaximumReached
+        {
+            add => AddHandler(MaximumReachedEvent, value);
+            remove => RemoveHandler(MaximumReachedEvent, value);
+        }
+
+        /// <summary>
+        ///     Event fired from this NumberBox when its value has reached the minimum value
+        /// </summary>
+        public event RoutedEventHandler MinimumReached
+        {
+            add => AddHandler(MinimumReachedEvent, value);
+            remove => RemoveHandler(MinimumReachedEvent, value);
+        }
+
+        public event NumbericUpDownChangedRoutedEventHandler ValueIncremented
+        {
+            add => AddHandler(ValueIncrementedEvent, value);
+            remove => RemoveHandler(ValueIncrementedEvent, value);
+        }
+
+        public event NumbericUpDownChangedRoutedEventHandler ValueDecremented
+        {
+            add => AddHandler(ValueDecrementedEvent, value);
+            remove => RemoveHandler(ValueDecrementedEvent, value);
+        }
+
+        public event RoutedEventHandler DelayChanged
+        {
+            add => AddHandler(DelayChangedEvent, value);
+            remove => RemoveHandler(DelayChangedEvent, value);
+        }
+
+        #endregion EVENTS
     }
 }
