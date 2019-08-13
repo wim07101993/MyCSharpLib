@@ -16,12 +16,14 @@
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     mc:Ignorable="d">
-    <dragablz:TabablzControl>
-        <TabItem Header="{Binding Strings.Logging}">
-            <views:Logging DataContext="{Binding LoggingViewModel}" />
-        </TabItem>
-        <TabItem Header="{Binding Strings.Fields}">
-            <views:Fields />
-        </TabItem>
-    </dragablz:TabablzControl>
+    <materialDesign:DialogHost>
+        <dragablz:TabablzControl>
+            <TabItem Header="{Binding Strings.Logging}">
+                <views:Logging DataContext="{Binding LoggingViewModel}" />
+            </TabItem>
+            <TabItem Header="{Binding Strings.Fields}">
+                <views:Fields />
+            </TabItem>
+        </dragablz:TabablzControl>
+    </materialDesign:DialogHost>
 </Window>

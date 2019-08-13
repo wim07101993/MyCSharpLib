@@ -7,16 +7,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <StackPanel Orientation="Vertical">
+        <TextBlock Style="{StaticResource MaterialDesignTitleTextBlock}" Text="Numeric Up-Down" />
         <controls:NumericUpDown
-            Width="100"
-            Margin="10" 
-            HorizontalAlignment="Left"
-            Value="10" />
-
-        <TextBox
             Width="100"
             Margin="10"
             HorizontalAlignment="Left"
-            Text="abc" />
+            Value="10" />
+
+        <TextBlock Style="{StaticResource MaterialDesignTitleTextBlock}" Text="Date time picker" />
+        <controls:DateTimePicker
+            Width="100"
+            Margin="10"
+            HorizontalAlignment="Left" />
     </StackPanel>
 </UserControl>
