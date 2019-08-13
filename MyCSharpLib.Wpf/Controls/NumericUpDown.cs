@@ -583,7 +583,7 @@ namespace MyCSharpLib.Wpf.Controls
             var numericInput = (NumericInput)e.NewValue;
 
             if (!numericInput.HasFlag(NumericInput.Decimal))
-                numericUpDown.Value = Math.Truncate(numericUpDown.Value.GetValueOrDefault());
+                numericUpDown.Value = System.Math.Truncate(numericUpDown.Value.GetValueOrDefault());
         }
 
         private static void OnSnapToMultipleOfIntervalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -593,8 +593,8 @@ namespace MyCSharpLib.Wpf.Controls
 
             var value = numericUpDown.Value.GetValueOrDefault();
 
-            if ((bool)e.NewValue && Math.Abs(numericUpDown.Interval) > 0)
-                numericUpDown.Value = Math.Round(value / numericUpDown.Interval) * numericUpDown.Interval;
+            if ((bool)e.NewValue && System.Math.Abs(numericUpDown.Interval) > 0)
+                numericUpDown.Value = System.Math.Round(value / numericUpDown.Interval) * numericUpDown.Interval;
         }
 
         #endregion callback
@@ -619,7 +619,7 @@ namespace MyCSharpLib.Wpf.Controls
             double val = ((double?)value).Value;
 
             if (!numericUpDown.NumericInputMode.HasFlag(NumericInput.Decimal))
-                val = Math.Truncate(val);
+                val = System.Math.Truncate(val);
 
             if (val < numericUpDown.Minimum)
                 return numericUpDown.Minimum;
@@ -1062,8 +1062,8 @@ namespace MyCSharpLib.Wpf.Controls
 
                 if (ValidateText(tb.Text, out double convertedValue))
                 {
-                    if (SnapToMultipleOfInterval && Math.Abs(Interval) > 0)
-                        convertedValue = Math.Round(convertedValue / Interval) * Interval;
+                    if (SnapToMultipleOfInterval && System.Math.Abs(Interval) > 0)
+                        convertedValue = System.Math.Round(convertedValue / Interval) * Interval;
 
                     if (convertedValue > Maximum)
                         convertedValue = Maximum;

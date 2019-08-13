@@ -21,7 +21,7 @@
                 <ControlTemplate TargetType="{x:Type controls:NumericUpDown}">
                     <Grid>
                         <Border
-                            x:Name="border"
+                            x:Name="Border"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
@@ -41,6 +41,7 @@
                                     x:Name="TextBox"
                                     Grid.Row="0"
                                     Grid.Column="0"
+                                    Margin="0"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     VerticalContentAlignment="Center"
@@ -49,7 +50,10 @@
                                     BorderThickness="0"
                                     Focusable="{TemplateBinding Focusable}" />
 
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" x:Name="ButtonsPanel">
+                                <StackPanel
+                                    x:Name="ButtonsPanel"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
                                     <RepeatButton
                                         x:Name="UpButton"
                                         Width="{TemplateBinding UpDownButtonsWidth}"
@@ -112,9 +116,9 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="border" Property="Opacity" Value="0.56" />
+                            <Setter TargetName="Border" Property="Opacity" Value="0.56" />
                             <Setter TargetName="DashedLine" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="border" Property="BorderBrush" Value="Transparent" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}" />
@@ -128,7 +132,7 @@
                             <Setter TargetName="Underline" Property="Background" Value="{DynamicResource ValidationErrorBrush}" />
                         </Trigger>
                         <Trigger Property="materialDesign:HintAssist.IsFloating" Value="True">
-                            <Setter TargetName="border" Property="Margin" Value="0,12,0,0" />
+                            <Setter TargetName="Border" Property="Margin" Value="0,12,0,0" />
                         </Trigger>
                         <Trigger Property="HideUpDownButtons" Value="True">
                             <Setter TargetName="ButtonsPanel" Property="Visibility" Value="Collapsed" />

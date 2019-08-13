@@ -149,10 +149,10 @@
                                     </StackPanel>
 
                                     <!--  process id  -->
-                                    <TextBox
+                                    <controls:NumericUpDown
                                         materialDesign:HintAssist.Hint="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Strings.ProcessId}"
-                                        Text="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=ProcessIdFilter}"
-                                        Visibility="{TemplateBinding ProcessIdFilterVisibility}" />
+                                        Visibility="{TemplateBinding ProcessIdFilterVisibility}"
+                                        Value="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=ProcessIdFilter}" />
 
                                     <!--  thread id  -->
                                     <TextBox
