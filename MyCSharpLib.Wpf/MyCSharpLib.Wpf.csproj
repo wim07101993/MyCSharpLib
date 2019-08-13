@@ -94,6 +94,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\ObjectBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Spinner.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
@@ -109,6 +113,8 @@
     <Compile Include="Controls\NumericUpDownChangedRoutedEventArgs.cs" />
     <Compile Include="Controls\NumericUpDownChangedRoutedEventHandler.cs" />
     <Compile Include="Controls\NumericInput.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowser.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowserDataTemplateSelector.cs" />
     <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Converters\NewLineRemover.cs" />
     <Compile Include="Converters\ObjectToBooleanConverter.cs" />
