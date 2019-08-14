@@ -8,8 +8,10 @@ namespace MyCSharpLib.Wpf.Converters
 {
     public class ToJsonConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value?.SerializeJson(Formatting.Indented);
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) 
+            => value?.SerializeJson(Formatting.Indented);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value?.ToString().DeserializeJson(targetType);
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) 
+            => value?.ToString().DeserializeJson(targetType);
     }
 }

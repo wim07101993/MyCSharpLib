@@ -82,11 +82,19 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="ControlStrings.cs" />
+    <Page Include="Themes\DateTimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\LogEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\LogsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\ObjectBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -98,13 +106,15 @@
   <ItemGroup>
     <Compile Include="Controls\AControl.cs" />
     <Compile Include="Controls\ButtonsAlignment.cs" />
+    <Compile Include="Controls\DateTimePicker.cs" />
     <Compile Include="Controls\LogEntry.cs" />
     <Compile Include="Controls\LogsView.cs" />
     <Compile Include="Controls\NumericUpDown.cs" />
     <Compile Include="Controls\NumericUpDownChangedRoutedEventArgs.cs" />
     <Compile Include="Controls\NumericUpDownChangedRoutedEventHandler.cs" />
     <Compile Include="Controls\NumericInput.cs" />
-    <Compile Include="Controls\SimpleTypeEditor.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowser.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowserDataTemplateSelector.cs" />
     <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Converters\NewLineRemover.cs" />
     <Compile Include="Converters\ObjectToBooleanConverter.cs" />

@@ -48,7 +48,7 @@ namespace MyCSharpLib.Wpf.Controls
         {
             get
             {
-                if  (!(Application.Current is IWithUnityContainer container))
+                if (!(Application.Current is IWithUnityContainer container))
                     throw new InvalidOperationException($"For this control to work, you need to implement the {nameof(IWithUnityContainer)} interface in the application");
 
                 return container.UnityContainer;

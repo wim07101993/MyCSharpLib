@@ -4,5 +4,6 @@
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/LogEntry.xaml" />
 
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/Spinner.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/DateTimePicker.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
