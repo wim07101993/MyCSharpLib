@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyCSharpLib.Reflection
 {
@@ -19,20 +20,25 @@ namespace MyCSharpLib.Reflection
 
         #region CONSTRUCTORS
 
-        public ObjectBrowserProperty(PropertyInfo property)
+        public ObjectBrowserProperty(PropertyInfo property, object parent)
         {
+            Parent = parent;
             Property = property;
 
             Type = Property.PropertyType;
 
-            DisplayName = Property.GetDisplayName();
-            Description = Property.GetDescription();
+            var displayAttribute = Property.GetCustomAttribute<DisplayAttribute>();
+
+            DisplayName = Property.GetDisplayName() ?? displayAttribute?.Name;
+            Description = Property.GetDescription() ?? displayAttribute?.Description;
             IsBrowsable = Property.IsBrowsable();
             IsReadOnly = !Property.CanWrite;
             EditableState = Property.GetEditableState();
             DefaultValue = Property.GetDefaultValue();
             AuthorizedLevels = Property.GetAuthorizationLevels();
-            IsEnum = Type.IsEnum;
+            IsEnum = Type.IsEnum || Property.GetCustomAttribute<EnumDataTypeAttribute>() != null;
+
+            ValidationAttributes = Type.GetCustomAttributes<ValidationAttribute>().ToArray();
         }
 
         #endregion CONSTRUCTORS
@@ -45,10 +51,14 @@ namespace MyCSharpLib.Reflection
             get => _parent;
             set
             {
+                if (_parent != null && Type.IsAssignableFrom(_parent.GetType()))
+                    throw new InvalidOperationException("Cannot set parent to different type");
+
                 if (!SetProperty(ref _parent, value))
                     return;
 
                 RaisePropertyChanged(nameof(Value));
+                RaisePropertyChanged(nameof(TypeProperties));
             }
         }
 
@@ -62,7 +72,7 @@ namespace MyCSharpLib.Reflection
                 if (Parent == null)
                     return;
 
-                Property.SetValue(Parent, value);
+                Property.SetValue(Parent, value.Cast(Type));
             }
         }
 
@@ -80,7 +90,7 @@ namespace MyCSharpLib.Reflection
         public double Accuracy => Property.GetCustomAttribute<AccuracyAttribute>()?.Accuracy ?? default;
 
         public bool IsEnum { get; }
-        public bool IsFlagEnum => Property.GetCustomAttribute<FlagsAttribute>() != null;
+        public bool IsFlagEnum => Property.GetCustomAttributes<FlagsAttribute>().Any();
 
         public string[] EnumNames
             => IsEnum
@@ -90,7 +100,9 @@ namespace MyCSharpLib.Reflection
         public IEnumerable<ObjectBrowserProperty> TypeProperties
             => Type.GetProperties(BindingFlags.Public)
                 .Where(x => x.CanRead)
-                .Select(x => new ObjectBrowserProperty(x));
+                .Select(x => new ObjectBrowserProperty(x, Value));
+
+        public IEnumerable<ValidationAttribute> ValidationAttributes { get; }
 
         #endregion PROPERTIES
     }

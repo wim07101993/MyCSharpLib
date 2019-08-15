@@ -2,6 +2,7 @@
 using MyCSharpLib.Wpf.Demo.Strings;
 using MyCSharpLib.Wpf.Demo.ViewModelInterfaces;
 using Prism.Mvvm;
+using System.ComponentModel;
 
 namespace MyCSharpLib.Wpf.Demo.ViewModels
 {
@@ -14,6 +15,7 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
         }
 
 
+        [Browsable(false)]
         public ApplicationStrings Strings { get; }
         protected ILogDispatcher Logger { get; }
     }

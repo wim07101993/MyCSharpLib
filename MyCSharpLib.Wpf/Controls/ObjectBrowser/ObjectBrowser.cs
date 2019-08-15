@@ -41,12 +41,6 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             typeof(ObjectBrowser),
             new PropertyMetadata(null, OnAuthorizedLevelChanged));
 
-        public static readonly DependencyProperty AuthorizationDelegateProperty = DependencyProperty.Register(
-           nameof(AuthorizationDelegate),
-           typeof(AuthorizationDelegate),
-           typeof(ObjectBrowser),
-           new PropertyMetadata(null, OnAuthorizationDelegateChanged));
-
         #endregion DEPENDENCY PROPERTIES
 
 
@@ -89,8 +83,8 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
 
         public IEnumerable<ObjectBrowserProperty> VisibleProperties
         {
-            get => (IEnumerable<ObjectBrowserProperty>)GetValue(PropertiesProperty);
-            private set => SetValue(PropertiesProperty, value);
+            get => (IEnumerable<ObjectBrowserProperty>)GetValue(VisiblePropertiesProperty);
+            private set => SetValue(VisiblePropertiesProperty, value);
         }
 
         [Bindable(true)]
@@ -98,13 +92,6 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
         {
             get => (int?)GetValue(AuthorizedLevelProperty);
             set => SetValue(AuthorizedLevelProperty, value);
-        }
-
-        [Bindable(true)]
-        public AuthorizationDelegate AuthorizationDelegate
-        {
-            get => (AuthorizationDelegate)GetValue(AuthorizationDelegateProperty);
-            set => SetValue(AuthorizationDelegateProperty, value);
         }
 
         #endregion PROPERTIES
@@ -119,10 +106,7 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             if (!(d is ObjectBrowser browser) || Equals(e.NewValue, e.OldValue))
                 return;
 
-            browser.Properties = browser.Type
-                .GetProperties(BindingFlags.Public)
-                .Where(x => x.CanRead)
-                .Select(x => new ObjectBrowserProperty(x));
+            browser.UpdateProperties();
         }
 
         private static void OnOverrideTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -150,20 +134,29 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             browser.UpdateVisibleProperties();
         }
 
-        private static void OnAuthorizationDelegateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (!(d is ObjectBrowser browser) || Equals(e.NewValue, e.OldValue))
-                return;
-
-            browser.UpdateVisibleProperties();
-        }
-
         #endregion callbacks
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            Type = DataContext?.GetType();
+        }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (OverrideType == true)
                 Type = DataContext.GetType();
+            else if (Properties != null)
+                foreach (var property in Properties)
+                    property.Parent = DataContext;
+        }
+
+        public void UpdateProperties()
+        {
+            Properties = Type
+              .GetProperties()
+              .Where(x => x.CanRead)
+              .Select(x => new ObjectBrowserProperty(x, DataContext));
         }
 
         public void UpdateVisibleProperties()
@@ -176,14 +169,11 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
 
             var props = Properties.Where(x => x.IsBrowsable);
 
-            if (AuthorizationDelegate != null)
-            {
-                var level = AuthorizedLevel;
-                props = AuthorizedLevel == null
-                    ? props.Where(x => x.AuthorizedLevels == 0)
-                    : props.Where(x => (x.AuthorizedLevels & level) > 0);
-            }
-
+            var level = AuthorizedLevel;
+            props = AuthorizedLevel == null
+                   ? props.Where(x => x.AuthorizedLevels == 0)
+                   : props.Where(x => (x.AuthorizedLevels & level) > 0);
+         
             VisibleProperties = props;
         }
 

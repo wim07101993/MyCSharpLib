@@ -22,6 +22,8 @@ namespace MyCSharpLib.Wpf.Converters
                     TraceEventType.Transfer;
 #pragma warning restore RECS0016 // Bitwise operation on enum which has no [Flags] attribute
 
+        public static TraceEventTypeToStringConverter Instance { get; } = new TraceEventTypeToStringConverter();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is TraceEventType traceEventType))

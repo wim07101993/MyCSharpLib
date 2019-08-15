@@ -7,12 +7,14 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
     public class MainWindowViewModel : AViewModel, IMainWindowViewModel
     {
         public MainWindowViewModel(ApplicationStrings strings, ILogDispatcher logger,
-            ILoggingViewModel loggingViewModel) 
+            ILoggingViewModel loggingViewModel, ObjectBrowserViewModel objectBrowserViewModel) 
             : base(strings, logger)
         {
             LoggingViewModel = loggingViewModel;
+            ObjectBrowserViewModel = objectBrowserViewModel;
         }
 
         public ILoggingViewModel LoggingViewModel { get; }
+        public ObjectBrowserViewModel ObjectBrowserViewModel { get; }
     }
 }

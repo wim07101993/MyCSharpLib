@@ -41,6 +41,10 @@
       <HintPath>..\packages\Prism.Core.7.2.0.1367\lib\net45\Prism.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
@@ -107,6 +111,7 @@
     <Compile Include="Controls\AControl.cs" />
     <Compile Include="Controls\ButtonsAlignment.cs" />
     <Compile Include="Controls\DateTimePicker.cs" />
+    <Compile Include="Controls\DependencyObjectWrapper.cs" />
     <Compile Include="Controls\LogEntry.cs" />
     <Compile Include="Controls\LogsView.cs" />
     <Compile Include="Controls\NumericUpDown.cs" />
@@ -115,7 +120,14 @@
     <Compile Include="Controls\NumericInput.cs" />
     <Compile Include="Controls\ObjectBrowser\ObjectBrowser.cs" />
     <Compile Include="Controls\ObjectBrowser\ObjectBrowserDataTemplateSelector.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowserPropertyValidationRule.cs" />
+    <Compile Include="Controls\ObjectBrowser\ValidationAttributesWrapper.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\EditorBrowsableStateToBooleanConverter.cs" />
+    <Compile Include="Converters\InvertedBooleanConverter.cs" />
+    <Compile Include="Converters\InvertedBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\ListToStringConverter.cs" />
+    <Compile Include="Converters\MultiBooleanAndConverter.cs" />
     <Compile Include="Converters\NewLineRemover.cs" />
     <Compile Include="Converters\ObjectToBooleanConverter.cs" />
     <Compile Include="Converters\ObjectToVisibilityConverter.cs" />

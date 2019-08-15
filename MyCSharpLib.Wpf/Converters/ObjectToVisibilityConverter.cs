@@ -7,6 +7,8 @@ namespace MyCSharpLib.Wpf.Converters
 {
     public class ObjectToVisibilityConverter : IValueConverter
     {
+        public static ObjectToVisibilityConverter Instance { get; } = new ObjectToVisibilityConverter();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value == null

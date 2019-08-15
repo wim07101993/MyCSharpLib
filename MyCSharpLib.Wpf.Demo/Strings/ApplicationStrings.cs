@@ -5,6 +5,7 @@
         private string _ApplicationTitle = "Demo";
         private string _logging = "Logging";
         private string _fields = "Fields";
+        private string _objectBrowser = "Object browser";
         
         public string ApplicationTitle
         {
@@ -24,6 +25,12 @@
             set => SetProperty(ref _fields, value);
         }
 
+        public string ObjectBrowser
+        {
+            get => _objectBrowser;
+            set => SetProperty(ref _objectBrowser, value);
+        }
+       
         #region log entry
 
         private string _id = "Id";

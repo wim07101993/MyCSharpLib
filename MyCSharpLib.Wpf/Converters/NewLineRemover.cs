@@ -7,6 +7,8 @@ namespace MyCSharpLib.Wpf.Converters
 {
     public class NewLineRemover : IValueConverter
     {
+        public static NewLineRemover Instance { get; } = new NewLineRemover();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)

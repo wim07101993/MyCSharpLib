@@ -63,6 +63,7 @@ namespace MyCSharpLib.Wpf.Controls.Demo
                 })
                 // view models
                 .RegisterType<ILoggingViewModel, LoggingViewModel>()
+                .RegisterType<ObjectBrowserViewModel>()
                 .RegisterType<IMainWindowViewModel, MainWindowViewModel>();
 
             var settings = Settings.Default.StringsSettings;

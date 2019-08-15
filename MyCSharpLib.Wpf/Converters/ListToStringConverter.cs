@@ -10,7 +10,9 @@ namespace MyCSharpLib.Wpf.Converters
 {
     public class ListToStringConverter : IValueConverter
     {
-        object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public static ListToStringConverter Instance { get; } = new ListToStringConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is IEnumerable enumerable))
                 return value.ToString();

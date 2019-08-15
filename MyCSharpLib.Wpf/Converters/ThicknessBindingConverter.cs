@@ -10,6 +10,8 @@ namespace MyCSharpLib.Wpf.Converters
     /// </summary>
     public class ThicknessBindingConverter : IValueConverter
     {
+        public static ThicknessBindingConverter Instance { get; } = new ThicknessBindingConverter();
+
         public ThicknessSideType IgnoreThicknessSide { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
