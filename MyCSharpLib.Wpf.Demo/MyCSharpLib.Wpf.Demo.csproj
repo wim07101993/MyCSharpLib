@@ -89,6 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Compile Include="ViewModels\ObjectBrowserViewModel.cs" />
+    <Compile Include="ViewModels\Something.cs" />
     <Compile Include="Views\ObjectBrowser.xaml.cs">
       <DependentUpon>ObjectBrowser.xaml</DependentUpon>
     </Compile>

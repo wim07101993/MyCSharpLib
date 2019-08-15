@@ -9,6 +9,7 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
         public DataTemplate StringTemplate { get; set; }
         public DataTemplate NumberWithoutDecimalTemplate { get; set; }
         public DataTemplate NumberWithDecimalTemplate { get; set; }
+        public DataTemplate ObjectTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -23,8 +24,7 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             else if (property.Type == typeof(float) || property.Type == typeof(decimal) || property.Type == typeof(double))
                 return NumberWithDecimalTemplate;
 
-
-            return base.SelectTemplate(item, container);
+            return ObjectTemplate;
         }
     }
 }

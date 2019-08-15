@@ -1,5 +1,6 @@
 ﻿using MyCSharpLib.Services.Logging.Loggers;
 using MyCSharpLib.Wpf.Demo.Strings;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MyCSharpLib.Wpf.Demo.ViewModels
@@ -10,6 +11,7 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
         private string _lastName;
         private int _age;
         private double _salary;
+        private Something _something = new Something();
 
         public ObjectBrowserViewModel(ApplicationStrings strings, ILogDispatcher logger)
             : base(strings, logger)
@@ -42,6 +44,13 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
         {
             get => _salary;
             set => SetProperty(ref _salary, value);
+        }
+
+        [Description("I didnt no any name to give to this property")]
+        public Something Something
+        {
+            get => _something;
+            set => SetProperty(ref _something, value);
         }
     }
 }

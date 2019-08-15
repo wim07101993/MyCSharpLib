@@ -9,7 +9,11 @@
 
     <DataTemplate x:Key="StringEditorTemplate" DataType="{x:Type reflection:ObjectBrowserProperty}">
         <StackPanel Orientation="Vertical" Visibility="{Binding IsBrowsable, Converter={x:Static converters:BooleanToVisibilityConverter.Instance}}">
-            <TextBox materialDesign:HintAssist.Hint="{Binding DisplayName}" Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <TextBox
+                MinWidth="100"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="{Binding DisplayName}"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}">
                 <TextBox.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -37,7 +41,11 @@
 
     <DataTemplate x:Key="NumberWithDecimalTemplate" DataType="{x:Type reflection:ObjectBrowserProperty}">
         <StackPanel Orientation="Vertical" Visibility="{Binding IsBrowsable, Converter={x:Static converters:BooleanToVisibilityConverter.Instance}}">
-            <controls:NumericUpDown materialDesign:HintAssist.Hint="{Binding DisplayName}" NumericInputMode="Decimal">
+            <controls:NumericUpDown
+                MinWidth="100"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="{Binding DisplayName}"
+                NumericInputMode="Decimal">
                 <controls:NumericUpDown.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -65,7 +73,11 @@
 
     <DataTemplate x:Key="NumberWithoutDecimalTemplate" DataType="{x:Type reflection:ObjectBrowserProperty}">
         <StackPanel Orientation="Vertical" Visibility="{Binding IsBrowsable, Converter={x:Static converters:BooleanToVisibilityConverter.Instance}}">
-            <controls:NumericUpDown materialDesign:HintAssist.Hint="{Binding DisplayName}" NumericInputMode="Numbers">
+            <controls:NumericUpDown
+                MinWidth="100"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="{Binding DisplayName}"
+                NumericInputMode="Numbers">
                 <controls:NumericUpDown.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -91,6 +103,46 @@
         </StackPanel>
     </DataTemplate>
 
+    <DataTemplate x:Key="ObjectTemplate" DataType="{x:Type reflection:ObjectBrowserProperty}">
+        <TreeViewItem>
+            <TreeViewItem.Header>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{Binding DisplayName}" />
+                    <TextBlock Text="{Binding Description}" Visibility="{Binding Description, Converter={x:Static converters:StringToVisibilityConverter.Instance}}" />
+                </StackPanel>
+            </TreeViewItem.Header>
+            <StackPanel Orientation="Vertical" Visibility="{Binding IsBrowsable, Converter={x:Static converters:BooleanToVisibilityConverter.Instance}}">
+                <objectBrowser:ObjectBrowser>
+                    <objectBrowser:ObjectBrowser.DataContext>
+                        <Binding
+                            Mode="TwoWay"
+                            Path="Value"
+                            UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <objectBrowser:ObjectBrowserPropertyValidationRule>
+                                    <objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
+                                        <objectBrowser:ValidationAttributesWrapper Value="{Binding ValidationAttributes}" />
+                                    </objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
+                                </objectBrowser:ObjectBrowserPropertyValidationRule>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </objectBrowser:ObjectBrowser.DataContext>
+                </objectBrowser:ObjectBrowser>
+            </StackPanel>
+        </TreeViewItem>
+    </DataTemplate>
+
+    <Style x:Key="ObjectBrowserTreeViewItem" TargetType="{x:Type objectBrowser:ObjectBrowser}">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type objectBrowser:ObjectBrowser}">
+                        <TreeViewItem ItemsSource="{TemplateBinding VisibleProperties}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
 
     <Style TargetType="{x:Type objectBrowser:ObjectBrowser}">
         <Style.Setters>
@@ -102,6 +154,7 @@
                                 <objectBrowser:ObjectBrowserDataTemplateSelector
                                     NumberWithDecimalTemplate="{StaticResource NumberWithDecimalTemplate}"
                                     NumberWithoutDecimalTemplate="{StaticResource NumberWithoutDecimalTemplate}"
+                                    ObjectTemplate="{StaticResource ObjectTemplate}"
                                     StringTemplate="{StaticResource StringEditorTemplate}" />
                             </TreeView.ItemTemplateSelector>
                         </TreeView>
