@@ -46,7 +46,7 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
             set => SetProperty(ref _salary, value);
         }
 
-        [Description("I didnt no any name to give to this property")]
+        [Description("I didnt know any name to give to this property")]
         public Something Something
         {
             get => _something;

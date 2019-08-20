@@ -3,12 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyCSharpLib.Wpf.Demo.ViewModels
 {
-    public class Something : BindableBase
+    public class SomethingElse : BindableBase
     {
         private string _string;
         private int _int;
         private double _double;
-        private SomethingElse _somethingElse;
 
 
         [Display(Name = "String", Description = "Some string")]
@@ -31,13 +30,6 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
         {
             get => _double;
             set => SetProperty(ref _double, value);
-        }
-
-
-        public SomethingElse SomethingElse
-        {
-            get => _somethingElse;
-            set => SetProperty(ref _somethingElse, value);
         }
     }
 }
