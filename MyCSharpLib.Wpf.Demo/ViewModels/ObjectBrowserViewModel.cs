@@ -1,5 +1,4 @@
 ﻿using MyCSharpLib.Services.Logging.Loggers;
-using MyCSharpLib.Wpf.Demo.Strings;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,8 +12,8 @@ namespace MyCSharpLib.Wpf.Demo.ViewModels
         private double _salary;
         private Something _something = new Something();
 
-        public ObjectBrowserViewModel(ApplicationStrings strings, ILogDispatcher logger)
-            : base(strings, logger)
+        public ObjectBrowserViewModel(ILogDispatcher logger)
+            : base(logger)
         {
         }
 

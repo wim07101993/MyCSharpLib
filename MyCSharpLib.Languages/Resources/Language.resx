@@ -46,7 +46,7 @@
     
     mimetype: application/x-microsoft.net.object.binary.base64
     value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
     
     mimetype: application/x-microsoft.net.object.soap.base64
@@ -60,6 +60,7 @@
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
@@ -68,9 +69,10 @@
               <xsd:sequence>
                 <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="name" use="required" type="xsd:string" />
               <xsd:attribute name="type" type="xsd:string" />
               <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
@@ -85,9 +87,10 @@
                 <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
                 <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
               <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
               <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
@@ -109,9 +112,133 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Body" xml:space="preserve">
+    <value>Body</value>
+  </data>
+  <data name="CallStack" xml:space="preserve">
+    <value>Call stack</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Leeg maken</value>
+    <comment>Werkwoord</comment>
+  </data>
+  <data name="Critical" xml:space="preserve">
+    <value>Kritiek</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Einde</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>Einddatum</value>
+  </data>
+  <data name="EndTime" xml:space="preserve">
+    <value>Eindtijd</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="EventType" xml:space="preserve">
+    <value>Event type</value>
+  </data>
+  <data name="Everything" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="Fields" xml:space="preserve">
+    <value>Velden</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="Footer" xml:space="preserve">
+    <value>Footer</value>
+  </data>
+  <data name="Header" xml:space="preserve">
+    <value>Header</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Informatie</value>
+  </data>
+  <data name="Loggin" xml:space="preserve">
+    <value>Logging</value>
+  </data>
+  <data name="Logging" xml:space="preserve">
+    <value>Logging</value>
+  </data>
+  <data name="ObjectBrowser" xml:space="preserve">
+    <value>Object verkenner</value>
+  </data>
+  <data name="OperationStack" xml:space="preserve">
+    <value>Operation stack</value>
+  </data>
+  <data name="Payload" xml:space="preserve">
+    <value>Payload</value>
+  </data>
+  <data name="ProcessId" xml:space="preserve">
+    <value>Process id</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Verder gaan</value>
+    <comment>Werkwoord</comment>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Zoeken</value>
+    <comment>Werkwoord</comment>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Bron</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>Startdatum</value>
+  </data>
+  <data name="StartTime" xml:space="preserve">
+    <value>Starttijd</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="Suspend" xml:space="preserve">
+    <value>Onderbreken</value>
+    <comment>Werkwoord</comment>
+  </data>
+  <data name="Tag" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="ThreadId" xml:space="preserve">
+    <value>Thread id</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Tijd</value>
+  </data>
+  <data name="TimeStamp" xml:space="preserve">
+    <value>Moment</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="Transfer" xml:space="preserve">
+    <value>Overdracht</value>
+    <comment>Zelfstandig naamwoord</comment>
+  </data>
+  <data name="Verbose" xml:space="preserve">
+    <value>Breedsprakig</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Waarschuwing</value>
+  </data>
 </root>

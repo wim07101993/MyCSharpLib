@@ -85,7 +85,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="ControlStrings.cs" />
     <Page Include="Themes\DateTimePicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -141,7 +140,6 @@
     <Compile Include="Extensions\DispatcherObjectExtensions.cs" />
     <Compile Include="Helpers\ControlHelper.cs" />
     <Compile Include="Helpers\TextBoxHelper.cs" />
-    <Compile Include="IControlsStrings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -166,6 +164,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MyCSharpLib.Languages\MyCSharpLib.Languages.csproj">
+      <Project>{2982ab53-5d25-4b2d-9511-bb8478c46c5a}</Project>
+      <Name>MyCSharpLib.Languages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyCSharpLib\MyCSharpLib.csproj">
       <Project>{a9ebd273-e73f-4051-bf56-e6a98ff2aa52}</Project>
       <Name>MyCSharpLib</Name>

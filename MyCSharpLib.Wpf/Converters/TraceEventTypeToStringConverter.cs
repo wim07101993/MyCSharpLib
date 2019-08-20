@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyCSharpLib.Languages;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Controls;
@@ -30,7 +31,7 @@ namespace MyCSharpLib.Wpf.Converters
                 return null;
 
             if (traceEventType == AllEventTypes)
-                return (parameter as IControlsStrings)?.Everything;
+                return Language.Everything;
 
             return traceEventType.ToString();
         }

@@ -4,10 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+    xmlns:lang="clr-namespace:MyCSharpLib.Languages;assembly=MyCSharpLib.Languages"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="clr-namespace:MyCSharpLib.Wpf.Demo.Views"
-    Title="{Binding Strings.Title}"
+    xmlns:app="clr-namespace:MyCSharpLib.Wpf.Demo"
+    Title="{x:Static app:Language.ApplicationTitle}"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
     TextElement.FontSize="13"
@@ -18,13 +20,13 @@
     mc:Ignorable="d">
     <materialDesign:DialogHost>
         <dragablz:TabablzControl>
-            <TabItem Header="{Binding Strings.Fields}">
+            <TabItem Header="{x:Static lang:Language.Fields}">
                 <views:Fields />
             </TabItem>
-            <TabItem Header="{Binding Strings.ObjectBrowser}">
+            <TabItem Header="{x:Static lang:Language.ObjectBrowser}">
                 <views:ObjectBrowser DataContext="{Binding ObjectBrowserViewModel}" />
             </TabItem>
-            <TabItem Header="{Binding Strings.Logging}">
+            <TabItem Header="{x:Static lang:Language.Logging}">
                 <views:Logging DataContext="{Binding LoggingViewModel}" />
             </TabItem>
         </dragablz:TabablzControl>

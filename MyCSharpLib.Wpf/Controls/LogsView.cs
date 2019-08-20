@@ -3,12 +3,12 @@ using MyCSharpLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using MyCSharpLib.Languages;
 
 namespace MyCSharpLib.Wpf.Controls
 {
@@ -314,8 +314,6 @@ namespace MyCSharpLib.Wpf.Controls
         private const string PartCallStackColumn = "CallStackColumn";
         private const string PartSearchButton = "SearchButton";
         private const string PartClearFilterButton = "ClearFilterButton";
-
-        private static readonly PropertyInfo[] _controlStringProperties = typeof(IControlsStrings).GetProperties();
 
         private readonly Dictionary<string, DataGridColumn> _collumns = new Dictionary<string, DataGridColumn>
         {
@@ -633,7 +631,6 @@ namespace MyCSharpLib.Wpf.Controls
             GetTemplateChilds();
 
             UpdateColumnVisibilities();
-            UpdateColumnNames();
         }
 
         private void GetTemplateChilds()
@@ -674,7 +671,6 @@ namespace MyCSharpLib.Wpf.Controls
 
         #endregion callbacks
 
-        protected override void OnStringsPropertyChanged(object sender, PropertyChangedEventArgs e) => UpdateColumnName(e.PropertyName);
         private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => UpdateFilteredItemsSource();
         private void OnSearchButtonClick(object sender, RoutedEventArgs e) => UpdateFilteredItemsSource();
         private void OnClearFilterButtonClick(object sender, RoutedEventArgs e) => ClearFilter();
@@ -736,34 +732,6 @@ namespace MyCSharpLib.Wpf.Controls
             FilteredItemsSource = itemsSource.ToList();
         }
         
-        public void UpdateColumnName(string propertyName)
-        {
-            foreach (var collumn in _collumns.Keys.ToList())
-            {
-                if ($"{propertyName}Column" != collumn)
-                    continue;
-
-                foreach (var property in _controlStringProperties)
-                    if (Equals(property.Name, propertyName))
-                    {
-                        _collumns[collumn].Header = property.GetValue(Strings);
-                        break;
-                    }
-
-                break;
-            }
-        }
-        public void UpdateColumnNames()
-        {
-            foreach (var collumn in _collumns.Keys.ToList())
-                foreach (var property in _controlStringProperties)
-                    if (Equals($"{property.Name}Column", collumn))
-                    {
-                        _collumns[collumn].Header = property.GetValue(Strings);
-                        break;
-                    }
-        }
-
         private void UpdateColumnVisibility(string propertyName, Visibility visibility)
         {
             var l = "Visibility".Length;
