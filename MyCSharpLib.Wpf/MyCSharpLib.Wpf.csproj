@@ -120,6 +120,7 @@
     <Compile Include="Controls\NumericInput.cs" />
     <Compile Include="Controls\ObjectBrowser\ObjectBrowser.cs" />
     <Compile Include="Controls\ObjectBrowser\ObjectBrowserDataTemplateSelector.cs" />
+    <Compile Include="Controls\ObjectBrowser\ObjectBrowserPropertyControl.cs" />
     <Compile Include="Controls\ObjectBrowser\ObjectBrowserPropertyValidationRule.cs" />
     <Compile Include="Controls\ObjectBrowser\ValidationAttributesWrapper.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />

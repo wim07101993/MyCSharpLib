@@ -6,7 +6,6 @@
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/Spinner.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/DateTimePicker.xaml" />
 
-
         <ResourceDictionary Source="pack://application:,,,/MyCSharpLib.Wpf;component/Themes/ObjectBrowser.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

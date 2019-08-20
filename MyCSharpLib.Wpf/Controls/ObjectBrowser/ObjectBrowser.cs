@@ -1,10 +1,10 @@
 ﻿using MyCSharpLib.Reflection;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
 {
@@ -33,6 +33,12 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
         public static readonly DependencyProperty VisiblePropertiesProperty = DependencyProperty.Register(
             nameof(VisibleProperties),
             typeof(IEnumerable<ObjectBrowserProperty>),
+            typeof(ObjectBrowser),
+            new PropertyMetadata(null, OnVisiblePropertiesChanged));
+
+        public static readonly DependencyProperty TemplateSelectorProperty = DependencyProperty.Register(
+            nameof(TemplateSelector),
+            typeof(ObjectBrowserDataTemplateSelector),
             typeof(ObjectBrowser));
 
         public static readonly DependencyProperty AuthorizedLevelProperty = DependencyProperty.Register(
@@ -42,6 +48,15 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             new PropertyMetadata(null, OnAuthorizedLevelChanged));
 
         #endregion DEPENDENCY PROPERTIES
+
+
+        #region FIELDS
+
+        private const string PartTreeView = "PartTreeView";
+
+        private TreeView _treeView;
+
+        #endregion FIELDS
 
 
         #region CONSTRUCTORS
@@ -61,14 +76,12 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
 
         #region PROPERTIES
 
-        [Bindable(true)]
         public Type Type
         {
             get => (Type)GetValue(TypeProperty);
             set => SetValue(TypeProperty, value);
         }
 
-        [Bindable(true)]
         public bool? OverrideType
         {
             get => (bool?)GetValue(OverrideTypeProperty);
@@ -87,7 +100,12 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             private set => SetValue(VisiblePropertiesProperty, value);
         }
 
-        [Bindable(true)]
+        public ObjectBrowserDataTemplateSelector TemplateSelector
+        {
+            get => (ObjectBrowserDataTemplateSelector)GetValue(TemplateSelectorProperty);
+            set => SetValue(TemplateSelectorProperty, value);
+        }
+
         public int? AuthorizedLevel
         {
             get => (int?)GetValue(AuthorizedLevelProperty);
@@ -126,6 +144,14 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
             browser.UpdateVisibleProperties();
         }
 
+        private static void OnVisiblePropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is ObjectBrowser browser) || Equals(e.NewValue, e.OldValue))
+                return;
+
+            browser.UpdateTreeView();
+        }
+
         private static void OnAuthorizedLevelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is ObjectBrowser browser) || Equals(e.NewValue, e.OldValue))
@@ -140,6 +166,9 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
         {
             base.OnApplyTemplate();
             Type = DataContext?.GetType();
+
+            _treeView = GetTemplateChild<TreeView>(PartTreeView);
+            UpdateTreeView();
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -175,6 +204,39 @@ namespace MyCSharpLib.Wpf.Controls.ObjectBrowser
                    : props.Where(x => (x.AuthorizedLevels & level) > 0);
          
             VisibleProperties = props;
+        }
+
+        public void UpdateTreeView()
+        {
+            if (_treeView == null)
+                return;
+
+            _treeView.Items.Clear();
+            foreach (var item in VisibleProperties.Select(GenerateTreeViewItem))
+                _treeView.Items.Add(item);
+        }
+
+        private object GenerateTreeViewItem(ObjectBrowserProperty property)
+        {
+            var propertyBinding = new Binding()
+            {
+                Source = property,
+                Mode = BindingMode.OneWay
+            };
+
+            var template = TemplateSelector.SelectTemplate(property, _treeView);
+            if (template != TemplateSelector.ObjectTemplate)
+                return CreateContentWithTemplate(propertyBinding, template);
+
+            var item = new TreeViewItem()
+            {
+                Header = CreateContentWithTemplate(propertyBinding, "ObjectHeaderTemplate")
+            };
+
+            foreach (var subItem in property.TypeProperties.Select(GenerateTreeViewItem))
+                item.Items.Add(subItem);
+
+            return item;
         }
 
         #endregion METHODS

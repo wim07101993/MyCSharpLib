@@ -98,7 +98,7 @@ namespace MyCSharpLib.Reflection
                 : null;
 
         public IEnumerable<ObjectBrowserProperty> TypeProperties
-            => Type.GetProperties(BindingFlags.Public)
+            => Type.GetProperties()
                 .Where(x => x.CanRead)
                 .Select(x => new ObjectBrowserProperty(x, Value));
 
