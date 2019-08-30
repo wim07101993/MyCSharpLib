@@ -9,10 +9,10 @@ namespace MyCSharpLib.Utilities.Collections
     {
         #region FIELDS
 
-        private readonly object _lock = new object();
+        protected readonly object _lock = new object();
         private readonly IDictionary<TKey, ActionSequenceAction<TKey>> _actions = new Dictionary<TKey, ActionSequenceAction<TKey>>();
 
-        private int _version;
+        protected int _version;
 
         #endregion FIELDS
 
@@ -33,7 +33,7 @@ namespace MyCSharpLib.Utilities.Collections
             while (enumerator.MoveNext()) { }
         }
 
-        public ActionSequence<TKey> BeforStart(ActionSequenceLifeCycleEventHandler<TKey> action)
+        public virtual ActionSequence<TKey> BeforStart(ActionSequenceLifeCycleEventHandler<TKey> action)
         {
             lock (_lock)
             {
@@ -41,7 +41,7 @@ namespace MyCSharpLib.Utilities.Collections
                 return this;
             }
         }
-        public ActionSequence<TKey> BeforeStep(ActionSequenceLifeCycleEventHandler<TKey> action)
+        public virtual ActionSequence<TKey> BeforeStep(ActionSequenceLifeCycleEventHandler<TKey> action)
         {
             lock (_lock)
             {
@@ -49,7 +49,7 @@ namespace MyCSharpLib.Utilities.Collections
                 return this;
             }
         }
-        public ActionSequence<TKey> AfterStep(ActionSequenceLifeCycleEventHandler<TKey> action)
+        public virtual ActionSequence<TKey> AfterStep(ActionSequenceLifeCycleEventHandler<TKey> action)
         {
             lock (_lock)
             {
@@ -57,7 +57,7 @@ namespace MyCSharpLib.Utilities.Collections
                 return this;
             }
         }
-        public ActionSequence<TKey> AfterEnd(ActionSequenceLifeCycleEventHandler<TKey> action)
+        public virtual ActionSequence<TKey> AfterEnd(ActionSequenceLifeCycleEventHandler<TKey> action)
         {
             lock (_lock)
             {
@@ -65,23 +65,28 @@ namespace MyCSharpLib.Utilities.Collections
                 return this;
             }
         }
-       
+
+        protected virtual void OnSequenceStarted() => SequenceStarted?.Invoke(this, Start, this[Start]);
+        protected virtual void OnExecutingAction(TKey key, ActionSequenceAction<TKey> action) => ExecutingAction?.Invoke(this, key, action);
+        protected virtual void OnExecutedAction(TKey key, ActionSequenceAction<TKey> action) => ExecutedAction?.Invoke(this, key, action);
+        protected virtual void OnSequenceEnded() => SequenceEnded?.Invoke(this, End, this[End]);
+
         #endregion METHODS
 
 
         #region EVENTS
 
-        public event ActionSequenceLifeCycleEventHandler<TKey> SequenceStarted;
-        public event ActionSequenceLifeCycleEventHandler<TKey> ExecutingAction;
-        public event ActionSequenceLifeCycleEventHandler<TKey> ExecutedAction;
-        public event ActionSequenceLifeCycleEventHandler<TKey> SequenceEnded;
+        public virtual event ActionSequenceLifeCycleEventHandler<TKey> SequenceStarted;
+        public virtual event ActionSequenceLifeCycleEventHandler<TKey> ExecutingAction;
+        public virtual event ActionSequenceLifeCycleEventHandler<TKey> ExecutedAction;
+        public virtual event ActionSequenceLifeCycleEventHandler<TKey> SequenceEnded;
 
         #endregion EVENTS
 
 
         #region ENUMERABLE
 
-        public IEnumerator<ActionSequenceAction<TKey>> GetEnumerator() => new ActionSequenceEnumerator(this);
+        public virtual IEnumerator<ActionSequenceAction<TKey>> GetEnumerator() => new ActionSequenceEnumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -90,12 +95,12 @@ namespace MyCSharpLib.Utilities.Collections
 
         #region IDICTIONARY
 
-        public ICollection<TKey> Keys => _actions.Keys;
-        public ICollection<ActionSequenceAction<TKey>> Values => _actions.Values;
-        public int Count => _actions.Count;
-        public bool IsReadOnly => false;
+        public virtual ICollection<TKey> Keys => _actions.Keys;
+        public virtual ICollection<ActionSequenceAction<TKey>> Values => _actions.Values;
+        public virtual int Count => _actions.Count;
+        public virtual bool IsReadOnly => false;
 
-        public ActionSequenceAction<TKey> this[TKey key]
+        public virtual ActionSequenceAction<TKey> this[TKey key]
         {
             get => _actions[key];
             set
@@ -110,11 +115,11 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public bool ContainsKey(TKey key) => _actions.ContainsKey(key);
-        public bool Contains(KeyValuePair<TKey, ActionSequenceAction<TKey>> item) => _actions.Contains(item);
-        public bool TryGetValue(TKey key, out ActionSequenceAction<TKey> value) => _actions.TryGetValue(key, out value);
+        public virtual bool ContainsKey(TKey key) => _actions.ContainsKey(key);
+        public virtual bool Contains(KeyValuePair<TKey, ActionSequenceAction<TKey>> item) => _actions.Contains(item);
+        public virtual bool TryGetValue(TKey key, out ActionSequenceAction<TKey> value) => _actions.TryGetValue(key, out value);
 
-        public void Add(TKey key, ActionSequenceAction<TKey> value)
+        public virtual void Add(TKey key, ActionSequenceAction<TKey> value)
         {
             lock (_lock)
             {
@@ -123,7 +128,7 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public void Add(KeyValuePair<TKey, ActionSequenceAction<TKey>> item)
+        public virtual void Add(KeyValuePair<TKey, ActionSequenceAction<TKey>> item)
         {
             lock (_lock)
             {
@@ -132,7 +137,7 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public bool Remove(TKey key)
+        public virtual bool Remove(TKey key)
         {
             lock (_lock)
             {
@@ -142,7 +147,7 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public bool Remove(KeyValuePair<TKey, ActionSequenceAction<TKey>> item)
+        public virtual bool Remove(KeyValuePair<TKey, ActionSequenceAction<TKey>> item)
         {
             lock (_lock)
             {
@@ -152,7 +157,7 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             lock (_lock)
             {
@@ -161,7 +166,7 @@ namespace MyCSharpLib.Utilities.Collections
             }
         }
 
-        public void CopyTo(KeyValuePair<TKey, ActionSequenceAction<TKey>>[] array, int arrayIndex) => _actions.CopyTo(array, arrayIndex);
+        public virtual void CopyTo(KeyValuePair<TKey, ActionSequenceAction<TKey>>[] array, int arrayIndex) => _actions.CopyTo(array, arrayIndex);
 
         IEnumerator<KeyValuePair<TKey, ActionSequenceAction<TKey>>> IEnumerable<KeyValuePair<TKey, ActionSequenceAction<TKey>>>.GetEnumerator() => _actions.GetEnumerator();
 
@@ -201,15 +206,15 @@ namespace MyCSharpLib.Utilities.Collections
                         throw new InvalidOperationException("The sequence changed while iterating over it...");
 
                     if (_key.Equals(_sequence.Start))
-                        _sequence.SequenceStarted?.Invoke(_sequence, _key, Current);
+                        _sequence.OnSequenceStarted();
                     
-                    _sequence.ExecutingAction?.Invoke(_sequence, _key, Current);
+                    _sequence.OnExecutingAction(_key, Current);
                     Current.Execute();
-                    _sequence.ExecutedAction?.Invoke(_sequence, _key, Current);
+                    _sequence.OnExecutedAction(_key, Current);
 
                     if (_key.Equals(_sequence.End))
                     {
-                        _sequence.SequenceEnded?.Invoke(_sequence, _key, Current);
+                        _sequence.OnSequenceEnded();
                         return false;
                     }
 
