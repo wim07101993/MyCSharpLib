@@ -33,7 +33,7 @@ namespace MyCSharpLib.Utilities.Collections
             while (enumerator.MoveNext()) { }
         }
 
-        public virtual ActionSequence<TKey> BeforStart(ActionSequenceLifeCycleEventHandler<TKey> action)
+        public virtual ActionSequence<TKey> BeforeStart(ActionSequenceLifeCycleEventHandler<TKey> action)
         {
             lock (_lock)
             {
@@ -181,11 +181,14 @@ namespace MyCSharpLib.Utilities.Collections
             private readonly int _version;
 
             private TKey _key;
+            private bool _started;
 
             public ActionSequenceEnumerator(ActionSequence<TKey> sequence)
             {
                 _sequence = sequence;
                 _version = sequence._version;
+
+                _started = false;
 
                 _key = sequence.Start;
                 Current = sequence[sequence.Start];
@@ -208,6 +211,13 @@ namespace MyCSharpLib.Utilities.Collections
                     if (_key.Equals(_sequence.Start))
                         _sequence.OnSequenceStarted();
                     
+                    if (_started)
+                        Current = _sequence[_key];
+                    else
+                    {
+                        _started = true;
+                    }
+
                     _sequence.OnExecutingAction(_key, Current);
                     Current.Execute();
                     _sequence.OnExecutedAction(_key, Current);
@@ -219,7 +229,6 @@ namespace MyCSharpLib.Utilities.Collections
                     }
 
                     _key = Current.NextAction;
-                    Current = _sequence[_key];
                     return true;
                 }
             }
@@ -228,6 +237,7 @@ namespace MyCSharpLib.Utilities.Collections
             {
                 _key = _sequence.Start;
                 Current = _sequence[_key];
+                _started = false;
             }
         }
 

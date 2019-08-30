@@ -4,7 +4,7 @@ namespace MyCSharpLib.Utilities.Collections
 {
     public class ActionSequenceAction<TKey> 
     {
-        public TKey NextAction { get; }
+        public TKey NextAction { get; set; }
         public Action Action { get; set; }
 
 
