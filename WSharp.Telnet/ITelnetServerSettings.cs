@@ -1,4 +1,4 @@
-﻿namespace WSharp.Services.Telnet
+﻿namespace WSharp.Telnet
 {
     public interface ITelnetServerSettings
     {

@@ -3,7 +3,7 @@ using WSharp.Services.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace WSharp.Services.Telnet
+namespace WSharp.Telnet
 {
     public class SentReceivedEventArgs
     {

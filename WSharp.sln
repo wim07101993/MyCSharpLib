@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.779
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WSharp", "WSharp\WSharp.csproj", "{A9EBD273-E73F-4051-BF56-E6A98FF2AA52}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WSharp.Utilities", "WSharp.Utilities\WSharp.Utilities.csproj", "{5E3D66F3-3EB7-481D-A5D9-B32FB498E6AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WSharp.Utilities.Tests", "WSharp.Utilities.Tests\WSharp.Utilities.Tests.csproj", "{860943BE-6765-4D52-A2B9-F6487BB3DEB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WSharp.Telnet", "WSharp.Telnet\WSharp.Telnet.csproj", "{36A07E3B-E424-484D-A1A0-2211ECE1BB92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{860943BE-6765-4D52-A2B9-F6487BB3DEB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{860943BE-6765-4D52-A2B9-F6487BB3DEB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{860943BE-6765-4D52-A2B9-F6487BB3DEB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36A07E3B-E424-484D-A1A0-2211ECE1BB92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36A07E3B-E424-484D-A1A0-2211ECE1BB92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36A07E3B-E424-484D-A1A0-2211ECE1BB92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36A07E3B-E424-484D-A1A0-2211ECE1BB92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
