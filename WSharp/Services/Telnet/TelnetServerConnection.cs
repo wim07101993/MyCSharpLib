@@ -35,9 +35,9 @@ namespace WSharp.Services.Telnet
 
         #region CONSTRUCTOR
 
-        public TelnetServerConnection(ILogDispatcher logDispatcher, ISerializerDeserializer serializerDeserializer, TcpClient tcpClient)
+        public TelnetServerConnection(ILogger logger, ISerializerDeserializer serializerDeserializer, TcpClient tcpClient)
         {
-            Logger = logDispatcher;
+            Logger = logger;
             SerializerDeserializer = serializerDeserializer;
             Id = Guid.NewGuid();
 
@@ -55,7 +55,7 @@ namespace WSharp.Services.Telnet
 
         protected virtual string ClassName => nameof(TelnetServerConnection);
 
-        protected ILogDispatcher Logger { get; }
+        protected ILogger Logger { get; }
         public ISerializerDeserializer SerializerDeserializer { get; }
 
         public Guid Id { get; }

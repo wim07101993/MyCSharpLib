@@ -10,7 +10,7 @@ namespace WSharp.Services.Telnet
     {
         #region FIELDS
 
-        private IUnityContainer _unityContainer;
+        private readonly IUnityContainer _unityContainer;
 
         #endregion FIELDS
 
@@ -18,8 +18,8 @@ namespace WSharp.Services.Telnet
         #region CONSTRUCTOR
 
         public TelnetServer(IUnityContainer unityContainer, ITelnetServerSettings settings, 
-            ILogDispatcher logDispatcher, ISerializerDeserializer serializerDeserializer)
-            : base(settings, logDispatcher, serializerDeserializer)
+            ILogger logger, ISerializerDeserializer serializerDeserializer)
+            : base(settings, logger, serializerDeserializer)
         {
             _unityContainer = unityContainer;
         }

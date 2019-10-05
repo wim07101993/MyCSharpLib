@@ -29,7 +29,7 @@ namespace WSharp.Services.Telnet
 
         #region CONSTRUCTOR
         
-        protected ATelnetServer(ITelnetServerSettings settings, ILogDispatcher logDispatcher, ISerializerDeserializer serializerDeserializer)
+        protected ATelnetServer(ITelnetServerSettings settings, ILogger logger, ISerializerDeserializer serializerDeserializer)
         {
             Settings = settings;
             SerializerDeserializer = serializerDeserializer;
@@ -37,7 +37,7 @@ namespace WSharp.Services.Telnet
             Connections = new ObservableCollection<T>();
             Connections.CollectionChanged += OnClientsCollectionChanged;
 
-            Logger = logDispatcher;
+            Logger = logger;
             Logger.Log(ClassName, $"Created new telnetServer on {settings.PortNumber}.");
         }
 
@@ -54,7 +54,7 @@ namespace WSharp.Services.Telnet
         protected ISerializerDeserializer SerializerDeserializer { get; }
         protected CancellationTokenSource AcceptClientCancelTokenSource { get; set; }
 
-        protected ILogDispatcher Logger { get; }
+        protected ILogger Logger { get; }
 
         public bool IsRunning
         {
