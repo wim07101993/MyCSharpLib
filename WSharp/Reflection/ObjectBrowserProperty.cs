@@ -38,7 +38,10 @@ namespace WSharp.Reflection
             AuthorizedLevels = Property.GetAuthorizationLevels();
             IsEnum = Type.IsEnum || Property.GetCustomAttribute<EnumDataTypeAttribute>() != null;
 
-            ValidationAttributes = Type.GetCustomAttributes<ValidationAttribute>().ToArray();
+            ValidationAttributes = Property.GetCustomAttributes<ValidationAttribute>().ToArray();
+
+            if (Parent is INotifyPropertyChanged notifyPropertyChanged)
+                notifyPropertyChanged.PropertyChanged += OnParentPropertyChanged;
         }
 
         #endregion CONSTRUCTORS
@@ -99,11 +102,22 @@ namespace WSharp.Reflection
 
         public IEnumerable<ObjectBrowserProperty> TypeProperties
             => Type.GetProperties()
-                .Where(x => x.CanRead)
+                .Where(x => x.CanRead && x.GetIndexParameters().Length == 0)
                 .Select(x => new ObjectBrowserProperty(x, Value));
 
         public IEnumerable<ValidationAttribute> ValidationAttributes { get; }
 
         #endregion PROPERTIES
+
+
+        #region METHODS
+
+        private void OnParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == Property.Name)
+                RaisePropertyChanged(nameof(Value));
+        }
+
+        #endregion METHODS
     }
 }

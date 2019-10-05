@@ -184,7 +184,7 @@ namespace WSharp.Wpf.Controls.ObjectBrowser
         {
             Properties = Type
               .GetProperties()
-              .Where(x => x.CanRead)
+              .Where(x => x.CanRead && x.GetIndexParameters().Length == 0)
               .Select(x => new ObjectBrowserProperty(x, DataContext));
         }
 

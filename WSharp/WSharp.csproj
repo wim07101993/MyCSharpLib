@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Wim07101993</Authors>
+    <Company />
+    <Description>A library with some classes and extensions to make life easier</Description>
+    <PackageProjectUrl>https://github.com/wim07101993/WSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wim07101993/WSharp</RepositoryUrl>
+    <NeutralLanguage>English</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

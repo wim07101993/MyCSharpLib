@@ -110,7 +110,6 @@
     <Compile Include="Controls\AControl.cs" />
     <Compile Include="Controls\ButtonsAlignment.cs" />
     <Compile Include="Controls\DateTimePicker.cs" />
-    <Compile Include="Controls\DependencyObjectWrapper.cs" />
     <Compile Include="Controls\LogEntry.cs" />
     <Compile Include="Controls\LogsView.cs" />
     <Compile Include="Controls\NumericUpDown.cs" />
@@ -138,6 +137,7 @@
     <Compile Include="Converters\ToJsonConverter.cs" />
     <Compile Include="Converters\ToStringConverter.cs" />
     <Compile Include="Extensions\DispatcherObjectExtensions.cs" />
+    <Compile Include="Helpers\BindingProxy.cs" />
     <Compile Include="Helpers\ControlHelper.cs" />
     <Compile Include="Helpers\TextBoxHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
