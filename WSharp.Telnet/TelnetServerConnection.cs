@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WSharp.Services.Telnet
+namespace WSharp.Telnet
 {
     public class TelnetServerConnection : BindableBase, ITelnetConnection
     {

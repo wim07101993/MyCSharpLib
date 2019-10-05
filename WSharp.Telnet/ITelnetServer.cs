@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WSharp.Services.Telnet
+namespace WSharp.Telnet
 {
     public interface ITelnetServer<T> : IDisposable
         where T : ITelnetConnection

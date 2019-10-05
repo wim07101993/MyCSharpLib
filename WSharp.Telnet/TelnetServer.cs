@@ -4,7 +4,7 @@ using WSharp.Services.Serialization;
 using Unity;
 using Unity.Resolution;
 
-namespace WSharp.Services.Telnet
+namespace WSharp.Telnet
 {
     public class TelnetServer : ATelnetServer<ITelnetConnection>
     {

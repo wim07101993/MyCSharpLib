@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WSharp.Services.Telnet
+namespace WSharp.Telnet
 {
     public interface ITelnetConnection : INotifyPropertyChanged, IDisposable
     {
