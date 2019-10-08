@@ -12,5 +12,7 @@ namespace WSharp.Tests.Mocks
 
         [Required]
         public object NotNull { get; set; }
+
+        public double Different { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using WSharp.Extensions;
 using FluentAssertions;
 using System.Security;
+using WSharp.Tests.Mocks;
 
 namespace WSharp.Tests.Tests.Extensions
 {
@@ -35,6 +36,28 @@ namespace WSharp.Tests.Tests.Extensions
             secure.GetValue()
                 .Should()
                 .Be("hello world", "that is what is stored in the stirng.");
+        }
+
+        [Test]
+        public void BuildSelectExpressionSingleProperty()
+        {
+            var obj = new ValidationObject { GreaterThen5 = 5 };
+            var propertyPath = nameof(ValidationObject.GreaterThen5);
+            var exp = propertyPath.BuildSelectExpression<ValidationObject>();
+            exp.Compile()(obj)
+                .Should()
+                .Be(5, "that is the value of the requested property");
+        }
+
+        [Test]
+        public void BuildSelectExpressionNestedProeprty()
+        {
+            var obj = new ValidationObject { Nested = new NestedValidationObject { Different = 6 } };
+            var propertyPath = $"{nameof(ValidationObject.Nested)}/{nameof(NestedValidationObject.Different)}";
+            var exp = propertyPath.BuildSelectExpression<ValidationObject>();
+            exp.Compile()(obj)
+                .Should()
+                .Be(6, "that is the value of the requested property");
         }
     }
 }

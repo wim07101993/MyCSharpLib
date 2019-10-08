@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -32,6 +36,49 @@ namespace WSharp.Extensions
             {
                 Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
             }
+        }
+
+        public static Expression<Func<TIn, object>> BuildSelectExpression<TIn>(this IList<string> propertyPath, 
+            bool includeProperties= true, bool includeIndexProeprties = true, bool includeEnumerableSearch = true)
+        {
+            var eParameter = Expression.Parameter(typeof(TIn), "x");
+
+            var type = typeof(TIn);
+            var propertyName = propertyPath.First();
+            var property = type.GetProperty(propertyName);
+            if (property == null)
+            {
+                if (typeof(IList).IsAssignableFrom(type))
+                {
+
+                }
+                throw new ArgumentException($"The property {property} was not found on type {type}", nameof(propertyPath));
+            }
+
+            Expression eProperty = Expression.Property(eParameter, propertyName);
+
+            for (int i = 1; i < propertyPath.Count; i++)
+            {
+                type = property.PropertyType;
+                propertyName = propertyPath[i];
+                property = type.GetProperty(propertyName);
+                if (property == null)
+                    throw new ArgumentException($"The property {property} was not found on type {type}", nameof(propertyPath));
+
+                eProperty = Expression.Property(eProperty, propertyName);
+            }
+
+            eProperty = Expression.Convert(eProperty, typeof(object));
+            return Expression.Lambda<Func<TIn, object>>(eProperty, eParameter);
+        }
+
+        public static Expression<Func<TIn, object>> BuildSelectExpression<TIn>(this string propertyPath, string delimitor = "/")
+        {
+            if (string.IsNullOrWhiteSpace(propertyPath))
+                throw new ArgumentException($"The property path must be specified", nameof(propertyPath));
+
+            var split = propertyPath.Split(new[] { delimitor }, StringSplitOptions.RemoveEmptyEntries);
+            return split.BuildSelectExpression<TIn>();
         }
     }
 }
