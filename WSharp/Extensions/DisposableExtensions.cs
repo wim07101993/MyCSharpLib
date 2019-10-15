@@ -7,6 +7,11 @@ namespace WSharp.Extensions
     {
         /// <summary>Tries to dispose the <see cref="IDisposable"/>.</summary>
         /// <param name="disposable"><see cref="IDisposable"/> to dispose.</param>
+        /// <returns><see langword="true"/>: Succesfully disposed.</returns>
+        public static bool TryDispose(this IDisposable disposable) => disposable.TryDispose(out _);
+
+        /// <summary>Tries to dispose the <see cref="IDisposable"/>.</summary>
+        /// <param name="disposable"><see cref="IDisposable"/> to dispose.</param>
         /// <param name="e">The exception if one occured.</param>
         /// <returns><see langword="true"/>: Succesfully disposed.</returns>
         public static bool TryDispose(this IDisposable disposable, out Exception e)
