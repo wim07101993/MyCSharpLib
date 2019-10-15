@@ -36,7 +36,8 @@ namespace WSharp.Tests.Tests.Extensions
                         NotEmpty = "This is not empty",
                         NotNull = new object(),
                     },
-                }
+                },
+                Version = "100.0"
             };
 
             obj.Validate(out var errors)
@@ -75,7 +76,8 @@ namespace WSharp.Tests.Tests.Extensions
                         NotEmpty = "This is not empty",
                         NotNull = new object(),
                     },
-                }
+                },
+                Version = "100.0"
             };
 
             obj.Validate(out var errors)
@@ -108,12 +110,13 @@ namespace WSharp.Tests.Tests.Extensions
             obj.NotEmpty = "Not empty";
             obj.NotNull = new object();
             obj.List[0].NotNull = null;
+            obj.Version = "this is no version";
             obj.Validate(out errors)
                 .Should()
                 .BeFalse();
             errors
                 .Should()
-                .HaveCount(4, "Five property is not valid");
+                .HaveCount(5, "Five property is not valid");
         }
     }
 }

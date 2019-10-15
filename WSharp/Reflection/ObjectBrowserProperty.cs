@@ -1,11 +1,11 @@
 ﻿using Prism.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Reflection;
 using WSharp.Extensions;
-using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace WSharp.Reflection
 {
@@ -16,7 +16,6 @@ namespace WSharp.Reflection
         private object _parent;
 
         #endregion FIELDS
-
 
         #region CONSTRUCTORS
 
@@ -45,7 +44,6 @@ namespace WSharp.Reflection
         }
 
         #endregion CONSTRUCTORS
-
 
         #region PROPERTIES
 
@@ -108,7 +106,6 @@ namespace WSharp.Reflection
         public IEnumerable<ValidationAttribute> ValidationAttributes { get; }
 
         #endregion PROPERTIES
-
 
         #region METHODS
 

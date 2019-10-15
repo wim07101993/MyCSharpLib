@@ -1,5 +1,5 @@
-﻿using WSharp.Services.Logging;
-using WSharp.Services.Logging.Loggers;
+﻿using WSharp.Logging;
+using WSharp.Logging.Loggers;
 using WSharp.Wpf.Demo.ViewModelInterfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

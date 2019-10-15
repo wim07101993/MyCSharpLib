@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Globalization;
 
 namespace WSharp.Math
 {
@@ -18,7 +17,6 @@ namespace WSharp.Math
         }
 
         #endregion CONSTRUCTOR
-
 
         #region PROPERTIES
 
@@ -39,7 +37,6 @@ namespace WSharp.Math
         }
 
         #endregion PROPERTIES
-
 
         #region METHODS
 
@@ -141,18 +138,23 @@ namespace WSharp.Math
         #region operators
 
         public static XyzwPoint operator +(XyzwPoint point) => new XyzwPoint(point.X, point.Y, point.Z, point.W);
+
         public static XyzwPoint operator +(XyzwPoint first, XyzwPoint second) => new XyzwPoint(first.X + second.X, first.Y + second.Y, first.Z + second.Z, first.W + second.W);
 
         public static XyzwPoint operator -(XyzwPoint point) => new XyzwPoint(-point.X, -point.Y, -point.Z, -point.W);
+
         public static XyzwPoint operator -(XyzwPoint first, XyzwPoint second) => new XyzwPoint(first.X - second.X, first.Y - second.Y, first.Z - second.Z, first.W - second.W);
 
         public static XyzwPoint operator *(XyzwPoint first, double value) => new XyzwPoint(first.X * value, first.Y * value, first.Z * value, first.W * value);
+
         public static XyzwPoint operator /(XyzwPoint first, double value) => new XyzwPoint(first.X / value, first.Y / value, first.Z / value, first.W / value);
 
         public static bool operator ==(XyzwPoint first, XyzwPoint second) => first.Equals(second);
+
         public static bool operator !=(XyzwPoint first, XyzwPoint second) => !first.Equals(second);
 
         public static explicit operator Point(XyzwPoint xyzw) => new Point((int)xyzw.X, (int)xyzw.Y);
+
         public static explicit operator XyzwPoint(Point point) => new XyzwPoint(x: point.X, y: point.Y);
 
         #endregion operators

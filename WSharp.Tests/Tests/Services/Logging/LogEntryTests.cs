@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using WSharp.Services.Logging;
+using WSharp.Logging;
 using NUnit.Framework;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

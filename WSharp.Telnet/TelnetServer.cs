@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
-using WSharp.Services.Logging.Loggers;
-using WSharp.Services.Serialization;
+using WSharp.Logging.Loggers;
+using WSharp.Serialization;
 using Unity;
 using Unity.Resolution;
 

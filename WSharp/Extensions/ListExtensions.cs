@@ -6,6 +6,21 @@ namespace WSharp.Extensions
 {
     public static class ListExtensions
     {
+        /// <summary>Adds a collection off items to the list.</summary>
+        /// <typeparam name="T">Type of the items to add.</typeparam>
+        /// <param name="source">The list to add the items to.</param>
+        /// <param name="items">Items to add to the list.</param>
+        public static void Add<T>(this IList<T> source, IEnumerable<T> items)
+        {
+            if (source == null)
+                throw new NullReferenceException(nameof(source));
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
+            foreach (var item in items)
+                source.Add(item);
+        }
+
         #region FINDING
 
         public static int IndexOfFirst<T>(this IList<T> list, Func<T, bool> predicate = null)
@@ -53,9 +68,8 @@ namespace WSharp.Extensions
                     return i;
             return -1;
         }
-        
-        #endregion FINDING
 
+        #endregion FINDING
 
         #region REMOVING
 

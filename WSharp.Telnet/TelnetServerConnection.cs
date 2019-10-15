@@ -1,6 +1,6 @@
 ﻿using WSharp.Extensions;
-using WSharp.Services.Logging.Loggers;
-using WSharp.Services.Serialization;
+using WSharp.Logging.Loggers;
+using WSharp.Serialization;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;

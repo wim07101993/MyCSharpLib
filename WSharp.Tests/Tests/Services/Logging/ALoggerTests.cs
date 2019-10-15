@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using WSharp.Services.Logging;
-using WSharp.Services.Logging.Filters;
+using WSharp.Logging;
+using WSharp.Logging.Filters;
 using WSharp.Tests.Mocks;
 using NUnit.Framework;
 using System.Diagnostics;

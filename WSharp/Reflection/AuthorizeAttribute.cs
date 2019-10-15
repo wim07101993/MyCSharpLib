@@ -3,7 +3,7 @@
 namespace WSharp.Reflection
 {
     [AttributeUsage(AttributeTargets.All, Inherited = true, AllowMultiple = true)]
-    sealed class AuthorizeAttribute : Attribute
+    internal sealed class AuthorizeAttribute : Attribute
     {
         public AuthorizeAttribute(int authorizedLevels)
         {

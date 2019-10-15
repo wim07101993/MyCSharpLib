@@ -1,5 +1,5 @@
-﻿using WSharp.Services.Logging;
-using WSharp.Services.Logging.Loggers;
+﻿using WSharp.Logging;
+using WSharp.Logging.Loggers;
 
 namespace WSharp.Tests.Mocks
 {
