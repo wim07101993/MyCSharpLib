@@ -73,7 +73,7 @@ namespace WSharp.Reflection
                 if (Parent == null)
                     return;
 
-                Property.SetValue(Parent, value.Cast(Type));
+                Property.SetValue(Parent, value.CastObject(Type));
             }
         }
 

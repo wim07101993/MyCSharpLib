@@ -23,29 +23,42 @@ namespace WSharp.Extensions
 
         #region FINDING
 
+        /// <summary>
+        ///     Searches for the index of the first element for which the predicate returns true. (-1
+        ///     when there is none.)
+        ///     <para>If the predicate is null, 0 is returned (except when the list has no elements).</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the item.</param>
+        /// <returns>The index of the first element for which the predicate returns true.</returns>
         public static int IndexOfFirst<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (predicate == null)
-            {
-                return list.Count > 0
-                    ? 0
-                    : -1;
-            }
+                return list.Count > 0 ? 0 : -1;
 
             for (var i = 0; i < list.Count; i++)
                 if (predicate(list[i]))
                     return i;
+
             return -1;
         }
 
+        /// <summary>
+        ///     Searches for the indexes of the elements for which the predicate returns true. (null
+        ///     when there are none.)
+        ///     <para>If the predicate is null, all indexes are returned.</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the items.</param>
+        /// <returns>The indexes of the first element for which the predicate returns true.</returns>
         public static List<int> IndexesWhere<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (predicate == null)
-            {
                 return list.Count > 0
                     ? Enumerable.Range(0, list.Count).ToList()
                     : null;
-            }
 
             var indexes = new List<int>();
 
@@ -53,11 +66,21 @@ namespace WSharp.Extensions
                 if (predicate(list[i]))
                     indexes.Add(i);
 
-            return indexes.Count == 0
-                ? null
-                : indexes;
+            return indexes.Count == 0 ? null : indexes;
         }
 
+        /// <summary>
+        ///     Searches for the index of the first element for which the predicate returns true
+        ///     while looping over the list in reverse order.(-1 when there is none.)
+        ///     <para>If the predicate is null, the last index is returned.</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the item.</param>
+        /// <returns>
+        ///     The index of the first element for which the predicate returns true while looping
+        ///     over the list in reverse order.
+        /// </returns>
         public static int IndexOfLast<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (predicate == null)
@@ -66,6 +89,7 @@ namespace WSharp.Extensions
             for (var i = list.Count - 1; i >= 0; i--)
                 if (predicate(list[i]))
                     return i;
+
             return -1;
         }
 
@@ -73,6 +97,14 @@ namespace WSharp.Extensions
 
         #region REMOVING
 
+        /// <summary>
+        ///     Removes the first element for which the predicate returns true.
+        ///     <para>If the predicate is null, the first element is removed.</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the items.</param>
+        /// <returns>Whether an element has been removed.</returns>
         public static bool RemoveFirst<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (list.Count <= 0)
@@ -87,14 +119,24 @@ namespace WSharp.Extensions
             var index = list.IndexOfFirst(predicate);
             if (index == -1)
                 return false;
+
             list.RemoveAt(index);
             return true;
         }
 
+        /// <summary>
+        ///     Removes the elements for which the predicate returns true.
+        ///     <para>If the predicate is null, all elements are removed.</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the items.</param>
+        /// <returns>Whether one ore more elements have been removed.</returns>
         public static bool RemoveWhere<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (list.Count <= 0)
                 return false;
+
             if (predicate == null)
             {
                 list.Clear();
@@ -113,6 +155,15 @@ namespace WSharp.Extensions
             return true;
         }
 
+        /// <summary>
+        ///     Removes the first element for which the predicate returns true while looping over the
+        ///     list in reverse order.
+        ///     <para>If the predicate is null, the last element is removed.</para>
+        /// </summary>
+        /// <typeparam name="T">Type of items in the list.</typeparam>
+        /// <param name="list">The list with items.</param>
+        /// <param name="predicate">Predicate used to search for the items.</param>
+        /// <returns>Whether an element has been removed.</returns>
         public static bool RemoveLast<T>(this IList<T> list, Func<T, bool> predicate = null)
         {
             if (list.Count == 0)
@@ -127,6 +178,7 @@ namespace WSharp.Extensions
             var index = list.IndexOfLast(predicate);
             if (index == -1)
                 return false;
+
             list.RemoveAt(index);
             return true;
         }

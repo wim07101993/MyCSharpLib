@@ -3,8 +3,13 @@ using WSharp.Languages;
 
 namespace WSharp.Extensions
 {
+    /// <summary>Extension methods for a <see cref="Thread"/>.</summary>
     public static class ThreadExtensions
     {
+        /// <summary>
+        ///     Sets language of the application to the language of the culture of the current thread.
+        /// </summary>
+        /// <param name="thread">Thread to get the language from.</param>
         public static void SetLanguage(this Thread thread)
         {
             switch (thread.CurrentCulture.ToString())
