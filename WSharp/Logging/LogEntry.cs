@@ -93,6 +93,14 @@ namespace WSharp.Logging
             {
                 var builder = new StringBuilder().Append(' ', IndentSize * IndentLevel);
 
+                var eventType = EventType.ToString();
+
+                builder.Append("[");
+                builder.Append(EventType);
+                builder.Append("]");
+                for (var i = eventType.Length; i < 11; i++)
+                    builder.Append(' ');
+
                 if (EventCache != null && IsEnabled(TraceOptions.DateTime))
                     builder
                         .Append(EventCache.DateTime.ToString(CultureInfo.InvariantCulture))
@@ -102,9 +110,8 @@ namespace WSharp.Logging
                     builder.Append(Source).Append(":");
 
                 if (!string.IsNullOrWhiteSpace(Tag))
-                    builder.Append(Tag).Append(":");
+                    builder.Append(Tag);
 
-                builder.Append(EventType);
                 if (!string.IsNullOrWhiteSpace(Title) ||
                     (Payload != null && Payload.Count > 0))
                     builder.Append(" -> ");

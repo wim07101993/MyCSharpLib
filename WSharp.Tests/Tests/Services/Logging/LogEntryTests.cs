@@ -25,7 +25,7 @@ namespace WSharp.Tests.Tests.Services.Logging
             entry.Header
                 .Should()
                 .Be(
-                $"    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:tag:Verbose -> title\r\n", 
+                $"    [Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:tag -> title\r\n", 
                 "that is the correct format");
         }
 
@@ -35,7 +35,7 @@ namespace WSharp.Tests.Tests.Services.Logging
             var entry = new LogEntry();
             entry.Header
                 .Should()
-                .Be($"{entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderEmpty:Verbose\r\n");
+                .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderEmpty\r\n");
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace WSharp.Tests.Tests.Services.Logging
             var entry = new LogEntry(source: "source");
             entry.Header
                 .Should()
-                .Be($"{entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:HeaderOnlySource:Verbose\r\n");
+                .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:HeaderOnlySource\r\n");
         }
         
         [Test]
@@ -53,7 +53,7 @@ namespace WSharp.Tests.Tests.Services.Logging
             var entry = new LogEntry(title: "title");
             entry.Header
                 .Should()
-                .Be($"{entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderOnlyTitle:Verbose -> title\r\n");
+                .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderOnlyTitle -> title\r\n");
         }
 
         [Test]
