@@ -241,6 +241,8 @@ namespace WSharp.Logging
         {
             switch (payload)
             {
+                case null:
+                    return null;
                 case string s:
                     return s;
 

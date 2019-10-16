@@ -91,7 +91,7 @@ namespace WSharp.Logging.Loggers
         public virtual void Log(IBufferLogEntry logEntry) => Log(new LogEntry(logEntry));
 
         public void Log(string source, object payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
-            => Log(new LogEntry(source, tag, payload: new[] { payload }, eventType: eventType));
+            => Log(source, payload == null ? null : new[] { payload }, eventType, tag);
 
         public void Log(string source, object[] payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
             => Log(new LogEntry(source, tag, payload: payload, eventType: eventType));
@@ -109,7 +109,8 @@ namespace WSharp.Logging.Loggers
                source,
                tag,
                eventType,
-               title, new ReadOnlyCollection<object>(payload),
+               title, 
+               payload == null ? null : new ReadOnlyCollection<object>(payload),
                traceOptions,
                indentLevel,
                indentSize));
