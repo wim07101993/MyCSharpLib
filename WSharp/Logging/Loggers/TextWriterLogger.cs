@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 
 namespace WSharp.Logging.Loggers
 {
+    /// <summary>Logger that logs to a <see cref="TextWriter"/>.</summary>
     public abstract class TextWriterLogger : ALogger, ITextLogger
     {
         #region FIELDS
@@ -75,6 +76,10 @@ namespace WSharp.Logging.Loggers
 
         #region METHODS
 
+        /// <summary>Releases all resources.</summary>
+        /// <param name="isDisposing">
+        ///     Indicates whether the <see cref="Dispose"/> method has been called before.
+        /// </param>
         public override void Dispose(bool isDisposing)
         {
             try
@@ -96,7 +101,9 @@ namespace WSharp.Logging.Loggers
             }
         }
 
-        public override void InternalLog(ILogEntry logEntry)
+        /// <summary>Method that actually logs the log entry.</summary>
+        /// <param name="logEntry">Entry to log.</param>
+        protected override void InternalLog(ILogEntry logEntry)
         {
             if (!EnsureWriter())
                 return;
@@ -109,7 +116,10 @@ namespace WSharp.Logging.Loggers
             catch (ObjectDisposedException) { }
         }
 
-        // This uses a machine resource, scoped by the fileName variable.
+        /// <summary>
+        /// Ensures a writer is present to log to.
+        /// </summary>
+        /// <returns>Indicates whether the writer is present.</returns>
         [ResourceExposure(ResourceScope.None)]
         [ResourceConsumption(ResourceScope.Machine, ResourceScope.Machine)]
         protected abstract bool EnsureWriter();

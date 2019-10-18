@@ -56,14 +56,6 @@ namespace WSharp.Logging
             return this;
         }
 
-        public ILogDispatcherFactory RegisterLogDispatcherSingleton<T>() where T : ILogDispatcher
-        {
-            _logDisptacherIntance = null;
-            LogDispatcherType = typeof(T);
-            _useSingleton = true;
-            return this;
-        }
-
         public ILogDispatcher Resolve()
         {
             if (LogDispatcherType == null)

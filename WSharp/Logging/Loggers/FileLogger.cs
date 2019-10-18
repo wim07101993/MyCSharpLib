@@ -6,6 +6,7 @@ using Unity;
 
 namespace WSharp.Logging.Loggers
 {
+    /// <summary>Logs to a file.</summary>
     public class FileLogger : TextWriterLogger, IFileLogger
     {
         #region FIELDS
@@ -16,11 +17,16 @@ namespace WSharp.Logging.Loggers
 
         #region CONSTRUCTORS
 
+        /// <summary>Constructs a new instance of a <see cref="FileLogger"/>.</summary>
         [InjectionConstructor]
         public FileLogger()
         {
         }
 
+        /// <summary>
+        ///     Constructs a new instance of a <see cref="FileLogger"/> with a given stream to log to.
+        /// </summary>
+        /// <param name="stream">Stream to write to.</param>
         public FileLogger(FileStream stream)
         {
             if (stream == null)
@@ -29,11 +35,19 @@ namespace WSharp.Logging.Loggers
             Writer = new StreamWriter(stream);
         }
 
+        /// <summary>
+        ///     Constructs a new instance of a <see cref="FileLogger"/> with a given writer to log to.
+        /// </summary>
+        /// <param name="writer">Writer to log to.</param>
         public FileLogger(TextWriter writer)
         {
             Writer = writer ?? throw new ArgumentNullException(nameof(writer));
         }
 
+        /// <summary>
+        ///     Constructs a new instance of a <see cref="FileLogger"/> with a given directory to log to.
+        /// </summary>
+        /// <param name="logDirectory"></param>
         [ResourceExposure(ResourceScope.Machine)]
         public FileLogger(string logDirectory)
         {
@@ -44,6 +58,7 @@ namespace WSharp.Logging.Loggers
 
         #region PROPERTIES
 
+        /// <summary>Directory to log to.</summary>
         public string LogDirectory
         {
             get => _logDirectory;

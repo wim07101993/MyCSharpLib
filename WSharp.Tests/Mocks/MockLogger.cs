@@ -7,6 +7,6 @@ namespace WSharp.Tests.Mocks
     {
         public ILogEntry LastLog { get; set; }
 
-        public override void InternalLog(ILogEntry logEntry) => LastLog = logEntry;
+        protected override void InternalLog(ILogEntry logEntry) => LastLog = logEntry;
     }
 }
