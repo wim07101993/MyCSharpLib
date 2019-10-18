@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace WSharp.Math
+namespace WSharp.Utilities.Math
 {
     /// <summary>A point in 4 dimensions (x, y, z, w).</summary>
     public struct XyzwPoint : IComparable, IComparable<XyzwPoint>, IEquatable<XyzwPoint>
