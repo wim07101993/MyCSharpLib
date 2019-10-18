@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
+using Unity;
 
 namespace WSharp.Logging.Loggers
 {
@@ -15,6 +16,7 @@ namespace WSharp.Logging.Loggers
 
         #region CONSTRUCTORS
 
+        [InjectionConstructor]
         public FileLogger()
         {
         }
@@ -141,8 +143,8 @@ namespace WSharp.Logging.Loggers
                 LogInternalException(exception);
                 return false;
             }
-
-            #endregion METHODS
         }
+
+        #endregion METHODS
     }
 }

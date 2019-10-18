@@ -104,6 +104,7 @@ namespace WSharp.Logging.Loggers
             try
             {
                 _writer.Write(logEntry);
+                _writer.Flush();
             }
             catch (ObjectDisposedException) { }
         }

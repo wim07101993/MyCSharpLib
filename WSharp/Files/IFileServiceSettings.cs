@@ -11,6 +11,7 @@ namespace WSharp.Files
     /// </summary>
     public interface IFileServiceSettings : INotifyPropertyChanged
     {
+        /// <summary>Path to directory in which the data of the application is stored.</summary>
         string DataDirectory { get; set; }
 
         /// <summary>

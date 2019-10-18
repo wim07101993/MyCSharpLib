@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace WSharp.Tests.Tests.Services.Logging
+namespace WSharp.Tests.Tests.Logging
 {
     public class LogEntryTests
     {

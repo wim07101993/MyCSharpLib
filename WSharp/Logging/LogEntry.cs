@@ -137,7 +137,7 @@ namespace WSharp.Logging
                 if (!string.IsNullOrWhiteSpace(Title))
                     builder.Append(' ', IndentSize * (IndentLevel + 2));
 
-                builder.AppendLine(PayloadToString(Payload[0])).ToString();
+                Indent(ref builder, Payload[0], IndentSize, (ushort)(IndentLevel + 2), false);
                 if (Payload.Count == 1)
                     return builder.ToString();
 
@@ -224,8 +224,7 @@ namespace WSharp.Logging
 
             var builder = new StringBuilder();
             foreach (var p in payLoad)
-                builder.Append(' ', indentSize * indentLevel)
-                    .AppendLine(PayloadToString(p));
+                Indent(ref builder, p, indentSize, indentLevel);
 
             return builder.ToString();
         }
@@ -256,6 +255,25 @@ namespace WSharp.Logging
                 default:
                     return payload.SerializeJson();
             }
+        }
+
+        private void Indent(ref StringBuilder builder, object o, ushort indentSize, ushort indentLevel, bool indentFirstLine = true)
+        {
+            var strPayload = PayloadToString(o);
+            IEnumerable<string> split = strPayload.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (split.Count() == 0)
+                return;
+
+            if (!indentFirstLine)
+            {
+                builder.AppendLine(split.First());
+                split = split.Skip(1);
+            }
+
+            foreach (var s in split)
+                builder.Append(' ', indentSize * indentLevel)
+                    .AppendLine(s);
         }
 
         public override string ToString() => $"{Header}{Body}{Footer}";

@@ -16,7 +16,7 @@ namespace WSharp.Logging
 
         ILogDispatcherFactory RegisterLogDispatcherInstance<T>(T instance) where T : ILogDispatcher;
 
-        ILogDispatcherFactory RegisterLogDispatcherSingletond<T>() where T : ILogDispatcher;
+        ILogDispatcherFactory RegisterLogDispatcherSingleton<T>() where T : ILogDispatcher;
 
         ILogDispatcherFactory RegisterType<TInterface, TImplementation>(params InjectionMember[] injectionMembers)
             where TInterface : ILogger

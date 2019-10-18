@@ -14,7 +14,6 @@ namespace WSharp.Logging
         private readonly IUnityContainer _unityContainer;
         private readonly List<Type> _loggerTypes = new List<Type>();
 
-        private Type _logDispatcherType;
         private ILogDispatcher _logDisptacherIntance;
         private bool _useSingleton;
 
@@ -25,6 +24,8 @@ namespace WSharp.Logging
         public LogDispatcherFactory(IUnityContainer unityContainer)
         {
             _unityContainer = unityContainer;
+            LogDispatcherType = typeof(LogDispatcher);
+            _useSingleton = true;
         }
 
         #endregion CONSTRUCTOR
@@ -33,7 +34,7 @@ namespace WSharp.Logging
 
         public IEnumerable<Type> LoggerTypes => _loggerTypes;
 
-        public Type LogDispatcherType => _logDispatcherType;
+        public Type LogDispatcherType { get; private set; }
 
         #endregion PROPERTIES
 
@@ -42,7 +43,7 @@ namespace WSharp.Logging
         public ILogDispatcherFactory RegisterLogDispatcherType<T>() where T : ILogDispatcher
         {
             _logDisptacherIntance = null;
-            _logDispatcherType = typeof(T);
+            LogDispatcherType = typeof(T);
             _useSingleton = false;
             return this;
         }
@@ -50,28 +51,28 @@ namespace WSharp.Logging
         public ILogDispatcherFactory RegisterLogDispatcherInstance<T>(T instance) where T : ILogDispatcher
         {
             _logDisptacherIntance = instance;
-            _logDispatcherType = typeof(T);
+            LogDispatcherType = typeof(T);
             _useSingleton = true;
             return this;
         }
 
-        public ILogDispatcherFactory RegisterLogDispatcherSingletond<T>() where T : ILogDispatcher
+        public ILogDispatcherFactory RegisterLogDispatcherSingleton<T>() where T : ILogDispatcher
         {
             _logDisptacherIntance = null;
-            _logDispatcherType = typeof(T);
+            LogDispatcherType = typeof(T);
             _useSingleton = true;
             return this;
         }
 
         public ILogDispatcher Resolve()
         {
-            if (_logDispatcherType == null)
+            if (LogDispatcherType == null)
                 throw new InvalidOperationException("Type of log dispatcher not set");
 
             if (_useSingleton && _logDisptacherIntance != null)
                 return _logDisptacherIntance;
 
-            foreach (var constructor in _logDispatcherType.GetConstructors())
+            foreach (var constructor in LogDispatcherType.GetConstructors())
             {
                 try
                 {

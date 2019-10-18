@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace WSharp.Tests.Tests.Services.Logging
+namespace WSharp.Tests.Tests.Logging
 {
     public class MemoryLoggerTests
     {

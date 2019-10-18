@@ -5,7 +5,7 @@ using WSharp.Tests.Mocks;
 using NUnit.Framework;
 using System.Diagnostics;
 
-namespace WSharp.Tests.Tests.Services.Logging
+namespace WSharp.Tests.Tests.Logging
 {
     public class ALoggerTests
     {
