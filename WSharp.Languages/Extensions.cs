@@ -1,10 +1,11 @@
 ﻿using System.Threading;
-using WSharp.Languages;
 
-namespace WSharp.Extensions
+namespace WSharp.Languages
 {
-    /// <summary>Extension methods for a <see cref="Thread"/>.</summary>
-    public static class ThreadExtensions
+    /// <summary>
+    /// Extension methods.
+    /// </summary>
+    public static class Extensions
     {
         /// <summary>
         ///     Sets language of the application to the language of the culture of the current thread.

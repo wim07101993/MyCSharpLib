@@ -4,7 +4,7 @@ using WSharp.Serialization;
 using WSharp.Wpf.Controls.Demo.Views;
 using WSharp.Wpf.Demo.ViewModelInterfaces;
 using WSharp.Wpf.Demo.ViewModels;
-using WSharp.Extensions;
+using WSharp.Languages;
 using System.Threading;
 using System.Windows;
 using Unity;

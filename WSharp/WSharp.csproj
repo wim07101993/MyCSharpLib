@@ -19,8 +19,4 @@
     <PackageReference Include="Unity.Container" Version="5.11.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\WSharp.Languages\WSharp.Languages.csproj" />
-  </ItemGroup>
-
 </Project>
