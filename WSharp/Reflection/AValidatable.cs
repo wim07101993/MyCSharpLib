@@ -24,7 +24,14 @@ namespace WSharp.Reflection
         /// </summary>
         protected virtual string ValidateErrorMessage => $"There is something wrong with the {GetType().Name}, check inner exceptions for details.";
 
-        /// <inheritdoc/>
+        /// <summary>
+        ///     Validates this object and puts all of the errors it comes across in a list. (Checks
+        ///     properties recursivly).
+        /// </summary>
+        /// <param name="errors">List of all the errors this object has.</param>
+        /// <returns>
+        ///     <see langword="true"/>: object is valid, <see langword="false"/>: objet is invalid.
+        /// </returns>
         public virtual bool TryValidate(out AggregateException errors)
         {
             var isValid = ObjectExtensions.Validate(this, out var errorList);
@@ -32,11 +39,13 @@ namespace WSharp.Reflection
             return isValid;
         }
 
-        /// <inheritdoc/>
         /// <summary>
         ///     This method calles the <see cref="TryValidate(out AggregateException)"/> method to
         ///     validate this object.
         /// </summary>
+        /// <exception cref="AggregateException">
+        ///     An <see cref="AggregateException"/> is thrown when this object is not valid.
+        /// </exception>
         public virtual void Validate()
         {
             if (!TryValidate(out var errorList))
