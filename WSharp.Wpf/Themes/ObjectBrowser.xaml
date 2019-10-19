@@ -3,17 +3,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:WSharp.Wpf.Controls"
     xmlns:converters="clr-namespace:WSharp.Wpf.Converters"
+    xmlns:helpers="clr-namespace:WSharp.Wpf.Helpers"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:objectBrowser="clr-namespace:WSharp.Wpf.Controls.ObjectBrowser"
     xmlns:reflection="clr-namespace:WSharp.Reflection;assembly=WSharp">
 
     <DataTemplate x:Key="StringEditorTemplate" DataType="{x:Type reflection:ObjectBrowserProperty}">
+
         <StackPanel Orientation="Vertical" Visibility="{Binding IsBrowsable, Converter={x:Static converters:BooleanToVisibilityConverter.Instance}}">
             <TextBox
                 MinWidth="100"
                 HorizontalAlignment="Left"
                 materialDesign:HintAssist.Hint="{Binding DisplayName}"
+                materialDesign:ValidationAssist.UsePopup="True"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}">
+                <TextBox.Resources>
+                    <helpers:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </TextBox.Resources>
                 <TextBox.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -28,7 +34,7 @@
                         <Binding.ValidationRules>
                             <objectBrowser:ObjectBrowserPropertyValidationRule>
                                 <objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
-                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding ValidationAttributes}" />
+                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding Data.ValidationAttributes, Source={StaticResource Proxy}}" />
                                 </objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
                             </objectBrowser:ObjectBrowserPropertyValidationRule>
                         </Binding.ValidationRules>
@@ -46,6 +52,10 @@
                 HorizontalAlignment="Left"
                 materialDesign:HintAssist.Hint="{Binding DisplayName}"
                 NumericInputMode="Decimal">
+                <controls:NumericUpDown.Resources>
+                    <helpers:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </controls:NumericUpDown.Resources>
+
                 <controls:NumericUpDown.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -60,7 +70,7 @@
                         <Binding.ValidationRules>
                             <objectBrowser:ObjectBrowserPropertyValidationRule>
                                 <objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
-                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding ValidationAttributes}" />
+                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding Data.ValidationAttributes, Source={StaticResource Proxy}}" />
                                 </objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
                             </objectBrowser:ObjectBrowserPropertyValidationRule>
                         </Binding.ValidationRules>
@@ -78,6 +88,9 @@
                 HorizontalAlignment="Left"
                 materialDesign:HintAssist.Hint="{Binding DisplayName}"
                 NumericInputMode="Numbers">
+                <controls:NumericUpDown.Resources>
+                    <helpers:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </controls:NumericUpDown.Resources>
                 <controls:NumericUpDown.IsEnabled>
                     <MultiBinding Converter="{x:Static converters:MultiBooleanAndConverter.Instance}">
                         <Binding Converter="{x:Static converters:InvertedBooleanConverter.Instance}" Path="IsReadOnly" />
@@ -92,7 +105,7 @@
                         <Binding.ValidationRules>
                             <objectBrowser:ObjectBrowserPropertyValidationRule>
                                 <objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
-                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding ValidationAttributes}" />
+                                    <objectBrowser:ValidationAttributesWrapper Value="{Binding Data.ValidationAttributes, Source={StaticResource Proxy}}" />
                                 </objectBrowser:ObjectBrowserPropertyValidationRule.ValidationAttributes>
                             </objectBrowser:ObjectBrowserPropertyValidationRule>
                         </Binding.ValidationRules>

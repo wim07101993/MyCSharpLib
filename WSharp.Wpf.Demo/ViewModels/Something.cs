@@ -9,6 +9,7 @@ namespace WSharp.Wpf.Demo.ViewModels
         private int _int;
         private double _double;
         private SomethingElse _somethingElse;
+        private string _myIpAddress;
 
 
         [Display(Name = "String", Description = "Some string")]
@@ -38,6 +39,14 @@ namespace WSharp.Wpf.Demo.ViewModels
         {
             get => _somethingElse;
             set => SetProperty(ref _somethingElse, value);
+        }
+
+        [Display(Name = "My IP-address", Description = "This is an example of regex validation")]
+        [RegularExpression(Regexamples.IpAddressRegex)]
+        public string MyIpAddress
+        {
+            get => _myIpAddress;
+            set => SetProperty(ref _myIpAddress, value);
         }
     }
 }

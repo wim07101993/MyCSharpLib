@@ -1,4 +1,4 @@
-﻿using WSharp.Services.Logging;
+﻿using WSharp.Logging;
 using WSharp.Extensions;
 using System;
 using System.Collections.Generic;

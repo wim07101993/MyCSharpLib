@@ -1,4 +1,4 @@
-﻿using WSharp.Services.Logging.Loggers;
+﻿using WSharp.Logging.Loggers;
 using WSharp.Wpf.Demo.ViewModelInterfaces;
 
 namespace WSharp.Wpf.Demo.ViewModels
