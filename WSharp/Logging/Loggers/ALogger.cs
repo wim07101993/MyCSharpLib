@@ -10,7 +10,7 @@ namespace WSharp.Logging.Loggers
     /// <summary>
     ///     Abstract class that implements the <see cref="ILogger"/> and <see cref="ILogFilter"/> interface.
     /// </summary>
-    public abstract class ALogger : ILogger, ILogFilter
+    public abstract class ALogger : ALogFilter, ILogger
     {
         #region FIELDS
 
@@ -96,14 +96,14 @@ namespace WSharp.Logging.Loggers
         /// <summary>Determines whether a log entry should be logged.</summary>
         /// <param name="logEntry">Log entry to check.</param>
         /// <returns>Whether the log entry should be logged.</returns>
-        public virtual bool FilterLog(ILogEntry logEntry)
-            => ShouldLog && (Filter == null || Filter.FilterLog(logEntry));
+        public override bool CanLog(ILogEntry logEntry)
+            => ShouldLog && (Filter == null || Filter.CanLog(logEntry));
 
         /// <summary>Logs the given entry if it passes the logfilter.</summary>
         /// <param name="logEntry">Log entry to log.``</param>
         public virtual void Log(ILogEntry logEntry)
         {
-            if (!FilterLog(logEntry))
+            if (!CanLog(logEntry))
                 return;
 
             lock (GlobalLock)
