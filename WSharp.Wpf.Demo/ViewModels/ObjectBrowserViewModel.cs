@@ -1,4 +1,4 @@
-﻿using WSharp.Services.Logging.Loggers;
+﻿using WSharp.Logging.Loggers;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,4 +1,4 @@
-﻿using WSharp.Services.Serialization;
+﻿using WSharp.Serialization;
 using System;
 using System.ComponentModel;
 using System.Net.Sockets;

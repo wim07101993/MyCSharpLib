@@ -43,22 +43,12 @@ namespace WSharp.Tests.Tests.Extensions
         }
 
         [Test]
-        public void CombineNull()
-        {
-            new List<string>()
-                .Combine(null as IEnumerable<string>)
-                .Invoking(x => x.ToList())
-                .Should()
-                .ThrowExactly<ArgumentNullException>("the list to combine is null.");
-        }
-
-        [Test]
         public void Combine()
         {
             var firstList = new List<string> { "hello", "world" };
             var secondList = new List<string> { "this", "is", "another", "test" };
 
-            firstList.Combine(secondList)
+            firstList.Concat(secondList)
                 .ToList()
                 .Should()
                 .HaveCount(6)

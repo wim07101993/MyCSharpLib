@@ -1,5 +1,5 @@
 ﻿using WSharp.Extensions;
-using WSharp.Services.Serialization;
+using WSharp.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

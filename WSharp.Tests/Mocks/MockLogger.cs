@@ -1,5 +1,5 @@
-﻿using WSharp.Services.Logging;
-using WSharp.Services.Logging.Loggers;
+﻿using WSharp.Logging;
+using WSharp.Logging.Loggers;
 
 namespace WSharp.Tests.Mocks
 {
@@ -7,6 +7,6 @@ namespace WSharp.Tests.Mocks
     {
         public ILogEntry LastLog { get; set; }
 
-        public override void InternalLog(ILogEntry logEntry) => LastLog = logEntry;
+        protected override void InternalLog(ILogEntry logEntry) => LastLog = logEntry;
     }
 }

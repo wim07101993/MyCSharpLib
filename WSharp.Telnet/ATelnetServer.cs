@@ -1,7 +1,6 @@
 ﻿using WSharp.Extensions;
-using WSharp.Services.Logging;
-using WSharp.Services.Logging.Loggers;
-using WSharp.Services.Serialization;
+using WSharp.Logging.Loggers;
+using WSharp.Serialization;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;

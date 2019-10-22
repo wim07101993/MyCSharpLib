@@ -1,10 +1,10 @@
-﻿using WSharp.Services.Logging;
-using WSharp.Services.Logging.Loggers;
-using WSharp.Services.Serialization;
+﻿using WSharp.Logging;
+using WSharp.Logging.Loggers;
+using WSharp.Serialization;
 using WSharp.Wpf.Controls.Demo.Views;
 using WSharp.Wpf.Demo.ViewModelInterfaces;
 using WSharp.Wpf.Demo.ViewModels;
-using WSharp.Extensions;
+using WSharp.Languages;
 using System.Threading;
 using System.Windows;
 using Unity;
