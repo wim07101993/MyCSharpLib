@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>WSharp</id>
+    <version>1.0.0</version>
+    <title>WSharp</title>
+    <authors>Wim</authors>
+    <owners>Wim</owners>
+    <licenseUrl>https://github.com/wim07101993/WSharp/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/wim07101993/WSharp</projectUrl>
+    <iconUrl>https://github.com/wim07101993/WSharp/blob/master/Icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Yet another library for C#</description>
+    <releaseNotes>First edition.</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags></tags>
+    <dependencies>
+      <dependency id="netstandard.library" version="4.5.0" />
+      <dependency id="newtonsoft.json" version="12.0.2" />
+      <dependency id="prism.core" version="7.2.0.1367" />
+      <dependency id="system.componentmodel.annotations" version="4.6.0" />
+      <dependency id="unity.container" version="5.11.1" />
+    </dependencies>
+  </metadata>
+</package>
