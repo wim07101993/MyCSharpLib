@@ -1,0 +1,1 @@
+nuget pack WSharp.csproj -Prop Configuration=Release

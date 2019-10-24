@@ -4,12 +4,17 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Wim07101993</Authors>
+    <Authors>Wim</Authors>
+    <owners>Wim</owners>
     <Company />
     <Description>A library with some classes and extensions to make life easier</Description>
     <PackageProjectUrl>https://github.com/wim07101993/WSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/wim07101993/WSharp</RepositoryUrl>
-    <NeutralLanguage>English</NeutralLanguage>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Icon>https://github.com/wim07101993/WSharp/blob/master/Icon.png</Icon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Copyright>Copyright 2019</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +22,19 @@
     <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
     <PackageReference Include="Unity.Container" Version="5.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

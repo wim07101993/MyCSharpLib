@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>WSharp</title>
+    <authors>$author$</authors>
+    <owners>Wim</owners>
+    <language>en</language>
+    <license type="file">LICENSE</license>
+    <projectUrl>https://github.com/wim07101993/WSharp</projectUrl>
+    <repository type="git" url="https://github.com/wim07101993/WSharp.git" branch="master" />
+    <icon>Icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>First edition.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags></tags>
+    
+    <dependencies>
+      <group>
+        <dependency id="newtonsoft.json" version="12.0.2" />
+        <dependency id="prism.core" version="7.2.0.1367" />
+        <dependency id="system.componentmodel.annotations" version="4.6.0" />
+        <dependency id="unity.container" version="5.11.1" />
+      </group>
+      
+      <group targetFramework="netstandard2.0">
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\Icon.png" />
+    <file src="..\LICENSE" />
+  </files>
+</package>
