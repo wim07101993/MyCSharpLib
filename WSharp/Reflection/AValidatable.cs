@@ -34,7 +34,7 @@ namespace WSharp.Reflection
         /// </returns>
         public virtual bool TryValidate(out AggregateException errors)
         {
-            var isValid = ObjectExtensions.Validate(this, out var errorList);
+            var isValid = this.Validate(true, out var errorList);
             errors = new AggregateException(ValidateErrorMessage, errorList);
             return isValid;
         }
