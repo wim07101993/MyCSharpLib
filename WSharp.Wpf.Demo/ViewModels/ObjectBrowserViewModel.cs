@@ -1,6 +1,7 @@
 ﻿using WSharp.Logging.Loggers;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Prism.Events;
 
 namespace WSharp.Wpf.Demo.ViewModels
 {
@@ -12,8 +13,8 @@ namespace WSharp.Wpf.Demo.ViewModels
         private double _salary;
         private Something _something = new Something();
 
-        public ObjectBrowserViewModel(ILogDispatcher logger)
-            : base(logger)
+        public ObjectBrowserViewModel(IEventAggregator eventAggregator, ILogger logger)
+            : base(eventAggregator, logger)
         {
         }
 

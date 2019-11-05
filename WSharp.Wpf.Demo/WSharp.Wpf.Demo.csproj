@@ -115,7 +115,6 @@
     <Compile Include="ViewModelInterfaces\ILoggingViewModel.cs" />
     <Compile Include="ViewModelInterfaces\IMainWindowViewModel.cs" />
     <Compile Include="ViewModelInterfaces\IViewModel.cs" />
-    <Compile Include="ViewModels\AViewModel.cs" />
     <Compile Include="ViewModels\LoggingViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\Fields.xaml.cs">
