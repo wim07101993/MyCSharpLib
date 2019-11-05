@@ -3,6 +3,7 @@ using WSharp.Logging.Loggers;
 using WSharp.Wpf.Demo.ViewModelInterfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Prism.Events;
 
 namespace WSharp.Wpf.Demo.ViewModels
 {
@@ -10,8 +11,8 @@ namespace WSharp.Wpf.Demo.ViewModels
     {
         private readonly IMemoryLogger _memoryLogger;
 
-        public LoggingViewModel(ILogDispatcher logger, IMemoryLogger memoryLogger) 
-            : base(logger)
+        public LoggingViewModel(IEventAggregator eventAggregator, ILogger logger, IMemoryLogger memoryLogger) 
+            : base(eventAggregator, logger)
         {
             _memoryLogger = memoryLogger;
             _memoryLogger.Log(nameof(LoggingViewModel), "Hello world, this is a test");
