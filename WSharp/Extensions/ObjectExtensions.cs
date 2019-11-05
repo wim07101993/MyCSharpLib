@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using WSharp.Reflection;
 
 namespace WSharp.Extensions
 {
@@ -47,8 +48,21 @@ namespace WSharp.Extensions
         /// <param name="obj">The object to validate.</param>
         /// <param name="validationErrors">The errors when the validation was unsuccessful.</param>
         /// <returns>Whether the object was validated successfully.</returns>
-        public static bool Validate(this object obj, out List<ValidationException> validationErrors)
+        public static bool Validate(this object obj, out List<ValidationException> validationErrors) 
+            => obj.Validate(false, out validationErrors);
+
+        public static bool Validate(this object obj, bool forceExtensionMethod, out List<ValidationException> validationErrors)
         {
+            if (!forceExtensionMethod && obj is IValidatable validatable)
+            {
+                var success = validatable.TryValidate(out var exception);
+                validationErrors = exception.InnerExceptions
+                    .Where(x => x is ValidationException)
+                    .Cast<ValidationException>()
+                    .ToList();
+                return success;
+            }
+
             var properties = obj.GetType().GetProperties();
 
             validationErrors = new List<ValidationException>();
@@ -105,15 +119,36 @@ namespace WSharp.Extensions
                     !(x.PropertyType == parentProperty.PropertyType &&
                     x.PropertyType == parentProperty.DeclaringType &&
                     x.DeclaringType == parentProperty.DeclaringType))
-                .Select(x => new
+                .Select(x => new 
                 {
                     Info = x,
-                    Value = x.GetValue(obj),
                     Attributes = x.GetCustomAttributes<ValidationAttribute>()
+                })
+                .Where(x => x.Attributes.Any())
+                .Select(x =>
+                {
+                    object value;
+                    try
+                    {
+                        value = x.Info.GetValue(obj);
+                    }
+                    catch (Exception)
+                    {
+                        value = Invalid.Value;
+                    }
+                    return new
+                    {
+                        x.Info,
+                        x.Attributes,
+                        Value = value
+                    };
                 });
 
             foreach (var property in properties)
             {
+                if (property.Value == Invalid.Value)
+                    validationErrors.Add(new ValidationException("Could not get the value of the property"));
+
                 foreach (var attribute in property.Attributes)
                 {
                     var result = attribute.GetValidationResult(property.Value, new ValidationContext(obj));
@@ -310,5 +345,10 @@ namespace WSharp.Extensions
                 return writer.ToString();
             }
         }
+    }
+
+    internal class Invalid 
+    {
+        public static Invalid Value { get; } = new Invalid();
     }
 }
