@@ -76,7 +76,8 @@ namespace WSharp.Extensions
                 var attributes = property.GetCustomAttributes<ValidationAttribute>();
                 foreach (var attribute in attributes)
                 {
-                    var result = attribute.GetValidationResult(value, new ValidationContext(obj));
+                    var context = new ValidationContext(obj) { DisplayName = property.GetDisplayName() };
+                    var result = attribute.GetValidationResult(value, context);
                     if (result != ValidationResult.Success)
                         validationErrors.Add(new ValidationException(result, attribute, value));
                 }
@@ -151,7 +152,8 @@ namespace WSharp.Extensions
 
                 foreach (var attribute in property.Attributes)
                 {
-                    var result = attribute.GetValidationResult(property.Value, new ValidationContext(obj));
+                    var context = new ValidationContext(obj) { DisplayName = property.Info.GetDisplayName() };
+                    var result = attribute.GetValidationResult(property.Value, context);
                     if (result != ValidationResult.Success)
                         validationErrors.Add(new ValidationException(result, attribute, property.Value));
                 }
