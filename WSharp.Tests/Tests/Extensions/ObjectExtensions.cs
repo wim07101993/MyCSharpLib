@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using WSharp.Extensions;
 using WSharp.Tests.Mocks;
 
@@ -86,6 +87,12 @@ namespace WSharp.Tests.Tests.Extensions
             errors
                 .Should()
                 .HaveCount(1, "one property is not valid");
+
+            errors
+                .First()
+                .Message
+                .Should()
+                .Contain("GreaterThen5", "that is the name of the property that is invalid.");
 
             obj.GreaterThen5 = 6;
             obj.Nested.GreaterThen5 = 1;
