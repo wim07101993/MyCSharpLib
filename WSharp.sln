@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WSharp", "WSharp\WSharp.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WSharp.Tests", "WSharp.Tests\WSharp.Tests.csproj", "{79B07336-2D2F-404E-9B1E-81F426CFD27F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WSharp.Wpf", "WSharp.Wpf\WSharp.Wpf.csproj", "{05322358-E260-438C-8CF2-A40235320819}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WSharp.Wpf.Demo", "WSharp.Wpf.Demo\WSharp.Wpf.Demo.csproj", "{359C8C4F-5C25-4995-9128-476A060514BA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,14 +21,6 @@ Global
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79B07336-2D2F-404E-9B1E-81F426CFD27F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05322358-E260-438C-8CF2-A40235320819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05322358-E260-438C-8CF2-A40235320819}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05322358-E260-438C-8CF2-A40235320819}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05322358-E260-438C-8CF2-A40235320819}.Release|Any CPU.Build.0 = Release|Any CPU
-		{359C8C4F-5C25-4995-9128-476A060514BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{359C8C4F-5C25-4995-9128-476A060514BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{359C8C4F-5C25-4995-9128-476A060514BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{359C8C4F-5C25-4995-9128-476A060514BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
