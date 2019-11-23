@@ -33,9 +33,10 @@
       <PackagePath></PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\icon.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
