@@ -8,12 +8,11 @@ namespace WSharp.Extensions
     {
         public static DateTimeFormatInfo GetDateFormat(this CultureInfo culture)
         {
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (culture == null)
+                throw new ArgumentNullException(nameof(culture));
 
             if (culture.Calendar is GregorianCalendar || culture.Calendar is PersianCalendar)
-            {
                 return culture.DateTimeFormat;
-            }
 
             GregorianCalendar foundCal = null;
             DateTimeFormatInfo dtfi = null;
@@ -22,9 +21,7 @@ namespace WSharp.Extensions
                 // Return the first Gregorian calendar with CalendarType == Localized 
                 // Otherwise return the first Gregorian calendar
                 if (foundCal == null)
-                {
                     foundCal = cal;
-                }
 
                 if (cal.CalendarType != GregorianCalendarTypes.Localized) continue;
 
