@@ -18,7 +18,8 @@ namespace WSharp.Logging.Loggers
         ILogFilter Filter { get; set; }
 
         /// <summary>
-        ///     A buffer to write to and in the end log with the <see cref="Log(IBufferLogEntry)"/> or <see cref="LogBuffer()"/> method.
+        ///     A buffer to write to and in the end log with the <see cref="Log(IBufferLogEntry)"/>
+        ///     or <see cref="LogBuffer()"/> method.
         /// </summary>
         IBufferLogEntry Buffer { get; }
 

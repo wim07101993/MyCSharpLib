@@ -23,10 +23,10 @@ namespace WSharp.Extensions
             catch (Exception ex)
             {
                 e = ex;
-                return false;
+                return default;
             }
 
-            e = null;
+            e = default;
             return true;
         }
     }

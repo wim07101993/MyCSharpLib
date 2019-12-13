@@ -1,15 +1,18 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 namespace WSharp.Extensions
 {
     /// <summary>Extension methods for the <see cref="TextReader"/> class.</summary>
     public static class TextReaderExtensions
     {
-        /// <summary>Deserializes the readers content to the type <typeparamref name="T"/> using json.</summary>
+        /// <summary>
+        ///     Deserializes the readers content to the type <typeparamref name="T"/> using json.
+        /// </summary>
         /// <typeparam name="T">The type to deserialize to.</typeparam>
         /// <param name="reader">The reader to read the contents de deserialize from.</param>
         /// <returns>The deserialize value.</returns>
@@ -23,14 +26,17 @@ namespace WSharp.Extensions
         public static object DeserializeJson(this TextReader reader, Type objectType)
             => new JsonSerializer().Deserialize(reader, objectType);
 
-        /// <summary>Deserializes the readers content to the type <typeparamref name="T"/> using json.</summary>
+        /// <summary>
+        ///     Deserializes the readers content to the type <typeparamref name="T"/> using json.
+        /// </summary>
         /// <typeparam name="T">The type to deserialize to.</typeparam>
         /// <param name="reader">The reader to read the contents de deserialize from.</param>
         /// <returns>The deserialize value.</returns>
         public static async Task<T> DeserializeJsonAsync<T>(this TextReader reader)
         {
-            using (var jsonReader = new JsonTextReader(reader))
-                return await new JsonSerializer().DeserializeAsync<T>(jsonReader);
+            using var jsonReader = new JsonTextReader(reader);
+
+            return await new JsonSerializer().DeserializeAsync<T>(jsonReader);
         }
 
         /// <summary>Deserializes the readers content to the given type using json.</summary>
@@ -40,7 +46,9 @@ namespace WSharp.Extensions
         public static Task<object> DeserializeJsonAsync(this TextReader reader, Type objectType)
             => new JsonSerializer().DeserializeAsync(reader, objectType);
 
-        /// <summary>Deserializes the readers content to the type <typeparamref name="T"/> using xml.</summary>
+        /// <summary>
+        ///     Deserializes the readers content to the type <typeparamref name="T"/> using xml.
+        /// </summary>
         /// <typeparam name="T">The type to deserialize to.</typeparam>
         /// <param name="reader">The reader to read the contents de deserialize from.</param>
         /// <returns>The deserialize value.</returns>
@@ -54,7 +62,9 @@ namespace WSharp.Extensions
         public static object DeserializeXml(this TextReader reader, Type objectType)
             => new XmlSerializer(objectType).Deserialize(reader);
 
-        /// <summary>Deserializes the readers content to the type <typeparamref name="T"/> using xml.</summary>
+        /// <summary>
+        ///     Deserializes the readers content to the type <typeparamref name="T"/> using xml.
+        /// </summary>
         /// <typeparam name="T">The type to deserialize to.</typeparam>
         /// <param name="reader">The reader to read the contents de deserialize from.</param>
         /// <returns>The deserialize value.</returns>

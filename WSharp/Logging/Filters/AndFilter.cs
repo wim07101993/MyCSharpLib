@@ -9,16 +9,16 @@ namespace WSharp.Logging.Filters
     public class AndFilter : ALogFilter
     {
         /// <summary> Constructs a new instance of the <see cref="AndFilter"/>. All the event types
-        /// should be present in the log to pass. ((log.EventType & eventType) > 0).</summary> <param
-        /// name="eventTypes">Eventtypes that should be present in the log.</param>
+        /// should be present in the log to pass. ((log.EventType & eventType) > 0).</summary>
+        /// <param name="eventTypes">Eventtypes that should be present in the log.</param>
         public AndFilter(params TraceEventType[] eventTypes)
             : this(eventTypes as IEnumerable<TraceEventType>)
         {
         }
 
         /// <summary> Constructs a new instance of the <see cref="AndFilter"/>. All the event types
-        /// should be present in the log to pass. ((log.EventType & eventType) > 0).</summary> <param
-        /// name="eventTypes">Eventtypes that should be present in the log.</param>
+        /// should be present in the log to pass. ((log.EventType & eventType) > 0).</summary>
+        /// <param name="eventTypes">Eventtypes that should be present in the log.</param>
         public AndFilter(IEnumerable<TraceEventType> eventTypes)
         {
             Filters = eventTypes.Select(e => new Func<ILogEntry, bool>(log => (log.EventType & e) > 0));

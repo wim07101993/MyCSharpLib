@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+
+using Newtonsoft.Json;
 
 namespace WSharp.Extensions
 {
@@ -9,8 +10,8 @@ namespace WSharp.Extensions
     public static class JsonSerializerExtensions
     {
         /// <summary>
-        ///     Serializes the specified <see cref="object"/> and writes the JSON structure using the
-        ///     specified <see cref="TextWriter"/>.
+        ///     Serializes the specified <see cref="object"/> and writes the JSON structure using
+        ///     the specified <see cref="TextWriter"/>.
         /// </summary>
         /// <param name="serializer">The serializer to serialize with.</param>
         /// <param name="textWriter">The <see cref="TextWriter"/> used to write the JSON structure.</param>
@@ -28,8 +29,8 @@ namespace WSharp.Extensions
         }
 
         /// <summary>
-        ///     Serializes the specified <see cref="object"/> and writes the JSON structure using the
-        ///     specified <see cref="JsonWriter"/>.
+        ///     Serializes the specified <see cref="object"/> and writes the JSON structure using
+        ///     the specified <see cref="JsonWriter"/>.
         /// </summary>
         /// <param name="serializer">The serializer to serialize with.</param>
         /// <param name="jsonWriter">The <see cref="JsonWriter"/> used to write the JSON structure.</param>

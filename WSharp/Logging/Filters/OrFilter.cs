@@ -29,8 +29,8 @@ namespace WSharp.Logging.Filters
         }
 
         /// <summary>
-        ///     Constructs a new instance of the <see cref="OrFilter"/>. Any the filters should agree
-        ///     on logging the log. (fitlers.Any(x =&gt; x.CanLog(log)).
+        ///     Constructs a new instance of the <see cref="OrFilter"/>. Any the filters should
+        ///     agree on logging the log. (fitlers.Any(x =&gt; x.CanLog(log)).
         /// </summary>
         /// <param name="filters">Filters that should agree on logging.</param>
         public OrFilter(params ILogFilter[] filters)

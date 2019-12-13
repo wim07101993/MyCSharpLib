@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+
 using WSharp.Logging.Filters;
 
 namespace WSharp.Logging.Loggers
@@ -14,7 +15,7 @@ namespace WSharp.Logging.Loggers
     {
         #region FIELDS
 
-        internal static readonly object globalLock = new object();
+        internal static readonly object StaticGlobalLock = new object();
 
         private bool _isDisposing;
         private IBufferLogEntry _buffer;
@@ -41,7 +42,7 @@ namespace WSharp.Logging.Loggers
         #region PROPERTIES
 
         /// <summary>A lock to synchronize tasks/threads.</summary>
-        public object GlobalLock => globalLock;
+        public object GlobalLock => StaticGlobalLock;
 
         /// <summary>If <see langword="false"/>: no logs are logged.</summary>
         public bool ShouldLog { get; set; } = true;
@@ -50,7 +51,8 @@ namespace WSharp.Logging.Loggers
         public ILogFilter Filter { get; set; }
 
         /// <summary>
-        ///     A buffer to write to and in the end log with the <see cref="Log(IBufferLogEntry)"/> or <see cref="LogBuffer()"/> method.
+        ///     A buffer to write to and in the end log with the <see cref="Log(IBufferLogEntry)"/>
+        ///     or <see cref="LogBuffer()"/> method.
         /// </summary>
         public IBufferLogEntry Buffer
         {
@@ -174,7 +176,7 @@ namespace WSharp.Logging.Loggers
         }
 
         /// <summary>
-        /// Logs an internal exception. Sets <see cref="ShouldLog"/> to false before logging the exception.
+        ///     Logs an internal exception. Sets <see cref="ShouldLog"/> to false before logging the exception.
         /// </summary>
         /// <param name="e">Exception to log.</param>
         /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>

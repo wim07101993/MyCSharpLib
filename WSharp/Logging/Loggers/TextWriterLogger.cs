@@ -29,8 +29,9 @@ namespace WSharp.Logging.Loggers
         /// <devdoc>
         ///     <para>
         ///         Initializes a new instance of the
-        ///         <see cref="System.Diagnostics.TextWriterTraceListener"/> class with the specified
-        ///         name and using the stream as the recipient of the debugging and tracing output.
+        ///         <see cref="System.Diagnostics.TextWriterTraceListener"/> class with the
+        ///         specified name and using the stream as the recipient of the debugging and
+        ///         tracing output.
         ///     </para>
         /// </devdoc>
         protected TextWriterLogger(Stream stream)
@@ -44,8 +45,9 @@ namespace WSharp.Logging.Loggers
         /// <devdoc>
         ///     <para>
         ///         Initializes a new instance of the
-        ///         <see cref="System.Diagnostics.TextWriterTraceListener"/> class with the specified
-        ///         name and using the specified writer as recipient of the tracing or debugging output.
+        ///         <see cref="System.Diagnostics.TextWriterTraceListener"/> class with the
+        ///         specified name and using the specified writer as recipient of the tracing or
+        ///         debugging output.
         ///     </para>
         /// </devdoc>
         protected TextWriterLogger(TextWriter writer)
@@ -64,7 +66,7 @@ namespace WSharp.Logging.Loggers
         {
             get
             {
-                EnsureWriter();
+                _ = EnsureWriter();
                 return _writer;
             }
             set => _writer = value;
@@ -116,9 +118,7 @@ namespace WSharp.Logging.Loggers
             catch (ObjectDisposedException) { }
         }
 
-        /// <summary>
-        /// Ensures a writer is present to log to.
-        /// </summary>
+        /// <summary>Ensures a writer is present to log to.</summary>
         /// <returns>Indicates whether the writer is present.</returns>
         [ResourceExposure(ResourceScope.None)]
         [ResourceConsumption(ResourceScope.Machine, ResourceScope.Machine)]
