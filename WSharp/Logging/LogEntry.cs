@@ -25,6 +25,10 @@ namespace WSharp.Logging
 
         public const TraceOptions DefaultOptions = TraceOptions.DateTime;
 
+        private string _header;
+        private string _body;
+        private string _footer;
+
         #endregion FIELDS
 
         #region CONSTRUCTOR
@@ -108,21 +112,20 @@ namespace WSharp.Logging
         {
             get
             {
+                if (_header != null) 
+                    return _header;
+
                 var eventType = EventType.ToString();
 
                 var builder = new StringBuilder()
                     .Append(' ', IndentSize * IndentLevel)
-                    .Append("[")
-                    .Append(EventType)
-                    .Append("]");
+                    .Append($"[{EventType}]");
 
                 for (var i = eventType.Length; i < 11; i++)
                     _ = builder.Append(' ');
 
                 if (EventCache != null && IsEnabled(TraceOptions.DateTime))
-                    _ = builder
-                        .Append(EventCache.DateTime.ToString(CultureInfo.InvariantCulture))
-                        .Append("|");
+                    _ = builder.Append($"{EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|");
 
                 if (!string.IsNullOrWhiteSpace(Source))
                     _ = builder.Append(Source).Append(":");
@@ -137,7 +140,8 @@ namespace WSharp.Logging
                 if (!string.IsNullOrWhiteSpace(Title))
                     _ = builder.AppendLine(Title);
 
-                return builder.ToString();
+                _header = builder.ToString();
+                return _header;
             }
         }
 
@@ -146,6 +150,9 @@ namespace WSharp.Logging
         {
             get
             {
+                if (_body != null)
+                    return _body;
+
                 if (Payload == null || Payload.Count == 0)
                     return null;
 
@@ -161,7 +168,8 @@ namespace WSharp.Logging
                 var slice = Payload.Skip(1).ToList();
                 var strPayload = PayloadToString(slice, IndentSize, (ushort)(IndentLevel + 2));
 
-                return builder.Append(strPayload).ToString();
+                _body = builder.Append(strPayload).ToString();
+                return _body;
             }
         }
 
@@ -170,6 +178,9 @@ namespace WSharp.Logging
         {
             get
             {
+                if (_footer != null)
+                    return _footer;
+
                 if (EventCache == null)
                     return null;
 
@@ -182,51 +193,38 @@ namespace WSharp.Logging
                 if (IsEnabled(TraceOptions.ProcessId))
                 {
                     hasFooter = true;
-                    _ = builder
-                        .Append("ProcessId=")
-                        .Append(EventCache.ProcessId)
-                        .Append("|");
+                    _ = builder.Append($"ProcessId={EventCache.ProcessId}|");
                 }
 
                 if (IsEnabled(TraceOptions.LogicalOperationStack))
                 {
                     hasFooter = true;
-                    _ = builder
-                        .Append("LogicalOperationStack=")
-                        .Append(OperationStackToString(EventCache.LogicalOperationStack))
-                        .Append("|");
+                    _ = builder.Append($"LogicalOperationStack={OperationStackToString(EventCache.LogicalOperationStack)}");
                 }
 
                 if (IsEnabled(TraceOptions.ThreadId))
                 {
                     hasFooter = true;
-                    _ = builder
-                        .Append("ThreadId=")
-                        .Append(EventCache.ThreadId)
-                        .Append("|");
+                    _ = builder.Append($"ThreadId={EventCache.ThreadId}|");
                 }
 
                 if (IsEnabled(TraceOptions.Timestamp))
                 {
                     hasFooter = true;
-                    _ = builder
-                        .Append("Timestamp=")
-                        .Append(EventCache.Timestamp)
-                        .Append("|");
+                    _ = builder.Append($"Timestamp={EventCache.Timestamp}|");
                 }
 
                 if (IsEnabled(TraceOptions.Callstack))
                 {
                     hasFooter = true;
-                    _ = builder
-                        .Append("Callstack=")
-                        .Append(EventCache.Callstack)
-                        .Append("|");
+                    _ = builder.Append($"Callstack={EventCache.Callstack}|");
                 }
 
-                return hasFooter
+                _footer = hasFooter
                     ? builder.AppendLine().ToString()
-                    : null;
+                    : "";
+
+                return _footer;
             }
         }
 
@@ -260,12 +258,11 @@ namespace WSharp.Logging
                 return null;
 
             var list = stack.Cast<object>().ToList();
-
-            var builder = new StringBuilder(list[0].ToString());
-            foreach (var item in list.Skip(1))
-                _ = builder.Append(", ").Append(item);
-
-            return builder.AppendLine().ToString();
+            return list
+                .Skip(1)
+                .Aggregate(new StringBuilder(list[0].ToString()), (b, x) => b.Append($", {x}"))
+                .AppendLine()
+                .ToString();
         }
 
         /// <summary>Converts a payload object to a string.</summary>
