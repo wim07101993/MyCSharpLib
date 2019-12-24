@@ -25,7 +25,7 @@ namespace WSharp.Logging.Filters
         /// <param name="eventTypes">Eventtypes that should be present in the log.</param>
         public OrFilter(IEnumerable<TraceEventType> eventTypes)
         {
-            Filters = eventTypes.Select(e => new Func<ILogEntry, bool>(log => (log.EventType | e) > 0));
+            Filters = eventTypes.Select(e => new Func<ILogEntry, bool>(log => (log.EventType & e) > 0));
         }
 
         /// <summary>
