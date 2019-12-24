@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+
 using WSharp.Extensions;
 
 namespace WSharp.Logging
@@ -107,35 +108,34 @@ namespace WSharp.Logging
         {
             get
             {
-                var builder = new StringBuilder().Append(' ', IndentSize * IndentLevel);
-
                 var eventType = EventType.ToString();
 
-                builder.Append("[");
-                builder.Append(EventType);
-                builder.Append("]");
+                var builder = new StringBuilder()
+                    .Append(' ', IndentSize * IndentLevel)
+                    .Append("[")
+                    .Append(EventType)
+                    .Append("]");
+
                 for (var i = eventType.Length; i < 11; i++)
-                    builder.Append(' ');
+                    _ = builder.Append(' ');
 
                 if (EventCache != null && IsEnabled(TraceOptions.DateTime))
-                    builder
+                    _ = builder
                         .Append(EventCache.DateTime.ToString(CultureInfo.InvariantCulture))
                         .Append("|");
 
                 if (!string.IsNullOrWhiteSpace(Source))
-                    builder.Append(Source).Append(":");
+                    _ = builder.Append(Source).Append(":");
 
                 if (!string.IsNullOrWhiteSpace(Tag))
-                    builder.Append(Tag);
+                    _ = builder.Append(Tag);
 
-                if (!string.IsNullOrWhiteSpace(Title) ||
-                    (Payload != null && Payload.Count > 0))
-                    builder.Append(" -> ");
-                else
-                    builder.AppendLine();
+                _ = !string.IsNullOrWhiteSpace(Title) || (Payload != null && Payload.Count > 0)
+                    ? builder.Append(" -> ")
+                    : builder.AppendLine();
 
                 if (!string.IsNullOrWhiteSpace(Title))
-                    builder.AppendLine(Title);
+                    _ = builder.AppendLine(Title);
 
                 return builder.ToString();
             }
@@ -152,7 +152,7 @@ namespace WSharp.Logging
                 var builder = new StringBuilder();
 
                 if (!string.IsNullOrWhiteSpace(Title))
-                    builder.Append(' ', IndentSize * (IndentLevel + 2));
+                    _ = builder.Append(' ', IndentSize * (IndentLevel + 2));
 
                 Indent(ref builder, Payload[0], IndentSize, (ushort)(IndentLevel + 2), false);
                 if (Payload.Count == 1)
@@ -176,13 +176,13 @@ namespace WSharp.Logging
                 var builder = new StringBuilder();
 
                 if (!string.IsNullOrWhiteSpace(Title))
-                    builder.Append(' ', IndentSize * (IndentLevel + 1));
+                    _ = builder.Append(' ', IndentSize * (IndentLevel + 1));
 
                 var hasFooter = false;
                 if (IsEnabled(TraceOptions.ProcessId))
                 {
                     hasFooter = true;
-                    builder
+                    _ = builder
                         .Append("ProcessId=")
                         .Append(EventCache.ProcessId)
                         .Append("|");
@@ -191,17 +191,16 @@ namespace WSharp.Logging
                 if (IsEnabled(TraceOptions.LogicalOperationStack))
                 {
                     hasFooter = true;
-                    Stack operationStack = EventCache.LogicalOperationStack;
-                    builder
+                    _ = builder
                         .Append("LogicalOperationStack=")
-                        .Append(OperationStackToString(operationStack))
+                        .Append(OperationStackToString(EventCache.LogicalOperationStack))
                         .Append("|");
                 }
 
                 if (IsEnabled(TraceOptions.ThreadId))
                 {
                     hasFooter = true;
-                    builder
+                    _ = builder
                         .Append("ThreadId=")
                         .Append(EventCache.ThreadId)
                         .Append("|");
@@ -210,7 +209,7 @@ namespace WSharp.Logging
                 if (IsEnabled(TraceOptions.Timestamp))
                 {
                     hasFooter = true;
-                    builder
+                    _ = builder
                         .Append("Timestamp=")
                         .Append(EventCache.Timestamp)
                         .Append("|");
@@ -219,7 +218,7 @@ namespace WSharp.Logging
                 if (IsEnabled(TraceOptions.Callstack))
                 {
                     hasFooter = true;
-                    builder
+                    _ = builder
                         .Append("Callstack=")
                         .Append(EventCache.Callstack)
                         .Append("|");
@@ -264,7 +263,7 @@ namespace WSharp.Logging
 
             var builder = new StringBuilder(list[0].ToString());
             foreach (var item in list.Skip(1))
-                builder.Append(", ").Append(item);
+                _ = builder.Append(", ").Append(item);
 
             return builder.AppendLine().ToString();
         }
@@ -274,17 +273,12 @@ namespace WSharp.Logging
         /// <returns>The string representation of the log payload.</returns>
         protected virtual string PayloadToString(object payload)
         {
-            switch (payload)
+            return payload switch
             {
-                case null:
-                    return null;
-
-                case string s:
-                    return s;
-
-                default:
-                    return payload.SerializeJson();
-            }
+                null => null,
+                string s => s,
+                _ => payload.SerializeJson(),
+            };
         }
 
         /// <summary>
@@ -305,24 +299,21 @@ namespace WSharp.Logging
 
             if (!indentFirstLine)
             {
-                builder.AppendLine(split.First());
+                _ = builder.AppendLine(split.First());
                 split = split.Skip(1);
             }
 
             foreach (var s in split)
-                builder.Append(' ', indentSize * indentLevel)
+                _ = builder
+                    .Append(' ', indentSize * indentLevel)
                     .AppendLine(s);
         }
 
-        /// <summary>
-        /// Converts the log entry to string ({Header}{Body}{Footer}).
-        /// </summary>
+        /// <summary>Converts the log entry to string ({Header}{Body}{Footer}).</summary>
         /// <returns>{Header}{Body}{Footer}</returns>
         public override string ToString() => $"{Header}{Body}{Footer}";
 
-        /// <summary>
-        /// Checks whether the given options are enabled in the <see cref="TraceOptions"/>.
-        /// </summary>
+        /// <summary>Checks whether the given options are enabled in the <see cref="TraceOptions"/>.</summary>
         /// <param name="opts">Options to check whether they are enabled.</param>
         /// <returns>Whether the given options are enabled in the <see cref="TraceOptions"/>.</returns>
         protected virtual bool IsEnabled(TraceOptions opts) => (opts & TraceOptions) != 0;
