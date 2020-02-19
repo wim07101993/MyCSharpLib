@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 namespace WSharp.Extensions
 {

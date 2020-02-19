@@ -1,6 +1,8 @@
-﻿using Prism.Events;
+﻿using System.ComponentModel;
+
+using Prism.Events;
 using Prism.Mvvm;
-using System.ComponentModel;
+
 using WSharp.Logging.Loggers;
 
 namespace WSharp

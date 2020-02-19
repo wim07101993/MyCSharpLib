@@ -16,8 +16,8 @@ namespace WSharp.Reflection
         bool TryValidate(out AggregateException errors);
 
         /// <summary>
-        ///     Validates this object. An <see cref="AggregateException"/> is thrown when this object
-        ///     is not valid. (Checks properties recursivly).
+        ///     Validates this object. An <see cref="AggregateException"/> is thrown when this
+        ///     object is not valid. (Checks properties recursivly).
         /// </summary>
         /// <exception cref="AggregateException">
         ///     An <see cref="AggregateException"/> is thrown when this object is not valid.

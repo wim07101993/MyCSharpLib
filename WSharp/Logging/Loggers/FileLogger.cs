@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
+
 using Unity;
 
 namespace WSharp.Logging.Loggers
@@ -45,7 +46,8 @@ namespace WSharp.Logging.Loggers
         }
 
         /// <summary>
-        ///     Constructs a new instance of a <see cref="FileLogger"/> with a given directory to log to.
+        ///     Constructs a new instance of a <see cref="FileLogger"/> with a given directory to
+        ///     log to.
         /// </summary>
         /// <param name="logDirectory"></param>
         [ResourceExposure(ResourceScope.Machine)]
@@ -72,7 +74,7 @@ namespace WSharp.Logging.Loggers
                         Writer.Dispose();
                         Writer = null;
                     }
-                    EnsureWriter();
+                    _ = EnsureWriter();
                 }
             }
         }
@@ -84,7 +86,7 @@ namespace WSharp.Logging.Loggers
         private static Encoding GetEncodingWithFallback(Encoding encoding)
         {
             // Clone it and set the "?" replacement fallback
-            Encoding fallbackEncoding = (Encoding)encoding.Clone();
+            var fallbackEncoding = (Encoding)encoding.Clone();
             fallbackEncoding.EncoderFallback = EncoderFallback.ReplacementFallback;
             fallbackEncoding.DecoderFallback = DecoderFallback.ReplacementFallback;
 
@@ -113,13 +115,13 @@ namespace WSharp.Logging.Loggers
                 // "?" replacement fallback encoding to substitute illegal chars. For ex, In case of
                 // high surrogate character D800-DBFF without a following low surrogate character DC00-DFFF
                 // NOTE: We also need to use an encoding that does't emit BOM whic is StreamWriter's default
-                Encoding noBOMwithFallback = GetEncodingWithFallback(new UTF8Encoding(false));
+                var noBOMwithFallback = GetEncodingWithFallback(new UTF8Encoding(false));
 
                 if (!Directory.Exists(LogDirectory))
                 {
                     try
                     {
-                        Directory.CreateDirectory(LogDirectory);
+                        _ = Directory.CreateDirectory(LogDirectory);
                     }
                     catch (Exception e)
                     {
@@ -129,7 +131,7 @@ namespace WSharp.Logging.Loggers
                 }
 
                 Exception exception = null;
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
                     try
                     {

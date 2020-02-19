@@ -9,7 +9,7 @@ namespace WSharp.Logging.Loggers
     {
         #region FIELDS
 
-        private Collection<ILogger> _loggers = new Collection<ILogger>();
+        private readonly Collection<ILogger> _loggers = new Collection<ILogger>();
 
         #endregion FIELDS
 

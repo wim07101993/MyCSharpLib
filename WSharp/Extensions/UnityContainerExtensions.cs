@@ -1,4 +1,5 @@
 ﻿using Unity;
+
 using WSharp.Files;
 using WSharp.Logging;
 using WSharp.Logging.Loggers;
@@ -26,12 +27,16 @@ namespace WSharp.Extensions
         ///     <list type="bullet">
         ///         <item>an instance of <see cref="IFileServiceSettings"/>: used by the <see cref="FileService"/>.</item>
         ///         <item><see cref="IDebugLogger"/>.</item>
-        ///         <item><see cref="ILogger"/>: usefull to set a default logger (can be the <see cref="ILogDispatcher"/>).</item>
-        ///         <item><see cref="ILogger"/>s to the <see cref="ILogDispatcherFactory"/>.</item>
+        ///         <item>
+        ///             <see cref="ILogger"/>: usefull to set a default logger (can be the <see cref="ILogDispatcher"/>).
+        ///         </item>
+        ///         <item><see cref="ILogger"/> s to the <see cref="ILogDispatcherFactory"/>.</item>
         ///     </list>
         /// </summary>
         /// <param name="unityContainer">The unity container to register the dependencies on.</param>
-        /// <returns>The unity container to register the dependencies on with the registered dependencies.</returns>
+        /// <returns>
+        ///     The unity container to register the dependencies on with the registered dependencies.
+        /// </returns>
         public static IUnityContainer RegisterWSharp(this IUnityContainer unityContainer)
         {
             return unityContainer

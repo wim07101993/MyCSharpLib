@@ -24,8 +24,8 @@ namespace WSharp.Extensions
         #region FINDING
 
         /// <summary>
-        ///     Searches for the index of the first element for which the predicate returns true. (-1
-        ///     when there is none.)
+        ///     Searches for the index of the first element for which the predicate returns true.
+        ///     (-1 when there is none.)
         ///     <para>If the predicate is null, 0 is returned (except when the list has no elements).</para>
         /// </summary>
         /// <typeparam name="T">Type of items in the list.</typeparam>
@@ -156,8 +156,8 @@ namespace WSharp.Extensions
         }
 
         /// <summary>
-        ///     Removes the first element for which the predicate returns true while looping over the
-        ///     list in reverse order.
+        ///     Removes the first element for which the predicate returns true while looping over
+        ///     the list in reverse order.
         ///     <para>If the predicate is null, the last element is removed.</para>
         /// </summary>
         /// <typeparam name="T">Type of items in the list.</typeparam>

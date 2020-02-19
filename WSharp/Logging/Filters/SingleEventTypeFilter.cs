@@ -10,7 +10,6 @@ namespace WSharp.Logging.Filters
             EventType = eventType;
         }
 
-
         /// <summary>Event type to pass.</summary>
         protected TraceEventType EventType { get; }
 

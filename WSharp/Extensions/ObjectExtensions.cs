@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +7,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+
+using Newtonsoft.Json;
+
 using WSharp.Reflection;
 
 namespace WSharp.Extensions
@@ -48,7 +50,7 @@ namespace WSharp.Extensions
         /// <param name="obj">The object to validate.</param>
         /// <param name="validationErrors">The errors when the validation was unsuccessful.</param>
         /// <returns>Whether the object was validated successfully.</returns>
-        public static bool Validate(this object obj, out List<ValidationException> validationErrors) 
+        public static bool Validate(this object obj, out List<ValidationException> validationErrors)
             => obj.Validate(false, out validationErrors);
 
         public static bool Validate(this object obj, bool forceExtensionMethod, out List<ValidationException> validationErrors)
@@ -120,7 +122,7 @@ namespace WSharp.Extensions
                     !(x.PropertyType == parentProperty.PropertyType &&
                     x.PropertyType == parentProperty.DeclaringType &&
                     x.DeclaringType == parentProperty.DeclaringType))
-                .Select(x => new 
+                .Select(x => new
                 {
                     Info = x,
                     Attributes = x.GetCustomAttributes<ValidationAttribute>()
@@ -349,7 +351,7 @@ namespace WSharp.Extensions
         }
     }
 
-    internal class Invalid 
+    internal class Invalid
     {
         public static Invalid Value { get; } = new Invalid();
     }
