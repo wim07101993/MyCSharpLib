@@ -199,7 +199,7 @@ namespace WSharp.Logging
                 if (IsEnabled(TraceOptions.LogicalOperationStack))
                 {
                     hasFooter = true;
-                    _ = builder.Append($"LogicalOperationStack={OperationStackToString(EventCache.LogicalOperationStack)}");
+                    _ = builder.Append($"LogicalOperationStack={OperationStackToString(EventCache.LogicalOperationStack)}|");
                 }
 
                 if (IsEnabled(TraceOptions.ThreadId))
