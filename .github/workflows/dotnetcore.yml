@@ -12,7 +12,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
     - name: Restore
-      run: donet restore
+      run: dotnet restore
     - name: Build with dotnet
       run: dotnet build --configuration Release
     - name: Run tests
