@@ -22,7 +22,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 4);
 
-            entry.Header
+            _ = entry.Header
                 .Should()
                 .Be(
                 $"    [Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:tag -> title\r\n", 
@@ -33,7 +33,7 @@ namespace WSharp.Tests.Tests.Logging
         public void HeaderEmpty()
         {
             var entry = new LogEntry();
-            entry.Header
+            _ = entry.Header
                 .Should()
                 .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderEmpty\r\n");
         }
@@ -42,7 +42,7 @@ namespace WSharp.Tests.Tests.Logging
         public void HeaderOnlySource()
         {
             var entry = new LogEntry(source: "source");
-            entry.Header
+            _ = entry.Header
                 .Should()
                 .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|source:HeaderOnlySource\r\n");
         }
@@ -51,7 +51,7 @@ namespace WSharp.Tests.Tests.Logging
         public void HeaderOnlyTitle()
         {
             var entry = new LogEntry(title: "title");
-            entry.Header
+            _ = entry.Header
                 .Should()
                 .Be($"[Verbose]    {entry.EventCache.DateTime.ToString(CultureInfo.InvariantCulture)}|HeaderOnlyTitle -> title\r\n");
         }
@@ -65,7 +65,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentSize: 2,
                 traceOptions: LogEntry.AllTraceOptions,
                 payload: new[] { "hello world"});
-            entry.Body
+            _ = entry.Body
                 .Should()
                 .Be("      hello world\r\n");
         }
@@ -77,7 +77,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 2,
                 payload: new ReadOnlyCollection<object>(new[] { "hello world" }));
-            entry.Body
+            _ = entry.Body
                 .Should()
                 .Be("hello world\r\n");
         }
@@ -89,7 +89,7 @@ namespace WSharp.Tests.Tests.Logging
                 title: "title",
                 indentSize: 2,
                 payload: new[] { "hello", "world" });
-            entry.Body
+            _ = entry.Body
                 .Should()
                 .Be(
                 "    hello\r\n" +
@@ -103,7 +103,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 2,
                 payload: new[] { "hello", "world", "this", "is", "another", "test" });
-            entry.Body
+            _ = entry.Body
                 .Should()
                 .Be(
                 "hello\r\n" +
@@ -125,7 +125,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 4);
             
-            entry.Footer
+            _ = entry.Footer
                 .Should()
                 .MatchRegex(@" {8}ProcessId=[0-9]{1,8}\|LogicalOperationStack=.*\|ThreadId=[0-9]{1,3}\|Timestamp=[0-9]*\|Callstack=.*");
         }
@@ -141,7 +141,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 4);
 
-            entry.Footer
+            _ = entry.Footer
                 .Should()
                 .MatchRegex(@" {8}ProcessId=[0-9]{1,8}\|ThreadId=[0-9]{1,3}\|\r\n");
         }
@@ -157,7 +157,7 @@ namespace WSharp.Tests.Tests.Logging
                 indentLevel: 1,
                 indentSize: 1);
 
-            entry.Footer
+            _ = entry.Footer
                 .Should()
                 .MatchRegex(@" {2}Timestamp=[0-9]*\|\r\n");
         }
@@ -175,7 +175,7 @@ namespace WSharp.Tests.Tests.Logging
                indentLevel: 1,
                indentSize: 4);
 
-            entry.ToString()
+            _ = entry.ToString()
                 .Should()
                 .Be($"{entry.Header}{entry.Body}{entry.Footer}");
         }
