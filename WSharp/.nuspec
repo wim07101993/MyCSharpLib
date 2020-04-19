@@ -30,7 +30,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\Icon.png" />
+    <file src=".\Icon.png" />
     <file src="..\LICENSE" />
   </files>
 </package>
