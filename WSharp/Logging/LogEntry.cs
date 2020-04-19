@@ -296,14 +296,17 @@ namespace WSharp.Logging
 
             if (!indentFirstLine)
             {
-                _ = builder.AppendLine(split.First());
+                _ = builder
+                    .Append(split.First())
+                    .Append("\r\n");
                 split = split.Skip(1);
             }
 
             foreach (var s in split)
                 _ = builder
                     .Append(' ', indentSize * indentLevel)
-                    .AppendLine(s);
+                    .Append(s)
+                    .Append("\r\n");
         }
 
         /// <summary>Converts the log entry to string ({Header}{Body}{Footer}).</summary>
