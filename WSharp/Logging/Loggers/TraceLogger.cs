@@ -5,9 +5,7 @@ namespace WSharp.Logging.Loggers
     /// <summary>Logger that logs to the <see cref="Trace"/></summary>
     public class TraceLogger : ALogger, ITraceLogger
     {
-        /// <summary>
-        /// Constructs a new instance of the <see cref="TraceLogger"/>.
-        /// </summary>
+        /// <summary>Constructs a new instance of the <see cref="TraceLogger"/>.</summary>
         public TraceLogger()
         {
         }

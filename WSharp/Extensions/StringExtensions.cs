@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+
+using Newtonsoft.Json;
 
 namespace WSharp.Extensions
 {
@@ -26,7 +27,7 @@ namespace WSharp.Extensions
         /// <returns>The string value of the password.</returns>
         public static string GetValue(this SecureString str)
         {
-            IntPtr valuePtr = IntPtr.Zero;
+            var valuePtr = IntPtr.Zero;
             try
             {
                 valuePtr = Marshal.SecureStringToGlobalAllocUnicode(str);
@@ -224,8 +225,9 @@ namespace WSharp.Extensions
         /// <returns>The deserialized object.</returns>
         public static async Task<T> DeserializeXmlAsync<T>(this string s)
         {
-            using (var reader = new StringReader(s))
-                return await reader.DeserializeXmlAsync<T>();
+            using var reader = new StringReader(s);
+
+            return await reader.DeserializeXmlAsync<T>();
         }
 
         /// <summary>Deserializes a xnml string to an object.</summary>
@@ -234,8 +236,9 @@ namespace WSharp.Extensions
         /// <returns>The deserialized object.</returns>
         public static T DeserializeXml<T>(this string s)
         {
-            using (var reader = new StringReader(s))
-                return reader.DeserializeXml<T>();
+            using var reader = new StringReader(s);
+
+            return reader.DeserializeXml<T>();
         }
     }
 }

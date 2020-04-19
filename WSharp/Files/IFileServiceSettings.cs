@@ -1,7 +1,8 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+
+using Prism.Mvvm;
 
 namespace WSharp.Files
 {

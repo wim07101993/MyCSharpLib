@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Unity;
 using Unity.Injection;
+
 using WSharp.Logging.Loggers;
 
 namespace WSharp.Logging
@@ -96,7 +98,7 @@ namespace WSharp.Logging
             where TInterface : ILogger
             where TImplementation : TInterface
         {
-            _unityContainer.RegisterType<TInterface, TImplementation>(injectionMembers);
+            _ = _unityContainer.RegisterType<TInterface, TImplementation>(injectionMembers);
             _loggerTypes.Add(typeof(TInterface));
             return this;
         }
@@ -105,7 +107,7 @@ namespace WSharp.Logging
             where TInterface : ILogger
             where TImplementation : TInterface
         {
-            _unityContainer.RegisterInstance<TInterface>(listener);
+            _ = _unityContainer.RegisterInstance<TInterface>(listener);
             _loggerTypes.Add(typeof(TInterface));
             return this;
         }
@@ -114,7 +116,7 @@ namespace WSharp.Logging
             where TInterface : ILogger
             where TImplementation : TInterface
         {
-            _unityContainer.RegisterSingleton<TInterface, TImplementation>(injectionMembers);
+            _ = _unityContainer.RegisterSingleton<TInterface, TImplementation>(injectionMembers);
             _loggerTypes.Add(typeof(TInterface));
             return this;
         }

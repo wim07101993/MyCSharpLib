@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace WSharp.Logging.Filters
 {
@@ -46,16 +45,16 @@ namespace WSharp.Logging.Filters
         public ILogFilter And(params TraceEventType[] eventTypes) => And(eventTypes as IEnumerable<TraceEventType>);
 
         /// <summary>
-        ///     Combines this filter with other funcs in an AND relation. This filter should
-        ///     accept the log if all the funcs agree.
+        ///     Combines this filter with other funcs in an AND relation. This filter should accept
+        ///     the log if all the funcs agree.
         /// </summary>
         /// <param name="funcs">Funcs to and.</param>
         /// <returns>The combined filter.</returns>
         public ILogFilter And(IEnumerable<Func<ILogEntry, bool>> funcs) => new AndFilter(this, new AndFilter(funcs));
 
         /// <summary>
-        ///     Combines this filter with other funcs in an AND relation. This filter should
-        ///     accept the log if all the funcs agree.
+        ///     Combines this filter with other funcs in an AND relation. This filter should accept
+        ///     the log if all the funcs agree.
         /// </summary>
         /// <param name="funcs">Funcs to and.</param>
         /// <returns>The combined filter.</returns>
@@ -94,16 +93,16 @@ namespace WSharp.Logging.Filters
         public ILogFilter Or(params TraceEventType[] eventTypes) => Or(eventTypes as IEnumerable<TraceEventType>);
 
         /// <summary>
-        ///     Combines this filter with other funcs in an OR relation. This filter should
-        ///     accept the log if any the funcs agree.
+        ///     Combines this filter with other funcs in an OR relation. This filter should accept
+        ///     the log if any the funcs agree.
         /// </summary>
         /// <param name="funcs">Funcs to and.</param>
         /// <returns>The combined filter.</returns>
         public ILogFilter Or(IEnumerable<Func<ILogEntry, bool>> funcs) => new OrFilter(this, new OrFilter(funcs));
 
         /// <summary>
-        ///     Combines this filter with other funcs in an OR relation. This filter should
-        ///     accept the log if any the funcs agree.
+        ///     Combines this filter with other funcs in an OR relation. This filter should accept
+        ///     the log if any the funcs agree.
         /// </summary>
         /// <param name="funcs">Funcs to and.</param>
         /// <returns>The combined filter.</returns>

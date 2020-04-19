@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+
 using WSharp.Extensions;
 
 namespace WSharp.Serialization
@@ -11,7 +12,8 @@ namespace WSharp.Serialization
         public string FileExtension { get; } = "xml";
 
         /// <summary>
-        ///     Deserializes the xml-content that is received from a <see cref="TextReader"/> to type <see cref="T"/>.
+        ///     Deserializes the xml-content that is received from a <see cref="TextReader"/> to
+        ///     type <see cref="T"/>.
         /// </summary>
         /// <typeparam name="T">Type of object to deserialize the content to.</typeparam>
         /// <param name="reader">Reader to read the serialized object from.</param>
@@ -27,7 +29,8 @@ namespace WSharp.Serialization
             => serializedValue.DeserializeXml<T>();
 
         /// <summary>
-        ///     Deserializes the xml-content that is received from a <see cref="TextReader"/> to type <see cref="T"/>.
+        ///     Deserializes the xml-content that is received from a <see cref="TextReader"/> to
+        ///     type <see cref="T"/>.
         /// </summary>
         /// <typeparam name="T">Type of object to deserialize the content to.</typeparam>
         /// <param name="reader">Reader to read the serialized object from.</param>

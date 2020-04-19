@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Unity.Injection;
+
 using WSharp.Logging.Loggers;
 
 namespace WSharp.Logging
@@ -18,24 +20,18 @@ namespace WSharp.Logging
         /// <returns>The resolved <see cref="ILogDispatcher"/>.</returns>
         ILogDispatcher Resolve();
 
-        /// <summary>
-        /// Sets the <see cref="ILogDispatcher"/> type to produce.
-        /// </summary>
+        /// <summary>Sets the <see cref="ILogDispatcher"/> type to produce.</summary>
         /// <typeparam name="T">Type to register.</typeparam>
         /// <returns>The factory that registered the type.</returns>
         ILogDispatcherFactory RegisterLogDispatcherType<T>() where T : ILogDispatcher;
 
-        /// <summary>
-        /// Sets the <see cref="ILogDispatcher"/> instance to modify.
-        /// </summary>
+        /// <summary>Sets the <see cref="ILogDispatcher"/> instance to modify.</summary>
         /// <typeparam name="T">Type to register.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <returns>The factory that registered the type.</returns>
         ILogDispatcherFactory RegisterLogDispatcherInstance<T>(T instance) where T : ILogDispatcher;
 
-        /// <summary>
-        /// Registers a type of logger to have in the <see cref="ILogDispatcher"/>.
-        /// </summary>
+        /// <summary>Registers a type of logger to have in the <see cref="ILogDispatcher"/>.</summary>
         /// <typeparam name="TInterface">Interface of the logger to register.</typeparam>
         /// <typeparam name="TImplementation">Type of the logger to register.</typeparam>
         /// <param name="injectionMembers">Parameters needed to construct the logger.</param>
@@ -45,7 +41,7 @@ namespace WSharp.Logging
             where TImplementation : TInterface;
 
         /// <summary>
-        /// Registers an instance of logger that each <see cref="ILogDispatcher"/> should have.
+        ///     Registers an instance of logger that each <see cref="ILogDispatcher"/> should have.
         /// </summary>
         /// <typeparam name="TInterface">Interface of the logger to register.</typeparam>
         /// <typeparam name="TImplementation">Type of the logger to register.</typeparam>
@@ -55,9 +51,7 @@ namespace WSharp.Logging
             where TInterface : ILogger
             where TImplementation : TInterface;
 
-        /// <summary>
-        /// Registers a singleton of a given type for the <see cref="ILogDispatcher"/>.
-        /// </summary>
+        /// <summary>Registers a singleton of a given type for the <see cref="ILogDispatcher"/>.</summary>
         /// <typeparam name="TInterface">Interface of the logger to register.</typeparam>
         /// <typeparam name="TImplementation">Type of the logger to register.</typeparam>
         /// <param name="injectionMembers">Parameters needed to construct the logger.</param>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+
 using WSharp.Serialization;
 
 namespace WSharp.Files
@@ -13,7 +14,7 @@ namespace WSharp.Files
     {
         #region FIELDS
 
-        private IFileServiceSettings _settings;
+        private readonly IFileServiceSettings _settings;
 
         #endregion FIELDS
 
@@ -72,8 +73,8 @@ namespace WSharp.Files
         /// </summary>
         /// <typeparam name="T">Type of the data to store in the file.</typeparam>
         /// <param name="path">
-        ///     Path to save the file to. If this parameter is null, it is filled in with the correct
-        ///     value (generated or from the dictionary)
+        ///     Path to save the file to. If this parameter is null, it is filled in with the
+        ///     correct value (generated or from the dictionary)
         /// </param>
         /// <param name="extension"></param>
         /// <returns></returns>
@@ -111,8 +112,8 @@ namespace WSharp.Files
         /// </exception>
         /// <exception cref="PathTooLongException">
         ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and file
-        ///     names must be less than 260 characters.
+        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
+        ///     file names must be less than 260 characters.
         /// </exception>
         /// <exception cref="DirectoryNotFoundException">
         ///     The specified path is invalid, (for example, it is on an unmapped drive).
@@ -126,8 +127,8 @@ namespace WSharp.Files
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            using (var fileStream = File.OpenText(path))
-                return await fileStream.ReadToEndAsync();
+            using var fileStream = File.OpenText(path);
+            return await fileStream.ReadToEndAsync();
         }
 
         /// <summary>Read the encrypted text from a specified encrypted path.</summary>
@@ -150,8 +151,8 @@ namespace WSharp.Files
         /// </exception>
         /// <exception cref="PathTooLongException">
         ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and file
-        ///     names must be less than 260 characters.
+        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
+        ///     file names must be less than 260 characters.
         /// </exception>
         /// <exception cref="DirectoryNotFoundException">
         ///     The specified path is invalid, (for example, it is on an unmapped drive).
@@ -168,10 +169,10 @@ namespace WSharp.Files
             if (cryptoTransform == null)
                 cryptoTransform = CryptoTransform;
 
-            using (var fileStream = File.OpenRead(path))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
-            using (var streamReader = new StreamReader(cryptoStream))
-                return await streamReader.ReadToEndAsync();
+            using var fileStream = File.OpenRead(path);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
+            using var streamReader = new StreamReader(cryptoStream);
+            return await streamReader.ReadToEndAsync();
         }
 
         /// <summary>Reads all lines from a specified file.</summary>
@@ -187,8 +188,8 @@ namespace WSharp.Files
         /// <exception cref="ArgumentNullException">Path is null.</exception>
         /// <exception cref="PathTooLongException">
         ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and file
-        ///     names must be less than 260 characters.
+        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
+        ///     file names must be less than 260 characters.
         /// </exception>
         /// <exception cref="DirectoryNotFoundException">
         ///     The specified path is invalid, (for example, it is on an unmapped drive).
@@ -206,14 +207,13 @@ namespace WSharp.Files
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            using (var fileStream = File.OpenText(path))
+            using var fileStream = File.OpenText(path);
+
+            var line = fileStream.ReadLine();
+            while (line != null)
             {
-                var line = fileStream.ReadLine();
-                while (line != null)
-                {
-                    yield return line;
-                    line = fileStream.ReadLine();
-                }
+                yield return line;
+                line = fileStream.ReadLine();
             }
         }
 
@@ -234,8 +234,8 @@ namespace WSharp.Files
         /// <exception cref="ArgumentNullException">Path is null.</exception>
         /// <exception cref="PathTooLongException">
         ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and file
-        ///     names must be less than 260 characters.
+        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
+        ///     file names must be less than 260 characters.
         /// </exception>
         /// <exception cref="DirectoryNotFoundException">
         ///     The specified path is invalid, (for example, it is on an unmapped drive).
@@ -256,16 +256,15 @@ namespace WSharp.Files
             if (cryptoTransform == null)
                 cryptoTransform = CryptoTransform;
 
-            using (var fileStream = File.OpenRead(path))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
-            using (var streamReader = new StreamReader(cryptoStream))
+            using var fileStream = File.OpenRead(path);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
+            using var streamReader = new StreamReader(cryptoStream);
+
+            var line = streamReader.ReadLine();
+            while (line != null)
             {
-                var line = streamReader.ReadLine();
-                while (line != null)
-                {
-                    yield return line;
-                    line = streamReader.ReadLine();
-                }
+                yield return line;
+                line = streamReader.ReadLine();
             }
         }
 
@@ -294,8 +293,9 @@ namespace WSharp.Files
             if (deserializer == null)
                 deserializer = Deserializer;
 
-            using (var fileStream = File.OpenText(path))
-                return await deserializer.DeserializeAsync<T>(fileStream);
+            using var fileStream = File.OpenText(path);
+
+            return await deserializer.DeserializeAsync<T>(fileStream);
         }
 
         /// <summary>
@@ -332,10 +332,10 @@ namespace WSharp.Files
             if (cryptoTransform == null)
                 cryptoTransform = CryptoTransform;
 
-            using (var fileStream = File.OpenRead(path))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read))
-            using (var streamReader = new StreamReader(cryptoStream))
-                return await deserializer.DeserializeAsync<T>(streamReader);
+            using var fileStream = File.OpenRead(path);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
+            using var streamReader = new StreamReader(cryptoStream);
+            return await deserializer.DeserializeAsync<T>(streamReader);
         }
 
         #endregion read
@@ -352,20 +352,19 @@ namespace WSharp.Files
 
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+                _ = Directory.CreateDirectory(directory);
 
             if (string.IsNullOrEmpty(text))
             {
-                File.Create(path);
+                _ = File.Create(path);
                 return;
             }
 
-            using (var fileStream = File.Open(path, FileMode.Create))
-            using (var streamWriter = new StreamWriter(fileStream))
-            {
-                await streamWriter.WriteAsync(text);
-                await streamWriter.FlushAsync();
-            }
+            using var fileStream = File.Open(path, FileMode.Create);
+            using var streamWriter = new StreamWriter(fileStream);
+
+            await streamWriter.WriteAsync(text);
+            await streamWriter.FlushAsync();
         }
 
         /// <summary>Writes a string encrypted to a file. TODO exceptions</summary>
@@ -382,24 +381,23 @@ namespace WSharp.Files
 
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+                _ = Directory.CreateDirectory(directory);
 
             if (string.IsNullOrEmpty(text))
             {
-                File.Create(path);
+                _ = File.Create(path);
                 return;
             }
 
             if (cryptoTransform == null)
                 cryptoTransform = CryptoTransform;
 
-            using (var fileStream = File.Open(path, FileMode.Create))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
-            using (var streamWriter = new StreamWriter(cryptoStream))
-            {
-                await streamWriter.WriteAsync(text);
-                await streamWriter.FlushAsync();
-            }
+            using var fileStream = File.Open(path, FileMode.Create);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
+            using var streamWriter = new StreamWriter(cryptoStream);
+
+            await streamWriter.WriteAsync(text);
+            await streamWriter.FlushAsync();
         }
 
         /// <summary>Writes a list of lines to a file. TODO exceptions</summary>
@@ -414,16 +412,15 @@ namespace WSharp.Files
 
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+                _ = Directory.CreateDirectory(directory);
 
-            using (var fileStream = File.Open(path, FileMode.Create))
-            using (var streamWriter = new StreamWriter(fileStream))
+            using var fileStream = File.Open(path, FileMode.Create);
+            using var streamWriter = new StreamWriter(fileStream);
+
+            foreach (var line in lines)
             {
-                foreach (var line in lines)
-                {
-                    await streamWriter.WriteLineAsync(line);
-                    await streamWriter.FlushAsync();
-                }
+                await streamWriter.WriteLineAsync(line);
+                await streamWriter.FlushAsync();
             }
         }
 
@@ -443,20 +440,19 @@ namespace WSharp.Files
 
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+                _ = Directory.CreateDirectory(directory);
 
             if (cryptoTransform == null)
                 cryptoTransform = CryptoTransform;
 
-            using (var fileStream = File.OpenRead(path))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
-            using (var streamWriter = new StreamWriter(cryptoStream))
+            using var fileStream = File.OpenRead(path);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
+            using var streamWriter = new StreamWriter(cryptoStream);
+
+            foreach (var line in lines)
             {
-                foreach (var line in lines)
-                {
-                    await streamWriter.WriteLineAsync(line);
-                    await streamWriter.FlushAsync();
-                }
+                await streamWriter.WriteLineAsync(line);
+                await streamWriter.FlushAsync();
             }
         }
 
@@ -471,9 +467,10 @@ namespace WSharp.Files
 
             path = GetPath<T>(serializer.FileExtension, path);
 
-            using (var fileStream = File.Open(path, FileMode.Create))
-            using (var streamWriter = new StreamWriter(fileStream))
-                await serializer.SerializeAsync(value, streamWriter);
+            using var fileStream = File.Open(path, FileMode.Create);
+            using var streamWriter = new StreamWriter(fileStream);
+
+            await serializer.SerializeAsync(value, streamWriter);
         }
 
         /// <summary>Writes an object, serialized with json, to an encrypted file. TODO exceptions</summary>
@@ -493,10 +490,11 @@ namespace WSharp.Files
 
             path = GetPath<T>(serializer.FileExtension, path);
 
-            using (var fileStream = File.Open(path, FileMode.Create))
-            using (var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write))
-            using (var streamWriter = new StreamWriter(cryptoStream))
-                await serializer.SerializeAsync(value, streamWriter);
+            using var fileStream = File.Open(path, FileMode.Create);
+            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
+            using var streamWriter = new StreamWriter(cryptoStream);
+
+            await serializer.SerializeAsync(value, streamWriter);
         }
 
         #endregion write

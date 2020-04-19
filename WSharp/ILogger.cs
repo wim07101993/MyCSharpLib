@@ -1,5 +1,7 @@
-﻿using Prism.Events;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+
+using Prism.Events;
+
 using WSharp.Logging.Loggers;
 
 namespace WSharp

@@ -7,7 +7,7 @@ namespace WSharp.Logging.Loggers
     {
         #region FIELDS
 
-        private ObservableCollection<ILogEntry> _logs = new ObservableCollection<ILogEntry>();
+        private readonly ObservableCollection<ILogEntry> _logs = new ObservableCollection<ILogEntry>();
 
         #endregion FIELDS
 
