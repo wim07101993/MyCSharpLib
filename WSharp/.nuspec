@@ -19,10 +19,10 @@
     
     <dependencies>
       <group>
-        <dependency id="newtonsoft.json" version="12.0.2" />
-        <dependency id="prism.core" version="7.2.0.1367" />
-        <dependency id="system.componentmodel.annotations" version="4.6.0" />
-        <dependency id="unity.container" version="5.11.1" />
+        <dependency id="newtonsoft.json" version="12.0.3" />
+        <dependency id="prism.core" version="7.2.0.1422" />
+        <dependency id="system.componentmodel.annotations" version="4.7.0" />
+        <dependency id="unity.container" version="5.11.7" />
       </group>
       
       <group targetFramework="netstandard2.0">
