@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 
 namespace WSharp.Logging.Loggers
 {
@@ -114,6 +115,19 @@ namespace WSharp.Logging.Loggers
             {
                 _writer.Write(logEntry);
                 _writer.Flush();
+            }
+            catch (ObjectDisposedException) { }
+        }
+
+        protected override async Task InternalLogAsync(ILogEntry logEntry)
+        {
+            if (!EnsureWriter())
+                return;
+
+            try
+            {
+                await _writer.WriteAsync(logEntry.ToString());
+                await _writer.FlushAsync();
             }
             catch (ObjectDisposedException) { }
         }
