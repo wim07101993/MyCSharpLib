@@ -5,16 +5,13 @@ namespace WSharp.Logging.Loggers
     /// <summary>Logger that logs to memory (a collection of logs)</summary>
     public class MemoryLogger : ALogger, IMemoryLogger
     {
-        #region FIELDS
-
-        private readonly ObservableCollection<ILogEntry> _logs = new ObservableCollection<ILogEntry>();
-
-        #endregion FIELDS
-
         #region PROPERTIES
 
+        /// <summary>Modifyable collection of logs that have been logged.</summary>
+        protected ObservableCollection<ILogEntry> InternalLogs { get; } = new ObservableCollection<ILogEntry>();
+
         /// <summary>Collection of logs that have been logged.</summary>
-        public ReadOnlyObservableCollection<ILogEntry> Logs => new ReadOnlyObservableCollection<ILogEntry>(_logs);
+        public ReadOnlyObservableCollection<ILogEntry> Logs => new ReadOnlyObservableCollection<ILogEntry>(InternalLogs);
 
         #endregion PROPERTIES
 
@@ -27,12 +24,12 @@ namespace WSharp.Logging.Loggers
             if (isDisposing)
                 return;
 
-            _logs.Clear();
+            InternalLogs.Clear();
         }
 
         /// <summary>Method that actually logs the log entry.</summary>
         /// <param name="logEntry">Entry to log.</param>
-        protected override void InternalLog(ILogEntry logEntry) => _logs.Add(logEntry);
+        protected override void InternalLog(ILogEntry logEntry) => InternalLogs.Add(logEntry);
 
         #endregion METHODS
     }

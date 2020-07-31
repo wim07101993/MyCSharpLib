@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 using WSharp.Logging.Filters;
 
@@ -54,15 +56,7 @@ namespace WSharp.Logging.Loggers
         ///     A buffer to write to and in the end log with the <see cref="Log(IBufferLogEntry)"/>
         ///     or <see cref="LogBuffer()"/> method.
         /// </summary>
-        public IBufferLogEntry Buffer
-        {
-            get
-            {
-                if (_buffer == null)
-                    _buffer = new BufferLogEntry();
-                return _buffer;
-            }
-        }
+        public IBufferLogEntry Buffer => _buffer ??= new BufferLogEntry();
 
         #endregion PROPERTIES
 
@@ -95,6 +89,10 @@ namespace WSharp.Logging.Loggers
         /// <param name="logEntry">Entry to log.</param>
         protected abstract void InternalLog(ILogEntry logEntry);
 
+        /// <summary>Method that actually logs the log entry.</summary>
+        /// <param name="logEntry">Entry to log.</param>
+        protected virtual Task InternalLogAsync(ILogEntry logEntry) => Task.Run(() => InternalLog(logEntry));
+
         /// <summary>Determines whether a log entry should be logged.</summary>
         /// <param name="logEntry">Log entry to check.</param>
         /// <returns>Whether the log entry should be logged.</returns>
@@ -114,64 +112,37 @@ namespace WSharp.Logging.Loggers
             }
         }
 
-        /// <summary>Logs the given entry if it passes the logfilter.</summary>
-        /// <param name="logEntry">Log entry to log.</param>
-        public virtual void Log(IBufferLogEntry logEntry) => Log(new LogEntry(logEntry));
-
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        public void Log(string source, object payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
-            => Log(source, payload == null ? null : new[] { payload }, eventType, tag);
-
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        public void Log(string source, object[] payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
-            => Log(new LogEntry(source, tag, payload: payload, eventType: eventType));
-
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        /// <param name="title">Title of the log</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="traceOptions">Tracing options that should be added to the log</param>
-        /// <param name="indentLevel">Level of indent at which the log should be logged.</param>
-        /// <param name="indentSize">Size of the indents.</param>
-        public virtual void Log(
-            TraceEventType eventType = TraceEventType.Verbose,
-            string source = null,
-            [CallerMemberName] string tag = null,
-            string title = null,
-            IList<object> payload = null,
-            TraceOptions traceOptions = TraceOptions.DateTime,
-            ushort indentLevel = 0,
-            ushort indentSize = 0)
-            => Log(new LogEntry(
-               source,
-               tag,
-               eventType,
-               title,
-               payload == null ? null : new ReadOnlyCollection<object>(payload),
-               traceOptions,
-               indentLevel,
-               indentSize));
-
         /// <summary>Logs the <see cref="Buffer"/>.</summary>
         public virtual void LogBuffer()
         {
-            Log(Buffer);
+            this.Log(Buffer);
+            _buffer = null;
+        }
+
+        /// <summary>Logs the given entry if it passes the logfilter.</summary>
+        /// <param name="logEntry">Log entry to log.``</param>
+        public async Task LogAsync(ILogEntry logEntry)
+        {
+            if (!CanLog(logEntry))
+                return;
+
+            var lockWasTaken = false;
+            try
+            {
+                Monitor.Enter(GlobalLock, ref lockWasTaken);
+                await InternalLogAsync(logEntry);
+            }
+            finally
+            {
+                if (lockWasTaken)
+                    Monitor.Exit(GlobalLock);
+            }
+        }
+
+        /// <summary>Logs the <see cref="Buffer"/>.</summary>
+        public async Task LogBufferAsync()
+        {
+            await this.LogAsync(Buffer);
             _buffer = null;
         }
 

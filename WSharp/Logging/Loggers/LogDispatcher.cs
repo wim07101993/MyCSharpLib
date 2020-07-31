@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WSharp.Logging.Loggers
 {
@@ -40,6 +42,9 @@ namespace WSharp.Logging.Loggers
             foreach (var l in this)
                 l.Log(logEntry);
         }
+
+        protected override Task InternalLogAsync(ILogEntry logEntry)
+            => Task.WhenAll(this.Select(x => x.LogAsync(logEntry)));
 
         /// <summary>Adds a logger to the dispatchers collection.</summary>
         /// <param name="item">Logger to add to the dispatcher</param>

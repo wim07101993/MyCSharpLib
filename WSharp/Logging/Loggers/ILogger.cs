@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace WSharp.Logging.Loggers
 {
@@ -24,54 +22,18 @@ namespace WSharp.Logging.Loggers
         IBufferLogEntry Buffer { get; }
 
         /// <summary>Logs the given entry if it passes the logfilter.</summary>
-        /// <param name="logEntry">Log entry to log.</param>
-        void Log(IBufferLogEntry logEntry);
-
-        /// <summary>Logs the given entry if it passes the logfilter.</summary>
         /// <param name="logEntry">Log entry to log.``</param>
         void Log(ILogEntry logEntry);
 
         /// <summary>Logs the <see cref="Buffer"/>.</summary>
         void LogBuffer();
 
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        void Log(string source, object o, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null);
+        /// <summary>Logs the given entry if it passes the logfilter.</summary>
+        /// <param name="logEntry">Log entry to log.``</param>
+        Task LogAsync(ILogEntry logEntry);
 
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        void Log(string source, object[] payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null);
-
-        /// <summary>
-        ///     Builds a log entry from the given parameters and logs it if it passes the filter.
-        /// </summary>
-        /// <param name="eventType">Type of the event that causes the log.</param>
-        /// <param name="source">The source that logs.</param>
-        /// <param name="tag">A tag to identify the log (by default the name of the caller).</param>
-        /// <param name="title">Title of the log.</param>
-        /// <param name="payload">The payload to log.</param>
-        /// <param name="traceOptions">Tracing options that should be added to the log.</param>
-        /// <param name="indentLevel">Level of indent at which the log should be logged.</param>
-        /// <param name="indentSize">Size of the indents.</param>
-        void Log(
-            TraceEventType eventType = TraceEventType.Verbose,
-            string source = null,
-            [CallerMemberName] string tag = null,
-            string title = null,
-            IList<object> payload = null,
-            TraceOptions traceOptions = LogEntry.DefaultOptions,
-            ushort indentLevel = 0,
-            ushort indentSize = 0);
+        /// <summary>Logs the <see cref="Buffer"/>.</summary>
+        Task LogBufferAsync();
 
         /// <summary>Releases all resources.</summary>
         /// <param name="isDisposing">
