@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 using WSharp.Dialogs;
 
@@ -8,15 +9,23 @@ namespace WSharp.Files
     {
         new T Read(Stream reader);
 
+        new Task<T> ReadAsync(Stream reader);
+
         void Write(T file, Stream writer);
+
+        Task WriteAsync(T file, Stream writer);
     }
 
     public interface IFileReaderWriter
     {
         FileFilter[] FileFilter { get; }
 
-        object Read(Stream reader);
+        IFile Read(Stream reader);
 
-        void Write(object file, Stream writer);
+        Task<IFile> ReadAsync(Stream reader);
+
+        void Write(IFile file, Stream writer);
+
+        Task WriteAsync(IFile file, Stream writer);
     }
 }

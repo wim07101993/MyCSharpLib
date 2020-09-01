@@ -4,7 +4,7 @@ namespace WSharp.Files.Results
 {
     public struct MultipleOpenFileResult : IMultipleOpenFileResult
     {
-        public MultipleOpenFileResult(EDialogResult dialogResult, IFile[] files)
+        public MultipleOpenFileResult(EDialogResult dialogResult, IFile[] files = null)
         {
             Files = files;
             DialogResult = dialogResult;
