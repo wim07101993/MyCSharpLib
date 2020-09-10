@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 using WSharp.Extensions;
-using WSharp.Observable;
+using WSharp.Observables;
 
 namespace WSharp.Reflection
 {

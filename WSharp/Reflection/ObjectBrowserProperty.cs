@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 
 using WSharp.Extensions;
-using WSharp.Observable;
+using WSharp.Observables;
 
 namespace WSharp.Reflection
 {

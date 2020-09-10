@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-using WSharp.Observable;
+using WSharp.Observables;
 
 namespace WSharp.Files
 {

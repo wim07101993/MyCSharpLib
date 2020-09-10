@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 
 using WSharp.Logging.Loggers;
-using WSharp.Observable;
+using WSharp.Observables;
 
 namespace WSharp
 {
