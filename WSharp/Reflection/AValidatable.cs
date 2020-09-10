@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-using Prism.Mvvm;
-
 using WSharp.Extensions;
+using WSharp.Observable;
 
 namespace WSharp.Reflection
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <summary>
-    ///     Abstraction for the <see cref="IValidatable"/> interface. It validates a classes
-    ///     properties with the
-    ///     <see cref="ObjectExtensions.Validate(object, out List{ValidationException})"/> method.
+    ///     Abstraction for the <see cref="IValidatable" /> interface. It validates a classes
+    ///     properties with the <see cref="ObjectExtensions.Validate(object, out
+    ///     List{ValidationException})" /> method.
     ///     <para>
-    ///         Also implements the <see cref="INotifyPropertyChanged"/> by extending the <see cref="BindableBase"/>.
+    ///         Also implements the <see cref="INotifyPropertyChanged" /> by extending the <see
+    ///         cref="BindableBase" />.
     ///     </para>
     /// </summary>
-    public abstract class AValidatable : BindableBase, IValidatable
+    public abstract class AValidatable : ObservableObject, IValidatable
     {
         /// <summary>
-        ///     Message of the <see cref="AggregateException"/> that is thrown when the
-        ///     <see cref="Validate"/> method is called an this object is not valid.
+        ///     Message of the <see cref="AggregateException" /> that is thrown when the <see
+        ///     cref="Validate" /> method is called an this object is not valid.
         /// </summary>
         protected virtual string ValidateErrorMessage => $"There is something wrong with the {GetType().Name}, check inner exceptions for details.";
 
@@ -32,7 +32,7 @@ namespace WSharp.Reflection
         /// </summary>
         /// <param name="errors">List of all the errors this object has.</param>
         /// <returns>
-        ///     <see langword="true"/>: object is valid, <see langword="false"/>: objet is invalid.
+        ///     <see langword="true" />: object is valid, <see langword="false" />: objet is invalid.
         /// </returns>
         public virtual bool TryValidate(out AggregateException errors)
         {
@@ -42,11 +42,11 @@ namespace WSharp.Reflection
         }
 
         /// <summary>
-        ///     This method calles the <see cref="TryValidate(out AggregateException)"/> method to
+        ///     This method calles the <see cref="TryValidate(out AggregateException)" /> method to
         ///     validate this object.
         /// </summary>
         /// <exception cref="AggregateException">
-        ///     An <see cref="AggregateException"/> is thrown when this object is not valid.
+        ///     An <see cref="AggregateException" /> is thrown when this object is not valid.
         /// </exception>
         public virtual void Validate()
         {

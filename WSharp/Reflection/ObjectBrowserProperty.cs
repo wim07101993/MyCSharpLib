@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
-using Prism.Mvvm;
-
 using WSharp.Extensions;
+using WSharp.Observable;
 
 namespace WSharp.Reflection
 {
@@ -15,7 +14,7 @@ namespace WSharp.Reflection
     ///     Class that is used to browse through an object in abstraction. It holds all the values
     ///     neede to let the user browse through an object.
     /// </summary>
-    public class ObjectBrowserProperty : BindableBase
+    public class ObjectBrowserProperty : ObservableObject
     {
         #region FIELDS
 
@@ -26,11 +25,11 @@ namespace WSharp.Reflection
         #region CONSTRUCTORS
 
         /// <summary>
-        ///     Constructs a new <see cref="ObjectBrowserProperty"/> from a
-        ///     <see cref="PropertyInfo"/> and its parent.
+        ///     Constructs a new <see cref="ObjectBrowserProperty" /> from a <see
+        ///     cref="PropertyInfo" /> and its parent.
         /// </summary>
         /// <param name="property">Information about the property.</param>
-        /// <param name="parent">Parent of the property.</param>
+        /// <param name="parent">  Parent of the property.</param>
         public ObjectBrowserProperty(PropertyInfo property, object parent)
         {
             Parent = parent;
@@ -68,7 +67,7 @@ namespace WSharp.Reflection
                 if (_parent != null && Type.IsAssignableFrom(_parent.GetType()))
                     throw new InvalidOperationException("Cannot set parent to different type");
 
-                if (!SetProperty(ref _parent, value))
+                if (!Set(ref _parent, value))
                     return;
 
                 RaisePropertyChanged(nameof(Value));

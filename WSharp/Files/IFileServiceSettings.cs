@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-using Prism.Mvvm;
-
 namespace WSharp.Files
 {
     /// <summary>

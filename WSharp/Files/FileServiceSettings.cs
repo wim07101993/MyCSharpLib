@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-using Prism.Mvvm;
+using WSharp.Observable;
 
 namespace WSharp.Files
 {
     /// <summary>
-    ///     Class that contains the settings needed to get the <see cref="FileService"/> working.
-    ///     Extends <see cref="BindableBase"/>.
+    ///     Class that contains the settings needed to get the <see cref="FileService" /> working.
+    ///     Extends <see cref="BindableBase" />.
     /// </summary>
-    public class FileServiceSettings : BindableBase, IFileServiceSettings
+    public class FileServiceSettings : ObservableObject, IFileServiceSettings
     {
         #region FIELDS
 
@@ -55,7 +55,7 @@ namespace WSharp.Files
         public string DataDirectory
         {
             get => _dataDirectory;
-            set => SetProperty(ref _dataDirectory, value);
+            set => Set(ref _dataDirectory, value);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace WSharp.Files
         public Dictionary<Type, string> FilePaths
         {
             get => _filePaths;
-            set => SetProperty(ref _filePaths, value);
+            set => Set(ref _filePaths, value);
         }
 
         #endregion PROPERTIES

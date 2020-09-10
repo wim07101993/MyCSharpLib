@@ -1,4 +1,4 @@
-﻿namespace WSharp
+﻿namespace WSharp.Observable
 {
     /// <summary>Delegate used to notify an object when an object has been disposed.</summary>
     /// <param name="sender">The disposed object.</param>
