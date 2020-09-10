@@ -1,504 +1,587 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using WSharp.Serialization;
+using Newtonsoft.Json;
+
+using Unity;
+
+using WSharp.Dialogs;
+using WSharp.Dialogs.Options;
+using WSharp.Extensions;
+using WSharp.Files.Results;
+using WSharp.Logging.Loggers;
 
 namespace WSharp.Files
 {
-    /// <summary>Service to read and write to files. Implements the <see cref="IFileService"/>.</summary>
-    public class FileService : IFileService
+    /// <summary>
+    ///     Service to read and write to files. Implements the <see cref="IFileService" />.
+    /// </summary>
+    public partial class FileService : IFileService
     {
         #region FIELDS
 
-        private readonly IFileServiceSettings _settings;
+        private readonly IUnityContainer _unityContainer;
+        private readonly ILogger _logger;
+        private readonly Dictionary<string, CustomReaderWriter> _guessedReaderWriters = new Dictionary<string, CustomReaderWriter>();
+
+        private IDialogService _dialogService;
+        private IReaderWriterCollection _readerWriters;
+
+        private IReadOnlyDictionary<Type, IFileReaderWriter> _readonlyReaderWriters;
 
         #endregion FIELDS
 
-        #region CONSTRUCTOR
-
-        /// <summary>Constructs a new instance of the <see cref="FileService"/>.</summary>
-        /// <param name="settings">Settings of the application.</param>
-        /// <param name="serializer">Serializer used to serialize objects to write to a file.</param>
-        /// <param name="deserializer">
-        ///     Deserializer used to deserialize objects read from a file.
-        /// </param>
-        /// <param name="cryptoTransform">
-        ///     Transformer used to encrypt and decrypt data to write and read from encrypted files.
-        /// </param>
-        public FileService(IFileServiceSettings settings, ISerializer serializer, IDeserializer deserializer, ICryptoTransform cryptoTransform)
+        public FileService(IUnityContainer unityContainer, ILogger logger)
         {
-            _settings = settings;
-            Serializer = serializer;
-            Deserializer = deserializer;
-            CryptoTransform = cryptoTransform;
+            _unityContainer = unityContainer;
+            _logger = logger;
         }
-
-        #endregion CONSTRUCTOR
 
         #region PROPERTIES
 
-        /// <summary>Serializer used to serialize objects to write to a file.</summary>
-        public ISerializer Serializer { get; }
+        protected IDialogService DialogService => _dialogService ??= _unityContainer.Resolve<IDialogService>();
 
-        /// <summary>Deserializer used to deserialize objects read from a file.</summary>
-        public IDeserializer Deserializer { get; }
+        protected IReaderWriterCollection InternalReaderWriters
+        {
+            get => _readerWriters ??= _unityContainer.IsRegistered<IReaderWriterCollection>()
+                    ? _unityContainer.Resolve<IReaderWriterCollection>()
+                    : new ReaderWriterCollection();
+        }
 
-        /// <summary>
-        ///     Transformer used to encrypt and decrypt data to write and read from encrypted files.
-        /// </summary>
-        public ICryptoTransform CryptoTransform { get; }
+        public IReadOnlyDictionary<Type, IFileReaderWriter> ReaderWriters
+            => _readonlyReaderWriters ??= new ReadOnlyDictionary<Type, IFileReaderWriter>(InternalReaderWriters);
 
         #endregion PROPERTIES
 
-        #region METHODS
-
-        /// <summary>Generates a new data file path for type T. {data directory}\{type name}.{extension}</summary>
-        /// <typeparam name="T">Type for which the file is ment.</typeparam>
-        /// <param name="extension">The extension of the file</param>
-        /// <returns>The path to write a file to.</returns>
-        public string GenerateDataFilePath<T>(string extension)
+        public IFileService RegisterReaderWriter(Type type, IFileReaderWriter readerWriter)
         {
-            var type = typeof(T);
-            return $@"{_settings.DataDirectory}\{type.Name}.{extension}";
+            _ = type ?? throw new ArgumentNullException(nameof(type));
+            _ = readerWriter ?? throw new ArgumentNullException(nameof(readerWriter));
+
+            Log($"Registering new ReaderWriter for type {type}");
+
+            if (!type.IsClass)
+                throw new ArgumentException($"Type {type} is not a class");
+            if (!type.GetInterfaces().Contains(typeof(IFile)))
+                throw new ArgumentException($"Type {type} is not a {nameof(IFile)}");
+
+            if (InternalReaderWriters.ContainsKey(type))
+                InternalReaderWriters[type] = readerWriter;
+            else
+                InternalReaderWriters.Add(type, readerWriter);
+
+            Log($"Registered new ReaderWriter for type {type}");
+            return this;
         }
 
-        /// <summary>
-        ///     If the path is not null or empty, it is just returned. Else the path is searched for
-        ///     in the dictionary in the settings. Finally if there is no path yet for the type, it
-        ///     is generated and added.
-        /// </summary>
-        /// <typeparam name="T">Type of the data to store in the file.</typeparam>
-        /// <param name="path">
-        ///     Path to save the file to. If this parameter is null, it is filled in with the
-        ///     correct value (generated or from the dictionary)
-        /// </param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
-        private string GetPath<T>(string extension, string path = null)
+        public IFileService RegisterReaderWriter(Type fileType, Type readerWriterType)
         {
-            if (!string.IsNullOrWhiteSpace(path))
-                return path;
+            _ = readerWriterType ?? throw new ArgumentNullException(nameof(readerWriterType));
 
-            var type = typeof(T);
-            path = _settings.FilePaths.FirstOrDefault(x => x.Key == type).Value;
+            if (!typeof(IFileReaderWriter).IsAssignableFrom(readerWriterType))
+                throw new ArgumentException($"{readerWriterType} is not assignable to a {nameof(IFileReaderWriter)}");
 
-            if (!string.IsNullOrWhiteSpace(path))
-                return path;
-
-            path = GenerateDataFilePath<T>(extension);
-            _settings.FilePaths.Add(typeof(T), path);
-            return path;
+            return RegisterReaderWriter(fileType, (IFileReaderWriter)_unityContainer.Resolve(readerWriterType));
         }
 
-        #region read
-
-        /// <summary>Read the text from a specified path as text.</summary>
-        /// <param name="path">Path to the file to read the content from.</param>
-        /// <returns>The string content of the file.</returns>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     Path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Path is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     The number of characters is larger than <see cref="int.MaxValue"/>.
-        /// </exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
-        ///     file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid, (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="FileNotFoundException">
-        ///     The file specified in path was not found.
-        /// </exception>
-        /// <exception cref="NotSupportedException">Path is in an invalid format.</exception>
-        public async Task<string> ReadTextAsync(string path)
+        public ISaveFileResult Save(IFile file, string path, bool forceDialog = false)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            _ = file ?? throw new ArgumentNullException(nameof(file));
 
-            using var fileStream = File.OpenText(path);
-            return await fileStream.ReadToEndAsync();
-        }
-
-        /// <summary>Read the encrypted text from a specified encrypted path.</summary>
-        /// <param name="path">Path to the file to read the content from.</param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to decrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        /// <returns>The string content of the file.</returns>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     Path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Path is null.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     The number of characters is larger than <see cref="int.MaxValue"/>.
-        /// </exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
-        ///     file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid, (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="FileNotFoundException">
-        ///     The file specified in path was not found.
-        /// </exception>
-        /// <exception cref="NotSupportedException">Path is in an invalid format.</exception>
-        public async Task<string> ReadEncryptedTextAsync(string path, ICryptoTransform cryptoTransform = null)
-        {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-
-            if (cryptoTransform == null)
-                cryptoTransform = CryptoTransform;
-
-            using var fileStream = File.OpenRead(path);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
-            using var streamReader = new StreamReader(cryptoStream);
-            return await streamReader.ReadToEndAsync();
-        }
-
-        /// <summary>Reads all lines from a specified file.</summary>
-        /// <param name="path">Path to the file to read from.</param>
-        /// <returns>The lines of the file.</returns>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     Path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Path is null.</exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
-        ///     file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid, (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="FileNotFoundException">
-        ///     The file specified in path was not found.
-        /// </exception>
-        /// <exception cref="NotSupportedException">Path is in an invalid format.</exception>
-        /// <exception cref="OutOfMemoryException">
-        ///     There is insufficient memory to allocate a buffer for the returned string.
-        /// </exception>
-        /// <exception cref="IOException">An I/O error occurs.</exception>
-        public IEnumerable<string> ReadLines(string path)
-        {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-
-            using var fileStream = File.OpenText(path);
-
-            var line = fileStream.ReadLine();
-            while (line != null)
+            var dialogResult = EDialogResult.None;
+            if (string.IsNullOrWhiteSpace(path) || forceDialog)
             {
-                yield return line;
-                line = fileStream.ReadLine();
+                var (canceled, newPath) = AskToSaveFile(file, path);
+                if (canceled)
+                    return new SaveFileResult(EDialogResult.Cancel, file);
+
+                path = newPath;
+                dialogResult = EDialogResult.Ok;
+            }
+
+            Log($"Writing file to {path}");
+
+            using var stream = File.Create(path);
+
+            if (InternalReaderWriters.TryGetValue(file.GetType(), out var readerWriter))
+                readerWriter.Write(file, stream);
+            else
+                new StreamWriter(stream).SerializeJson(file);
+
+            file.IsSaved = true;
+            file.Path = path;
+
+            Log($"Done writing file to {path}");
+            return new SaveFileResult(dialogResult, file);
+        }
+
+        public async Task<ISaveFileResult> SaveAsync(IFile file, string path, bool forceDialog = false)
+        {
+            _ = file ?? throw new ArgumentNullException(nameof(file));
+
+            var dialogResult = EDialogResult.None;
+            if (string.IsNullOrWhiteSpace(path) || forceDialog)
+            {
+                var (canceled, newPath) = await AskToSaveFileAsync(file, path);
+                if (canceled)
+                    return new SaveFileResult(EDialogResult.Cancel, file);
+
+                path = newPath;
+                dialogResult = EDialogResult.Ok;
+            }
+
+            Log($"Writing file to {path}");
+
+            using var stream = File.Create(path);
+
+            if (InternalReaderWriters.TryGetValue(file.GetType(), out var readerWriter))
+                await readerWriter.WriteAsync(file, stream);
+            else
+                new StreamWriter(stream).SerializeJson(file);
+
+            file.IsSaved = true;
+            file.Path = path;
+
+            Log($"Done writing file to {path}");
+            return new SaveFileResult(dialogResult, file);
+        }
+
+        protected (bool canceled, string newPath) AskToSaveFile(IFile file, string path)
+        {
+            var type = file.GetType();
+            var dialogResult = DialogService.ShowSaveFileDialog(new SaveFileDialogOptions(
+                filter: GetFileFilter(type).ToList(),
+                addAllFilesFilterOption: true,
+                originalFilePath: path,
+                valueType: type));
+
+            switch (dialogResult.Result)
+            {
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (false, default);
+
+                default:
+                    return (true, dialogResult.Path);
             }
         }
 
-        /// <summary>Reads all lines from a specified encrypted file.</summary>
-        /// <param name="path">Path to the file to read from.</param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to decrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        /// <returns>The lines of the file.</returns>
-        /// <exception cref="UnauthorizedAccessException">
-        ///     The caller does not have the required permission.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     Path is a zero-length string, contains only white space, or contains one or more
-        ///     invalid characters as defined by <see cref="Path.InvalidPathChars"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">Path is null.</exception>
-        /// <exception cref="PathTooLongException">
-        ///     The specified path, file name, or both exceed the system-defined maximum length. For
-        ///     example, on Windows-based platforms, paths must be less than 248 characters, and
-        ///     file names must be less than 260 characters.
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        ///     The specified path is invalid, (for example, it is on an unmapped drive).
-        /// </exception>
-        /// <exception cref="FileNotFoundException">
-        ///     The file specified in path was not found.
-        /// </exception>
-        /// <exception cref="NotSupportedException">Path is in an invalid format.</exception>
-        /// <exception cref="OutOfMemoryException">
-        ///     There is insufficient memory to allocate a buffer for the returned string.
-        /// </exception>
-        /// <exception cref="IOException">An I/O error occurs.</exception>
-        public IEnumerable<string> ReadEncryptedLines(string path, ICryptoTransform cryptoTransform = null)
+        protected async Task<(bool canceled, string newPath)> AskToSaveFileAsync(IFile file, string path)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            var type = file.GetType();
+            var dialogResult = await DialogService.ShowSaveFileDialogAsync(new SaveFileDialogOptions(
+                filter: GetFileFilter(type).ToList(),
+                addAllFilesFilterOption: true,
+                originalFilePath: path,
+                valueType: type));
 
-            if (cryptoTransform == null)
-                cryptoTransform = CryptoTransform;
-
-            using var fileStream = File.OpenRead(path);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
-            using var streamReader = new StreamReader(cryptoStream);
-
-            var line = streamReader.ReadLine();
-            while (line != null)
+            switch (dialogResult.Result)
             {
-                yield return line;
-                line = streamReader.ReadLine();
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (false, default);
+
+                default:
+                    return (true, dialogResult.Path);
             }
         }
 
-        /// <summary>Reads the content of a file and parses it to an object. TODO exceptions</summary>
-        /// <typeparam name="T">Type to parse the content to.</typeparam>
-        /// <param name="path">Path to the file to read the json from.</param>
-        /// <param name="deserializer">
-        ///     Deserializer to deserialize the content of the file. If this parameter is null, the
-        ///     property value is used.
-        /// </param>
-        /// <returns>The parsed value.</returns>
-        public async Task<T> ReadAsync<T>(string path = null, IDeserializer deserializer = null)
+        #region opening
+
+        public IMultipleOpenFileResult Open(bool canOpenMultiple, IEnumerable<Type> types)
         {
-            if (path == null)
+            _ = types ?? throw new ArgumentNullException(nameof(types));
+            if (types.Any(x => !typeof(IFile).IsAssignableFrom(x)))
+                throw new InvalidOperationException($"Cannot open type that is not assignable to {typeof(IFile).Name}");
+
+            Log($"Opening file of type {types.SerializeJson(Formatting.None)}");
+            var (canceled, paths, selectedContentType) = AskToOpenFile(canOpenMultiple, types);
+            if (canceled)
+            {
+                Log($"No files selected");
+                return new MultipleOpenFileResult(EDialogResult.Cancel);
+            }
+
+            var files = paths.Select(x => Open(selectedContentType, x)).ToArray();
+
+            Log($"Done opening file of type {types.SerializeJson(Formatting.None)}.");
+            return new MultipleOpenFileResult(EDialogResult.Ok, files);
+        }
+
+        public async Task<IMultipleOpenFileResult> OpenAsync(bool canOpenMultiple, IEnumerable<Type> types)
+        {
+            _ = types ?? throw new ArgumentNullException(nameof(types));
+            if (types.Any(x => !typeof(IFile).IsAssignableFrom(x)))
+                throw new InvalidOperationException($"Cannot open type that is not assignable to {typeof(IFile).Name}");
+
+            Log($"Opening file of type {types.SerializeJson(Formatting.None)}");
+            var (canceled, paths, selectedContentType) = await AskToOpenFileAsync(canOpenMultiple, types);
+            if (canceled)
+            {
+                Log($"No files selected");
+                return new MultipleOpenFileResult(EDialogResult.Cancel);
+            }
+
+            var files = paths.Select(x => Open(selectedContentType, x)).ToArray();
+
+            Log($"Done opening file of type {types.SerializeJson(Formatting.None)}.");
+            return new MultipleOpenFileResult(EDialogResult.Ok, files);
+        }
+
+        protected (bool canceled, string[] paths, Type selectedContentType) AskToOpenFile(
+            bool canOpenMultiple, IEnumerable<Type> types)
+        {
+            var dialogResult = DialogService.ShowOpenFileDialog(new OpenFileDialogOptions(
+                filter: GetFileFilter(types).ToList(),
+                initialDirectory: Environment.SpecialFolder.MyDocuments.ToString(),
+                multiSelect: canOpenMultiple,
+                addAllFilesFilterOption: true));
+
+            switch (dialogResult.Result)
+            {
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (true, default, default);
+
+                default:
+                    return (false, dialogResult.Paths, dialogResult.SelectedFileFilter.FileContentsType);
+            }
+        }
+
+        protected async Task<(bool canceled, string[] paths, Type selectedContentType)> AskToOpenFileAsync(
+            bool canOpenMultiple, IEnumerable<Type> types)
+        {
+            var dialogResult = await DialogService.ShowOpenFileDialogAsync(new OpenFileDialogOptions(
+                filter: GetFileFilter(types).ToList(),
+                initialDirectory: Environment.SpecialFolder.MyDocuments.ToString(),
+                multiSelect: canOpenMultiple,
+                addAllFilesFilterOption: true));
+
+            switch (dialogResult.Result)
+            {
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (true, default, default);
+
+                default:
+                    return (false, dialogResult.Paths, dialogResult.SelectedFileFilter.FileContentsType);
+            }
+        }
+
+        public IFile Open(Type type, string filePath)
+        {
+            _ = filePath ?? throw new ArgumentNullException(nameof(filePath));
+            if (type != null && !typeof(IFile).IsAssignableFrom(type))
+                throw new InvalidOperationException($"Cannot open type that is not assignable to {typeof(IFile).Name}");
+
+            if (type != null && InternalReaderWriters.TryGetValue(type, out var internalReaderWriter))
+            {
+                Log($"Using reader {internalReaderWriter}");
+                var file = TryReadFile(internalReaderWriter.Read, filePath);
+                if (file != null)
+                    return file;
+            }
+            else
+            {
+                Log("No reader detected, started guessing");
+                foreach (var readerWriter in GetReadersToTry(type, filePath))
+                {
+                    var file = TryReadFile(readerWriter.Read, filePath);
+                    if (file != null)
+                    {
+                        Log("Found correct reader");
+                        _guessedReaderWriters.Add(filePath, readerWriter);
+                        return file;
+                    }
+                }
+            }
+
+            throw new Exception("Could not read the given file.");
+
+            static IFile TryReadFile(Func<Stream, IFile> reader, string filePath)
             {
                 try
                 {
-                    path = _settings.FilePaths[typeof(T)];
+                    using var stream = File.OpenRead(filePath);
+
+                    var file = reader(stream);
+                    if (file == null)
+                        return null;
+
+                    file.Path = filePath;
+                    file.IsSaved = true;
+                    return file;
                 }
-                catch (KeyNotFoundException e)
+                catch
                 {
-                    throw new KeyNotFoundException($"There was no path found for type {typeof(T).Name}", e);
+                    // IGNORED
+                    return null;
+                }
+            }
+        }
+
+        public async Task<IFile> OpenAsync(Type type, string filePath)
+        {
+            _ = filePath ?? throw new ArgumentNullException(nameof(filePath));
+            if (type != null && !typeof(IFile).IsAssignableFrom(type))
+                throw new InvalidOperationException($"Cannot open type that is not assignable to {typeof(IFile).Name}");
+
+            if (type != null && InternalReaderWriters.TryGetValue(type, out var internalReaderWriter))
+            {
+                Log($"Using reader {internalReaderWriter}");
+                var file = await TryReadFileAsync(internalReaderWriter.ReadAsync, filePath);
+                if (file != null)
+                    return file;
+            }
+            else
+            {
+                Log("No reader detected, started guessing");
+                foreach (var readerWriter in GetReadersToTry(type, filePath))
+                {
+                    var file = await TryReadFileAsync(readerWriter.ReadAsync, filePath);
+                    if (file != null)
+                    {
+                        Log("Found correct reader");
+                        _guessedReaderWriters.Add(filePath, readerWriter);
+                        return file;
+                    }
                 }
             }
 
-            if (deserializer == null)
-                deserializer = Deserializer;
+            throw new Exception("Could not read the given file.");
 
-            using var fileStream = File.OpenText(path);
-
-            return await deserializer.DeserializeAsync<T>(fileStream);
-        }
-
-        /// <summary>
-        ///     Reads the encrypted content of a file and parses it to an object. TODO exceptions
-        /// </summary>
-        /// <typeparam name="T">Type to parse the content to.</typeparam>
-        /// <param name="path">Path to the file to read the json from.</param>
-        /// <param name="deserializer">
-        ///     Deserializer to deserialize the content of the file. If this parameter is null, the
-        ///     property value is used.
-        /// </param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to decrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        /// <returns>The parsed value.</returns>
-        public async Task<T> ReadEncryptedAsync<T>(string path = null, IDeserializer deserializer = null, ICryptoTransform cryptoTransform = null)
-        {
-            if (path == null)
+            static async Task<IFile> TryReadFileAsync(Func<Stream, Task<IFile>> reader, string filePath)
             {
                 try
                 {
-                    path = _settings.FilePaths[typeof(T)];
+                    using var stream = File.OpenRead(filePath);
+
+                    var file = await reader(stream);
+                    if (file == null)
+                        return null;
+
+                    file.Path = filePath;
+                    file.IsSaved = true;
+                    return file;
                 }
-                catch (KeyNotFoundException e)
+                catch
                 {
-                    throw new KeyNotFoundException($"There was no path found for type {typeof(T).Name}", e);
+                    // IGNORED
+                    return null;
                 }
             }
-
-            if (deserializer == null)
-                deserializer = Deserializer;
-
-            if (cryptoTransform == null)
-                cryptoTransform = CryptoTransform;
-
-            using var fileStream = File.OpenRead(path);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Read);
-            using var streamReader = new StreamReader(cryptoStream);
-            return await deserializer.DeserializeAsync<T>(streamReader);
         }
 
-        #endregion read
-
-        #region write
-
-        /// <summary>Writes a string to a file. TODO exceptions</summary>
-        /// <param name="text">Text to write to the file.</param>
-        /// <param name="path">Path to the file to write to.</param>
-        public async Task WriteTextAsync(string text, string path)
+        private IEnumerable<CustomReaderWriter> GetReadersToTry(Type type, string filePath)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            var extension = Path.GetExtension(filePath);
 
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
-                _ = Directory.CreateDirectory(directory);
-
-            if (string.IsNullOrEmpty(text))
+            if (_guessedReaderWriters.Any())
             {
-                _ = File.Create(path);
-                return;
+                Log("Trying previous used custom readers/writers");
+                if (_guessedReaderWriters.TryGetValue(filePath, out var previouslyUsedValue))
+                    yield return previouslyUsedValue;
+
+                var customSerializers = _guessedReaderWriters
+                    .Where(x => x.Key != filePath)
+                    .ToList();
+
+                var customSerializersWithCorrectExtension = _guessedReaderWriters.Where(x => Path.GetExtension(x.Key) == extension);
+                foreach (var customSerializer in customSerializersWithCorrectExtension)
+                {
+                    _ = customSerializers.Remove(customSerializer);
+                    yield return customSerializer.Value;
+                }
+
+                foreach (var customSerializer in customSerializers)
+                    yield return customSerializer.Value;
             }
 
-            using var fileStream = File.Open(path, FileMode.Create);
-            using var streamWriter = new StreamWriter(fileStream);
+            var registeredReaderWriters = ReaderWriters.Values.ToList();
 
-            await streamWriter.WriteAsync(text);
-            await streamWriter.FlushAsync();
-        }
+            Log("Trying registered readers with correct file extension");
+            var readerWritersWithCorrectExtension = ReaderWriters.Values
+                .Where(rw => rw.FileFilter.Any(filter => filter.Extensions.Substring(1) == extension));
 
-        /// <summary>Writes a string encrypted to a file. TODO exceptions</summary>
-        /// <param name="text">Text to write to the file.</param>
-        /// <param name="path">Path to the file to write to.</param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to encrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        public async Task WriteEncryptedTextAsync(string text, string path, ICryptoTransform cryptoTransform = null)
-        {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
-                _ = Directory.CreateDirectory(directory);
-
-            if (string.IsNullOrEmpty(text))
+            foreach (var readerWriter in readerWritersWithCorrectExtension)
             {
-                _ = File.Create(path);
-                return;
+                _ = registeredReaderWriters.Remove(readerWriter);
+                yield return new CustomReaderWriter(readerWriter.Read);
             }
 
-            if (cryptoTransform == null)
-                cryptoTransform = CryptoTransform;
+            switch (extension)
+            {
+                case "json":
+                case "js":
+                    yield return new CustomReaderWriter(EReaderType.Json, type);
+                    break;
 
-            using var fileStream = File.Open(path, FileMode.Create);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
-            using var streamWriter = new StreamWriter(cryptoStream);
+                case "xml":
+                    yield return new CustomReaderWriter(EReaderType.Xml, type);
+                    break;
 
-            await streamWriter.WriteAsync(text);
-            await streamWriter.FlushAsync();
+            }
+
+            if (extension == ".json")
+
+
+                Log("Trying registered readers with incorrect file extension");
+            foreach (var readerWriter in registeredReaderWriters)
+                yield return new CustomReaderWriter(
+                    readerWriter.Read, readerWriter.ReadAsync,
+                    readerWriter.Write, readerWriter.WriteAsync);
         }
 
-        /// <summary>Writes a list of lines to a file. TODO exceptions</summary>
-        /// <param name="path">Path to the file to write to.</param>
-        /// <param name="text">Lines to write to the file.</param>
-        public async Task WriteLinesAsync(IEnumerable<string> lines, string path)
+        #endregion opening
+
+        #region close
+
+        public IMultipleCloseFileResult Close(IList<IFile> files)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-            if (lines == null)
-                throw new ArgumentNullException(nameof(lines));
+            Log("Closing files");
 
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
-                _ = Directory.CreateDirectory(directory);
+            _ = files ?? throw new ArgumentNullException(nameof(files));
+            if (files.Count == 0)
+                return new MultipleCloseFileResult(EDialogResult.None, false);
 
-            using var fileStream = File.Open(path, FileMode.Create);
-            using var streamWriter = new StreamWriter(fileStream);
-
-            foreach (var line in lines)
+            var filesToSave = new List<IFile>();
+            var alreadySavedFiles = new List<IFile>();
+            foreach (var file in files)
             {
-                await streamWriter.WriteLineAsync(line);
-                await streamWriter.FlushAsync();
+                if (file.IsSaved)
+                    alreadySavedFiles.Add(file);
+                else
+                    filesToSave.Add(file);
+            }
+
+            var dialogResult = EDialogResult.None;
+            var savedFiles = false;
+            if (filesToSave.Any())
+            {
+                var (canceled, filesToActuallySave) = AskToSaveUnSavedFiles(filesToSave);
+                if (canceled)
+                    return new MultipleCloseFileResult(EDialogResult.Cancel, false);
+
+                var results = this.Save(filesToActuallySave);
+                savedFiles = results.Any(x => (x.DialogResult & (EDialogResult.None | EDialogResult.Ok)) > 0);
+                if (results.Any(x => x.DialogResult == EDialogResult.Cancel))
+                    return new MultipleCloseFileResult(EDialogResult.Cancel, savedFiles);
+
+                dialogResult = EDialogResult.Ok;
+            }
+
+            foreach (var file in files)
+                file.Dispose();
+
+            return new MultipleCloseFileResult(dialogResult, savedFiles);
+        }
+
+        public async Task<IMultipleCloseFileResult> CloseAsync(IList<IFile> files)
+        {
+            Log("Closing files");
+
+            _ = files ?? throw new ArgumentNullException(nameof(files));
+            if (files.Count == 0)
+                return new MultipleCloseFileResult(EDialogResult.None, false);
+
+            var filesToSave = new List<IFile>();
+            var alreadySavedFiles = new List<IFile>();
+            foreach (var file in files)
+            {
+                if (file.IsSaved)
+                    alreadySavedFiles.Add(file);
+                else
+                    filesToSave.Add(file);
+            }
+
+            var dialogResult = EDialogResult.None;
+            var savedFiles = false;
+            if (filesToSave.Any())
+            {
+                var (canceled, filesToActuallySave) = await AskToSaveUnSavedFilesAsync(filesToSave);
+                if (canceled)
+                    return new MultipleCloseFileResult(EDialogResult.Cancel, false);
+
+                var results = this.Save(filesToActuallySave);
+                savedFiles = results.Any(x => (x.DialogResult & (EDialogResult.None | EDialogResult.Ok)) > 0);
+                if (results.Any(x => x.DialogResult == EDialogResult.Cancel))
+                    return new MultipleCloseFileResult(EDialogResult.Cancel, savedFiles);
+
+                dialogResult = EDialogResult.Ok;
+            }
+
+            foreach (var file in files)
+                file.Dispose();
+
+            return new MultipleCloseFileResult(dialogResult, savedFiles);
+        }
+
+        protected (bool canceled, IEnumerable<IFile> filesToSave) AskToSaveUnSavedFiles(IReadOnlyCollection<IFile> files)
+        {
+            var dialogResult = DialogService.ShowSaveUnsavedFilesDialog(new SaveUnsavedFilesDialogOptions(files));
+
+            switch (dialogResult.Result)
+            {
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (true, null);
+
+                default:
+                    return (false, dialogResult.FilesToSave
+                        .Where(x => x.shouldSave)
+                        .Select(x => x.file)
+                        .ToList());
             }
         }
 
-        /// <summary>Writes a list of lines encrypted to a file. TODO exceptions</summary>
-        /// <param name="path">Path to the file to write to.</param>
-        /// <param name="lines">Lines to write to the file.</param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to encrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        public async Task WriteEncryptedLinesAsync(IEnumerable<string> lines, string path, ICryptoTransform cryptoTransform = null)
+        protected async Task<(bool canceled, IEnumerable<IFile> filesToSave)> AskToSaveUnSavedFilesAsync(IReadOnlyCollection<IFile> files)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
-            if (lines == null)
-                throw new ArgumentNullException(nameof(lines));
+            var dialogResult = await DialogService.ShowSaveUnsavedFilesDialogAsync(new SaveUnsavedFilesDialogOptions(files));
 
-            var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
-                _ = Directory.CreateDirectory(directory);
-
-            if (cryptoTransform == null)
-                cryptoTransform = CryptoTransform;
-
-            using var fileStream = File.OpenRead(path);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
-            using var streamWriter = new StreamWriter(cryptoStream);
-
-            foreach (var line in lines)
+            switch (dialogResult.Result)
             {
-                await streamWriter.WriteLineAsync(line);
-                await streamWriter.FlushAsync();
+                case EDialogResult.Cancel:
+                case EDialogResult.Close:
+                    return (true, null);
+
+                default:
+                    return (false, dialogResult.FilesToSave
+                        .Where(x => x.shouldSave)
+                        .Select(x => x.file)
+                        .ToList());
             }
         }
 
-        /// <summary>Writes an object, serialized with json, to a file. TODO exceptions</summary>
-        /// <param name="path">Path to the file to write to.</param>
-        /// <param name="value">Value to write to the file as json</param>
-        /// <param name="serializer"></param>
-        public async Task WriteAsync<T>(T value, string path = null, ISerializer serializer = null)
+        #endregion close
+
+        protected IEnumerable<FileFilter> GetFileFilter(params Type[] types)
+            => GetFileFilter((IEnumerable<Type>)types);
+
+        protected IEnumerable<FileFilter> GetFileFilter(IEnumerable<Type> types)
         {
-            if (serializer == null)
-                serializer = Serializer;
-
-            path = GetPath<T>(serializer.FileExtension, path);
-
-            using var fileStream = File.Open(path, FileMode.Create);
-            using var streamWriter = new StreamWriter(fileStream);
-
-            await serializer.SerializeAsync(value, streamWriter);
+            return types
+                .Select(x =>
+                {
+                    var success = InternalReaderWriters.TryGetValue(x, out var readerWriter);
+                    return (success, readerWriter);
+                })
+                .Where(x => x.success)
+                .Select(x => x.readerWriter.FileFilter)
+                .SelectMany(x => x)
+                .Distinct();
         }
 
-        /// <summary>Writes an object, serialized with json, to an encrypted file. TODO exceptions</summary>
-        /// <param name="path">Path to the file to write to.</param>
-        /// <param name="value">Value to write to the file as json</param>
-        /// <param name="deserializer">
-        ///     Serializer to serialize the object. If this parameter is null, the property value is used.
-        /// </param>
-        /// <param name="cryptoTransform">
-        ///     Transformer that is use to encrypt the data. If this parameter is null, the property
-        ///     value is used.
-        /// </param>
-        public async Task WriteEncryptedAsync<T>(T value, string path = null, ISerializer serializer = null, ICryptoTransform cryptoTransform = null)
-        {
-            if (serializer == null)
-                serializer = Serializer;
+        protected void Log(object o, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
+            => _logger?.LogAsync(GetType().Name, o, eventType, tag);
 
-            path = GetPath<T>(serializer.FileExtension, path);
-
-            using var fileStream = File.Open(path, FileMode.Create);
-            using var cryptoStream = new CryptoStream(fileStream, cryptoTransform, CryptoStreamMode.Write);
-            using var streamWriter = new StreamWriter(cryptoStream);
-
-            await serializer.SerializeAsync(value, streamWriter);
-        }
-
-        #endregion write
-
-        #endregion METHODS
+        protected void Log<T>(string title, T payload, TraceEventType eventType = TraceEventType.Verbose, [CallerMemberName] string tag = null)
+            => _logger.LogAsync(eventType, GetType().Name, tag, title, new object[] { payload });
     }
 }

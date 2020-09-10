@@ -3,30 +3,27 @@ using System.Collections.Generic;
 
 namespace WSharp.Dialogs.Options
 {
-    public struct OpenFileDialogOptions : IOpenFileDialogOptions
+    public struct SaveFileDialogOptions : ISaveFileDialogOptions
     {
-        public OpenFileDialogOptions(
-            IList<FileFilter> filter,
-            bool addAllFilesFilterOption,
-            string initialDirectory,
-            Type valueType = null,
-            bool multiSelect = false)
+        public SaveFileDialogOptions(
+            IList<FileFilter> filter, Type valueType, string originalFilePath,
+            bool addAllFilesFilterOption = default, string initialDirectory = default)
         {
             Filter = filter;
             AddAllFilesFilterOption = addAllFilesFilterOption;
+            OriginalFilePath = originalFilePath;
             InitialDirectory = initialDirectory;
             ValueType = valueType;
-            MultiSelect = multiSelect;
         }
 
         public IList<FileFilter> Filter { get; }
 
         public bool AddAllFilesFilterOption { get; }
 
+        public string OriginalFilePath { get; }
+
         public string InitialDirectory { get; }
 
         public Type ValueType { get; }
-
-        public bool MultiSelect { get; }
     }
 }
