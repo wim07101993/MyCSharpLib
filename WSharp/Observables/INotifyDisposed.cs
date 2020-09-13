@@ -1,4 +1,4 @@
-﻿namespace WSharp
+﻿namespace WSharp.Observables
 {
     /// <summary>Notifier that an object has been disposed.</summary>
     public interface INotifyDisposed

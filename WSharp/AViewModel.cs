@@ -1,29 +1,21 @@
 ﻿using System.ComponentModel;
 
-using Prism.Events;
-using Prism.Mvvm;
-
 using WSharp.Logging.Loggers;
+using WSharp.Observables;
 
 namespace WSharp
 {
-    public abstract class AViewModel : BindableBase, IViewModel
+    public abstract class AViewModel : ObservableObject, IViewModel
     {
         protected AViewModel()
         {
-            EventAggregator = new EventAggregator();
             Logger = new MemoryLogger();
         }
 
-        protected AViewModel(IEventAggregator eventAggregator, ILogger logger)
+        protected AViewModel(ILogger logger)
         {
-            EventAggregator = eventAggregator;
             Logger = logger;
         }
-
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public virtual IEventAggregator EventAggregator { get; }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
